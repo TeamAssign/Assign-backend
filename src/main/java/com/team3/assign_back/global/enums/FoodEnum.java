@@ -19,4 +19,14 @@ public class FoodEnum {
 
         private final String koreanName;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public enum FoodType{
+        SOLO("혼밥"),
+        GROUP("그룹"),
+        COMPANYDINNER("회식");
+
+        private final String koreanName;
+    }
 }

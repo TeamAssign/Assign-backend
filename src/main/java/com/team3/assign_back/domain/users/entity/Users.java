@@ -1,9 +1,15 @@
 package com.team3.assign_back.domain.users.entity;
 
+import com.team3.assign_back.domain.review.entity.UsersReview;
+import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -41,4 +47,11 @@ public class Users extends BaseEntity {
 
     @Column(nullable = false, length = 2000)
     private String profileImgUrl;
+
+    @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
+
+    @OneToMany
+    private List<UsersReview> usersReviews = new ArrayList<>();
 }
