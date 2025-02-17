@@ -34,12 +34,12 @@ public class Food extends BaseEntity {
     @Column(nullable = false, length = 400)
     private String description;
 
-    @Column(nullable = false, precision = 3, scale = 2)
+    @Column(nullable = false)
     @Min(1)
     @Max(5)
     private Float spicy;
 
-    @Column(nullable = false, precision = 3, scale = 2)
+    @Column(nullable = false)
     @Min(1)
     @Max(5)
     private Float salty;
