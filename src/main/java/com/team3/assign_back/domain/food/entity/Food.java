@@ -31,7 +31,7 @@ public class Food extends BaseEntity {
     @Column(nullable = false)
     private Integer price;
 
-    @Column(nullable = false, length = 4000)
+    @Column(nullable = false, length = 400)
     private String description;
 
     @Column(nullable = false, precision = 3, scale = 2)
