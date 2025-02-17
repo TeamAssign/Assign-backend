@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.users.entity;
 
+import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -41,4 +42,8 @@ public class Users extends BaseEntity {
 
     @Column(nullable = false, length = 2000)
     private String profileImgUrl;
+
+    @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
 }
