@@ -1,10 +1,15 @@
 package com.team3.assign_back.domain.users.entity;
 
+import com.team3.assign_back.domain.review.entity.UsersReview;
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -34,10 +39,10 @@ public class Users extends BaseEntity {
     @Min(5)
     private Integer sweet;
 
-    @Column(nullable = true, length = 255)
+    @Column(nullable = true)
     private String pros; // 호 데이터
 
-    @Column(nullable = true, length = 255)
+    @Column(nullable = true)
     private String cons; // 불 데이터
 
     @Column(nullable = false, length = 2000)
@@ -46,4 +51,7 @@ public class Users extends BaseEntity {
     @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
+
+    @OneToMany(mappedBy = "user" )
+    private List<UsersReview> usersReviews = new ArrayList<>();
 }
