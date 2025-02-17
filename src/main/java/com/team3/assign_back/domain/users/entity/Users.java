@@ -52,6 +52,6 @@ public class Users extends BaseEntity {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    @OneToMany
+    @OneToMany(mappedBy = "review" )
     private List<UsersReview> usersReviews = new ArrayList<>();
 }

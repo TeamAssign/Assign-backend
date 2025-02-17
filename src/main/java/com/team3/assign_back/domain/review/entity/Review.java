@@ -7,9 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "review")
 @Getter
@@ -21,13 +18,5 @@ public class Review extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 후기 id
 
-    @OneToMany
-    @Builder.Default
-    private List<UsersReview> usersReviews = new ArrayList<>();
 
-    @OneToOne
-    private DirectReview directReviews;
-
-    @OneToOne
-    private RecommendationReview recommendationReviews;
 }
