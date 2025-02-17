@@ -44,7 +44,7 @@ public class Food extends BaseEntity {
     @Max(5)
     private Float salty;
 
-    @Column(nullable = false, precision = 3, scale = 2)
+    @Column(nullable = false)
     @Min(1)
     @Max(5)
     private Float sweet;
