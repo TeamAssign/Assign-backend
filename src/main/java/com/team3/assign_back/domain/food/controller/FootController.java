@@ -27,11 +27,4 @@ public class FootController {
         return ResponseEntity.status(200).body(call);
 
     }
-
-    @GetMapping("/test2")
-    public ResponseEntity<Object> test2(){
-
-        return ResponseEntity.status(200).body("농담 좀 해봐");
-    }
-
 }
