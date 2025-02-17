@@ -4,6 +4,7 @@ import com.team3.assign_back.domain.review.entity.UsersReview;
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
@@ -26,17 +27,17 @@ public class Users extends BaseEntity {
 
     @Column(nullable = false)
     @Min(1)
-    @Min(5)
+    @Max(5)
     private Integer spicy;
 
     @Column(nullable = false)
     @Min(1)
-    @Min(5)
+    @Max(5)
     private Integer salty;
 
     @Column(nullable = false)
     @Min(1)
-    @Min(5)
+    @Max(5)
     private Integer sweet;
 
     @Column(nullable = true)
