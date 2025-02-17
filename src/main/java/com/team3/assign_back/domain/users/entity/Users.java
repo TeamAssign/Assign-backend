@@ -39,10 +39,10 @@ public class Users extends BaseEntity {
     @Min(5)
     private Integer sweet;
 
-    @Column(nullable = true, length = 255)
+    @Column(nullable = true)
     private String pros; // 호 데이터
 
-    @Column(nullable = true, length = 255)
+    @Column(nullable = true)
     private String cons; // 불 데이터
 
     @Column(nullable = false, length = 2000)
@@ -52,6 +52,6 @@ public class Users extends BaseEntity {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    @OneToMany(mappedBy = "review" )
+    @OneToMany(mappedBy = "user" )
     private List<UsersReview> usersReviews = new ArrayList<>();
 }
