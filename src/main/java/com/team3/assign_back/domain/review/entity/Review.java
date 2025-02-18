@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.review.entity;
 
+import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,5 +19,14 @@ public class Review extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 후기 id
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users users; // 리뷰 작성자 (FK)
+
+    @OneToOne(mappedBy = "review")
+    private DirectReview directReview;
+
+    @OneToOne(mappedBy = "review")
+    private RecommendationReview recommendationReview;
 
 }
