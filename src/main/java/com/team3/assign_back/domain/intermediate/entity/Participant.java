@@ -25,6 +25,6 @@ public class Participant extends BaseEntity {
     private Review review;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "users_id", nullable = false)
+    private Users users;
 }

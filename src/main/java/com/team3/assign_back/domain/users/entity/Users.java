@@ -40,10 +40,10 @@ public class Users extends BaseEntity {
     private Team team;
 
     @Builder.Default
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "users")
     private Set<UserTastePreference> userTastePreferences = new HashSet<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "users")
     private List<Participant> participants = new ArrayList<>();
 }

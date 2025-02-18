@@ -22,7 +22,7 @@ public class UserTastePreference extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private Users users;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tastePreferenceId")
