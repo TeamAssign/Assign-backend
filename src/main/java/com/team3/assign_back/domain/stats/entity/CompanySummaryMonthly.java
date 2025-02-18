@@ -20,17 +20,12 @@ public class CompanySummaryMonthly {
     private int year;
     private int month; // 몇월 통계인지
 
-    private CompanySummaryWeekly.Statistics statistics;
+    private Statistics statistics;
 
     @Data
-    public static class Statistics{
+    public static class Statistics {
         private int totalCount; // 총 음식 먹은 수
         private Map<String, Integer> categories; // 카테고리별 먹은 수
-        private CompanySummaryWeekly.MostEatenFood mostEatenFood;  // 가장 많이 먹은 음식
-    }
-    @Data
-    public static class MostEatenFood{
-        private String name; // 메뉴명
-        private int count; // 먹은 횟수
     }
 }
+

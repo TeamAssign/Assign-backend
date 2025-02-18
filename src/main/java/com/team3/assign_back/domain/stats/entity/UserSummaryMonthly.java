@@ -21,21 +21,14 @@ public class UserSummaryMonthly {
     private String userId;  // 팀 단위 집계 시 사용 (필요 없으면 null)
 
     private int year;
-    private int month;  // 해당 주차
+    private int month;  // 해당월
 
-    private TeamSummaryWeekly.Statistics statistics;
+    private Statistics statistics;
 
     @Data
     public static class Statistics {
         private int totalCount;  // 총 음식 소비 횟수
         private Map<String, Integer> categories;  // 음식 카테고리별 소비 횟수
-        private Map<String, Integer> menu; // 메뉴별 소비 홧수
-        private TeamSummaryWeekly.MostEatenFood mostEatenFood;  // 가장 많이 먹은 음식
-    }
-
-    @Data
-    public static class MostEatenFood {
-        private String name;  // 음식 이름
-        private int count;    // 먹은 횟수
     }
 }
+

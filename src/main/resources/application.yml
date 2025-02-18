@@ -1,7 +1,8 @@
 spring:
   application:
     name: assign-back
-
+  config:
+    import: "optional:classpath:.env[.properties],optional:file:./.env"
   okta:
     oauth2:
       issuer: https://dev-bdlzsc6hhucdmhb1.us.auth0.com/
@@ -20,15 +21,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
   data:
     mongodb:
-      host: mongodb
-      port: ${MONGODB_PORT}
-      database: ${MONGODB_DATABASE_NAME}
-      username: ${MONGODB_ROOT_NAME}
-      password: ${MONGODB_ROOT_PASSWORD}
+      uri: mongodb+srv://moon:moon@mycluster.wpc83.mongodb.net/?retryWrites=true&w=majority&appName=myCluster
+      database: assign
       auto-index-creation: true
 

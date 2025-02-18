@@ -22,12 +22,12 @@ public class Review extends BaseEntity {
     private Long id; // 후기 id
 
     @OneToMany
-    private List<Users_Review> usersReviews = new ArrayList<>();
+    private List<UsersReview> usersReviews = new ArrayList<>();
 
     @OneToMany
     private List<DirectReview> directReviews = new ArrayList<>();
 
     @OneToMany
-    private List<Recommendation_Review> recommendationReviews = new ArrayList<>();
+    private List<RecommendationReview> recommendationReviews = new ArrayList<>();
 
 }
