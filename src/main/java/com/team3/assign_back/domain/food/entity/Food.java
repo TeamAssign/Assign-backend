@@ -3,8 +3,6 @@ package com.team3.assign_back.domain.food.entity;
 import com.team3.assign_back.global.common.BaseEntity;
 import com.team3.assign_back.global.enums.FoodEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,6 +34,6 @@ public class Food extends BaseEntity {
 
 
     @OneToOne(mappedBy = "food", fetch = FetchType.LAZY)
-    private FoodMetrics foodMetrics;
+    private TasteMetrics tasteMetrics;
 
 }

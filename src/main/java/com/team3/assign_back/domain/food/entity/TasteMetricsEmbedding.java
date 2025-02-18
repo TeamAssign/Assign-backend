@@ -2,8 +2,6 @@ package com.team3.assign_back.domain.food.entity;
 
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,16 +12,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "food_metrics_embedding")
-public class FoodMetricsEmbedding extends BaseEntity {
+@Table(name = "taste_metrics_embedding")
+public class TasteMetricsEmbedding extends BaseEntity {
 
     @Id
-    private Long foodMetricsId;
+    private Long tasteMetricsId;
 
     @OneToOne(optional = false)
     @MapsId
-    @JoinColumn(name = "food_metrics_id")
-    private FoodMetrics foodMetrics;
+    @JoinColumn(name = "taste_metrics_id")
+    private TasteMetrics tasteMetrics;
 
     @Column(name = "text_embedding", columnDefinition = "vector(512)")
     private float[] textEmbedding;

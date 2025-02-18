@@ -1,7 +1,6 @@
 package com.team3.assign_back.domain.food.entity;
 
 import com.team3.assign_back.global.common.BaseEntity;
-import com.team3.assign_back.global.enums.FoodEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -16,8 +15,8 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "food_metrics")
-public class FoodMetrics extends BaseEntity {
+@Table(name = "taste_metrics")
+public class TasteMetrics extends BaseEntity {
 
     @Id
     private Long foodId;
@@ -48,7 +47,7 @@ public class FoodMetrics extends BaseEntity {
     @JoinColumn(name = "food_id")
     private Food food;
 
-    @OneToOne(mappedBy = "foodMetrics", fetch = FetchType.LAZY)
-    private FoodMetricsEmbedding embedding;
+    @OneToOne(mappedBy = "tasteMetrics", fetch = FetchType.LAZY)
+    private TasteMetricsEmbedding tasteMetricsEmbedding;
 
 }
