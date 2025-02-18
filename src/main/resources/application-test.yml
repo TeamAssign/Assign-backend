@@ -29,4 +29,4 @@ spring:
 
 okta:
   oauth2:
-    issuer: https://dev-bdlzsc6hhucdmhb1.us.auth0.com/
+    issuer: https://dev-aqq0w41zxvftci4m.jp.auth0.com/
