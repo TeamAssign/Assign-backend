@@ -3,12 +3,13 @@ package com.team3.assign_back.domain.food.entity;
 import com.team3.assign_back.global.common.BaseEntity;
 import com.team3.assign_back.global.enums.FoodEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -25,19 +26,22 @@ public class FoodMetrics extends BaseEntity {
     private String description;
 
     @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Float spicy;
+    @DecimalMin("1.0")
+    @DecimalMax("5.0")
+    @Digits(integer = 1, fraction = 2)
+    private BigDecimal spicy;
 
     @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Float salty;
+    @DecimalMin("1.0")
+    @DecimalMax("5.0")
+    @Digits(integer = 1, fraction = 2)
+    private BigDecimal salty;
 
     @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Float sweet;
+    @DecimalMin("1.0")
+    @DecimalMax("5.0")
+    @Digits(integer = 1, fraction = 2)
+    private BigDecimal sweet;
 
     @OneToOne(optional = false)
     @MapsId
