@@ -16,7 +16,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SecurityConfig {
-    @Value("${spring.okta.oauth2.issuer}")
+    @Value("${okta.oauth2.issuer}")
     private String issuerUri;
 
     @Bean

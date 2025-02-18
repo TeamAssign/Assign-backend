@@ -20,5 +20,6 @@ public class TeamSummaryService {
                 .year(year)
                 .month(month)
                 .build();
+
     }
 }
