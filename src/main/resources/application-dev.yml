@@ -20,12 +20,15 @@ spring:
 
 
 
-  okta:
-    oauth2:
-      issuer: https://dev-aqq0w41zxvftci4m.jp.auth0.com/
-      client-id: ${AUTH0_CLIENT_ID}
-      client-secret: ${AUTH0_CLIENT_SECRET}
-
   ai:
     openai:
       api-key: ${OPEN_AI_API_KEY}
+
+  okta:
+    oauth2:
+      client-id: ${AUTH0_CLIENT_ID}
+      client-secret: ${AUTH0_CLIENT_SECRET}
+okta:
+  oauth2:
+    issuer: https://dev-aqq0w41zxvftci4m.jp.auth0.com/
+
