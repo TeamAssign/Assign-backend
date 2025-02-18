@@ -31,24 +31,11 @@ public class Food extends BaseEntity {
     @Column(nullable = false)
     private Integer price;
 
-    @Column(nullable = false, length = 400)
-    private String description;
-
-    @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Float spicy;
-
-    @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Float salty;
-
-    @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Float sweet;
-
     @Column(nullable = true, length = 2000)
     private String imgUrl;
+
+
+    @OneToOne(mappedBy = "food", fetch = FetchType.LAZY)
+    private FoodMetrics foodMetrics;
+
 }
