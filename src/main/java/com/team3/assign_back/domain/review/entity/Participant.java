@@ -19,9 +19,6 @@ public class Participant extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 사용자 후기 id
 
-    @Column(nullable = false)
-    private Boolean isReviewer; // 작성자
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Users users; // 사용자와 연결
