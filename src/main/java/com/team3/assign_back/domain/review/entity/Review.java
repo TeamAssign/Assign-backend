@@ -29,4 +29,5 @@ public class Review extends BaseEntity {
 
     @OneToMany
     private List<Recommendation_Review> recommendationReviews = new ArrayList<>();
+
 }

@@ -1,8 +1,6 @@
 package com.team3.assign_back.domain.review.entity;
 
 import com.team3.assign_back.global.common.BaseEntity;
-import com.team3.assign_back.global.enums.FoodEnum;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,20 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "direct_review")
+@Table(name = "recommendation_review")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DirectReview extends BaseEntity {
+public class RecommendationReview extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 직접작성후기 id
-
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private FoodEnum.FoodType type;
+    private Long id; // 추천기반후기 id
 
     @Column(nullable = false)
     private String comment; // 내용
@@ -37,4 +30,5 @@ public class DirectReview extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
+
 }
