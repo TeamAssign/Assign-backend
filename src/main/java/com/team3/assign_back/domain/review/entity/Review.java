@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.review.entity;
 
+import com.team3.assign_back.domain.intermediate.entity.Participant;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -7,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "review")
@@ -17,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 후기 id
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -29,4 +33,7 @@ public class Review extends BaseEntity {
     @OneToOne(mappedBy = "review")
     private RecommendationReview recommendationReview;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "review")
+    private List<Participant> participants = new ArrayList<>();
 }
