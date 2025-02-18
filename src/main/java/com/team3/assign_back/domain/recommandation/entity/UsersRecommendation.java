@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.review.entity;
+package com.team3.assign_back.domain.recommandation.entity;
 
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
@@ -9,25 +9,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users_review")
+@Table(name = "users_recommendation")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersReview extends BaseEntity {
+public class UsersRecommendation extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 사용자 후기 id
-
-    @Column(nullable = false)
-    private Boolean isReviewer; // 작성자
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user; // 사용자와 연결7
+    private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = false)
-    private Review review; // 리뷰와 연결
-
+    @JoinColumn(name="recommendation_id", nullable = false)
+    private Recommendation recommendation;
 }

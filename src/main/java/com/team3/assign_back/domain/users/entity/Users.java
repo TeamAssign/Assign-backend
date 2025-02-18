@@ -1,8 +1,6 @@
 package com.team3.assign_back.domain.users.entity;
 
-
-import com.team3.assign_back.domain.review.entity.UsersReview;
-
+import com.team3.assign_back.domain.review.entity.Participant;
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -54,7 +52,6 @@ public class Users extends BaseEntity {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    @OneToMany(mappedBy = "user" )
-    private List<UsersReview> usersReviews = new ArrayList<>();
-
+    @OneToMany(mappedBy = "users" )
+    private List<Participant> usersReviews = new ArrayList<>();
 }

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TeamSummaryRepository extends MongoRepository<TeamSummaryMonthly,String> {
-    TeamSummaryMonthly findbyYearAndMonth(int year, int month);
+    TeamSummaryMonthly findByYearAndMonth(int year, int month);
 }

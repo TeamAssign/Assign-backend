@@ -34,7 +34,7 @@ public class DirectReview extends BaseEntity {
     @Column(nullable = false, length = 2000)
     private String imgUrl; // 후기 이미지 URL
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 }

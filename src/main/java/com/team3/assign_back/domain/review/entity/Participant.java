@@ -9,24 +9,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "review")
+@Table(name = "participant")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Review extends BaseEntity {
+public class Participant extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 후기 id
+    private Long id; // 사용자 후기 id
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Users users; // 리뷰 작성자 (FK)
+    private Users users; // 사용자와 연결
 
-    @OneToOne(mappedBy = "review")
-    private DirectReview directReview;
-
-    @OneToOne(mappedBy = "review")
-    private RecommendationReview recommendationReview;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id", nullable = false)
+    private Review review; // 리뷰와 연결
 
 }
