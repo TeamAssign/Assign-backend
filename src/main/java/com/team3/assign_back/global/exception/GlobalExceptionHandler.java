@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
         return ResponseEntity
-                .status(ErrorCode.CUSTOM_ERROR.getStatus())
+                .status(ex.getErrorCode().getStatus())
                 .body(ErrorResponse.of(ex.getErrorCode()));
     }
 
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         return ResponseEntity
                 .status(ErrorCode.VALIDATION_ERROR.getStatus())
-                .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
+                .body(new ErrorResponse(ex.getClass().getSimpleName(), ex.getMessage()));
     }
 
     /**
@@ -41,8 +41,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
-
-
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
