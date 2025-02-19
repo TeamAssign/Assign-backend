@@ -20,42 +20,32 @@ public class GlobalExceptionHandler {
      * CustomException 예외 처리
      */
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Map<String, String>> handleCustomException(CustomException ex) {
-        Map<String, String> errorDetails = new HashMap<>();
-        errorDetails.put("error", ex.getErrorCode().name());
-        errorDetails.put("message", ex.getErrorCode().getMessage());
-
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errorDetails);
+                .status(ErrorCode.CUSTOM_ERROR.getStatus())
+                .body(ErrorResponse.of(ex.getErrorCode()));
     }
 
     /**
      * 유효성 검증 예외 처리
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
-        Map<String, String> errorDetails = new HashMap<>();
-        errorDetails.put("error", ErrorCode.VALIDATION_ERROR.name());
-        errorDetails.put("message", ex.getFieldError().getDefaultMessage());
-
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         return ResponseEntity
                 .status(ErrorCode.VALIDATION_ERROR.getStatus())
-                .body(errorDetails);
+                .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 
     /**
      * 예상하지 못한 예외 처리
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGlobalException(Exception ex) {
-        Map<String, String> errorDetails = new HashMap<>();
-        errorDetails.put("error", ErrorCode.INTERNAL_SERVER_ERROR.name());
-        errorDetails.put("message", ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+
 
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(errorDetails);
+                .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }
 
