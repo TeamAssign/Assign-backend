@@ -27,6 +27,7 @@ public class UserService {
     private final TastePreferenceRepository tastePreferenceRepository;
     private final UserTastePreferenceRepository userTastePreferenceRepository;
 
+    @Transactional
     public UserRegisterResponseDto registerUser(String vendorId, UserRegisterRequestDto requestDto) {
         validateUserNotExist(vendorId);
 
