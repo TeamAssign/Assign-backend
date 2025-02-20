@@ -1,31 +1,33 @@
 package com.team3.assign_back.domain.food.controller;
 
 
+import com.team3.assign_back.domain.food.dto.FoodAnalysisRequestDto;
+import com.team3.assign_back.domain.food.service.FoodService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/food")
 @RequiredArgsConstructor
-public class FootController {
+public class FoodController {
 
-    private final OpenAiChatModel chatModel;
+    private final FoodService foodService;
 
-    @GetMapping("/test")
-    public ResponseEntity<Object> test(@RequestParam("query") String query){
+    @PostMapping
+    public ResponseEntity<Void> createFoods(@RequestBody FoodAnalysisRequestDto foodAnalysisRequestDto){
+        foodService.createFoods(foodAnalysisRequestDto);
 
-        String call = null;
-        try{
-            call = chatModel.call(query);
-        }catch (Exception e){
-            return ResponseEntity.status(400).body(e.getMessage());
-        }
-        return ResponseEntity.status(200).body(call);
+        return ResponseEntity.status(200).build();
+
+    }
+
+
+    @PostMapping("/taste")
+    public ResponseEntity<Void> createTasteMetrics(){
+        foodService.createTasteMetrics();
+
+        return ResponseEntity.status(200).build();
 
     }
 }
