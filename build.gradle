@@ -33,9 +33,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
 
-    // Spring Security
-    //implementation 'org.springframework.boot:spring-boot-starter-security'
-
     // .env
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
@@ -48,6 +45,13 @@ dependencies {
 
     // jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    //querydsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    annotationProcessor "org.hibernate:hibernate-jpamodelgen:6.2.0.Final"
 
     // postgre
     runtimeOnly 'org.postgresql:postgresql'
