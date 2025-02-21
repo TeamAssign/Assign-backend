@@ -21,7 +21,11 @@ import java.util.Set;
 @Table(name = "users")
 public class Users extends BaseEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String vendorId; // Auth0 ID(sub)
 
     @Column(nullable = false)
     private String name;
