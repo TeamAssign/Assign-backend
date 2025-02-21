@@ -12,23 +12,11 @@ import java.util.Collections;
 @Getter
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
-    private final User auth0User;
+    private final String vendorId;
 
     @Override
     public String getUsername() {
-        return auth0User.getId();
-    }
-
-    public String getEmail() {
-        return auth0User.getEmail();
-    }
-
-    public String getName() {
-        return auth0User.getName();
-    }
-
-    public String getPicture() {
-        return auth0User.getPicture();
+        return vendorId;
     }
 
     @Override
