@@ -47,7 +47,4 @@ public class TasteMetrics extends BaseEntity {
     @JoinColumn(name = "food_id")
     private Food food;
 
-    @OneToOne(mappedBy = "tasteMetrics", fetch = FetchType.LAZY)
-    private TasteMetricsEmbedding tasteMetricsEmbedding;
-
 }
