@@ -26,14 +26,11 @@ public class Food extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FoodEnum.FoodCategory category;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer price;
 
     @Column(nullable = true, length = 2000)
     private String imgUrl;
 
-
-    @OneToOne(mappedBy = "food", fetch = FetchType.LAZY)
-    private TasteMetrics tasteMetrics;
 
 }

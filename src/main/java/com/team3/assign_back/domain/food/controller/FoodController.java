@@ -30,4 +30,13 @@ public class FoodController {
         return ResponseEntity.status(200).build();
 
     }
+
+    @PostMapping("/embedding")
+    public ResponseEntity<Void> createTasteMetricsEmbedding(){
+        foodService.createTasteMetricsEmbedding();
+
+        return ResponseEntity.status(200).build();
+
+    }
+
 }
