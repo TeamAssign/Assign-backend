@@ -1,6 +1,5 @@
 package com.team3.assign_back.domain.users.dto;
 
-import com.auth0.json.mgmt.users.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
