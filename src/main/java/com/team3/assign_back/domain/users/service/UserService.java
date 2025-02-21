@@ -8,7 +8,6 @@ import com.team3.assign_back.domain.tastePreference.repository.UserTastePreferen
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
-import com.team3.assign_back.domain.users.dto.UserRegisterResponseDto;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.exception.ErrorCode;
@@ -28,7 +27,7 @@ public class UserService {
     private final UserTastePreferenceRepository userTastePreferenceRepository;
 
     @Transactional
-    public UserRegisterResponseDto registerUser(String vendorId, UserRegisterRequestDto requestDto) {
+    public void registerUser(String vendorId, UserRegisterRequestDto requestDto) {
         validateUserNotExist(vendorId);
 
         Team team = getTeamByName(requestDto.getTeamName());
@@ -36,7 +35,7 @@ public class UserService {
         Users user = createUser(vendorId, requestDto, team);
         createUserTastePreference(user, tastePreference);
 
-        return convertToResponseDto(user, tastePreference);
+        log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
 
     private void validateUserNotExist(String vendorId) {
@@ -81,19 +80,5 @@ public class UserService {
                 .build();
 
         userTastePreferenceRepository.save(userTastePreference);
-    }
-
-    private UserRegisterResponseDto convertToResponseDto(Users user, TastePreference tastePreference) {
-        return UserRegisterResponseDto.builder()
-                .id(user.getId())
-                .userName(user.getName())
-                .teamName(user.getTeam().getName())
-                .profileImageUrl(user.getProfileImgUrl())
-                .spicy(tastePreference.getSpicy())
-                .salty(tastePreference.getSalty())
-                .sweet(tastePreference.getSweet())
-                .pros(user.getPros())
-                .cons(user.getCons())
-                .build();
     }
 }

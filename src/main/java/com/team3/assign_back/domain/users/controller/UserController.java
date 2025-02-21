@@ -2,7 +2,6 @@ package com.team3.assign_back.domain.users.controller;
 
 import com.team3.assign_back.domain.users.dto.CustomUserDetails;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
-import com.team3.assign_back.domain.users.dto.UserRegisterResponseDto;
 import com.team3.assign_back.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,13 +19,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserRegisterResponseDto> registerUser(
+    public ResponseEntity<Void> registerUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody UserRegisterRequestDto userRegisterRequestDto) {
         String vendorId = userDetails.getUsername();
-        UserRegisterResponseDto registerResponseDto = userService.registerUser(vendorId, userRegisterRequestDto);
+        userService.registerUser(vendorId, userRegisterRequestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }
