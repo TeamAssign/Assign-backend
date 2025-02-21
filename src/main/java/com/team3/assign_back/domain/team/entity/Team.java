@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.team.entity;
 
+import com.team3.assign_back.domain.intermediate.entity.TeamTastePreference;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -11,7 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "team")
@@ -27,27 +30,10 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private String name; // 팀 이름
 
-    @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Integer spicy; // 맵기 정도
-
-    @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Integer salty; // 짠맛 정도
-
-    @Column(nullable = false)
-    @Min(1)
-    @Max(5)
-    private Integer sweet; // 단맛 정도
-
-    @Column(nullable = true)
-    private String pros; // 호 데이터
-
-    @Column(nullable = true)
-    private String cons; // 불 데이터
-
     @OneToMany(mappedBy = "team")
     private List<Users> users = new ArrayList<>(); // 팀에 속한 사용자 목록
+
+    @Builder.Default
+    @OneToMany(mappedBy = "team")
+    private Set<TeamTastePreference> teamTastePreferences = new HashSet<>();
 }

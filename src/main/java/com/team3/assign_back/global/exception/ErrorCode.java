@@ -18,7 +18,8 @@ public enum ErrorCode {
     AUTH0_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Auth0 API 호출 중 오류가 발생하였습니다."),
 
     // 팀 관련 에러
-    TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다.")
+    TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
+    TASTE_PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND, "팀의 맛 선호도를 찾을 수 없습니다.")
     ;
 
     private final HttpStatus status;

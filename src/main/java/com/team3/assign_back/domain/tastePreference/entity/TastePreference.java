@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.tastePreference.entity;
 
+import com.team3.assign_back.domain.intermediate.entity.TeamTastePreference;
 import com.team3.assign_back.domain.intermediate.entity.UserTastePreference;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -42,7 +43,25 @@ public class TastePreference extends BaseEntity {
     @Digits(integer = 1, fraction = 2)
     private BigDecimal sweet;
 
+    @Column(nullable = true)
+    private String pros; // 호 데이터
+
+    @Column(nullable = true)
+    private String cons; // 불 데이터
+
     @Builder.Default
     @OneToMany(mappedBy = "tastePreference")
     private Set<UserTastePreference> userTastePreferences = new HashSet<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "tastePreference")
+    private Set<TeamTastePreference> TeamTastePreferences = new HashSet<>();
+
+    public void updateTastePreferences(TastePreference tastePreference){
+        this.spicy = tastePreference.getSpicy();
+        this.salty = tastePreference.getSalty();
+        this.sweet = tastePreference.getSweet();
+        this.pros = tastePreference.getPros();
+        this.cons = tastePreference.getCons();
+    }
 }
