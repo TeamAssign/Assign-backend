@@ -6,12 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team3.assign_back.domain.food.dto.FoodAnalysisDto;
 import com.team3.assign_back.domain.food.dto.FoodAnalysisRequestDto;
 import com.team3.assign_back.domain.food.entity.Food;
-import com.team3.assign_back.domain.food.entity.TasteMetrics;
 import com.team3.assign_back.domain.food.repository.FoodRepository;
-import com.team3.assign_back.domain.food.repository.TasteMetricsRepository;
-import groovy.util.logging.Slf4j;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -30,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 import static com.team3.assign_back.domain.food.prompt.FoodPrompt.FOOD_ANALYSIS;
 import static com.team3.assign_back.global.constant.FoodConstant.FOOD_LIST_BATCH_SIZE;
 
-@lombok.extern.slf4j.Slf4j
 @Service
 @Slf4j
 @RequiredArgsConstructor
