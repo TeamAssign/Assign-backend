@@ -23,6 +23,13 @@ spring:
   ai:
     openai:
       api-key: ${OPEN_AI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+      embedding:
+        options:
+          model: text-embedding-3-small
+          dimensions: 256
 
 okta:
   oauth2:
