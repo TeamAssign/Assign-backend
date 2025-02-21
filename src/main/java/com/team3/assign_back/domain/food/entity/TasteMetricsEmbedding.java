@@ -1,6 +1,7 @@
 package com.team3.assign_back.domain.food.entity;
 
 import com.team3.assign_back.global.common.BaseEntity;
+import com.team3.assign_back.global.common.FloatArrayToVectorConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,9 +24,13 @@ public class TasteMetricsEmbedding extends BaseEntity {
     @JoinColumn(name = "taste_metrics_id")
     private TasteMetrics tasteMetrics;
 
+
+    @Convert(converter = FloatArrayToVectorConverter.class)
     @Column(name = "text_embedding", columnDefinition = "vector(256)")
     private float[] textEmbedding;
 
+
+    @Convert(converter = FloatArrayToVectorConverter.class)
     @Column(name = "metrics_embedding", columnDefinition = "vector(3)")
     private float[] metricsEmbedding;
 
