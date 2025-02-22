@@ -1,7 +1,6 @@
 package com.team3.assign_back.domain.users.service;
 
 import com.team3.assign_back.domain.intermediate.entity.UserTastePreference;
-import com.team3.assign_back.domain.intermediate.entity.UserTastePreferenceId;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceRepository;
 import com.team3.assign_back.domain.tastePreference.repository.UserTastePreferenceRepository;
@@ -54,6 +53,8 @@ public class UserService {
                 .spicy(requestDto.getSpicy())
                 .salty(requestDto.getSalty())
                 .sweet(requestDto.getSweet())
+                .pros(requestDto.getPros())
+                .cons(requestDto.getCons())
                 .build();
 
         return tastePreferenceRepository.save(tastePreference);
@@ -64,8 +65,6 @@ public class UserService {
                 .vendorId(vendorId)
                 .name(requestDto.getName())
                 .team(team)
-                .pros(requestDto.getPros())
-                .cons(requestDto.getCons())
                 .profileImgUrl("default-profile.png")
                 .build();
 
@@ -74,7 +73,6 @@ public class UserService {
 
     private void createUserTastePreference(Users user, TastePreference tastePreference) {
         UserTastePreference userTastePreference = UserTastePreference.builder()
-                .id(new UserTastePreferenceId(user.getId(), tastePreference.getId()))
                 .users(user)
                 .tastePreference(tastePreference)
                 .build();

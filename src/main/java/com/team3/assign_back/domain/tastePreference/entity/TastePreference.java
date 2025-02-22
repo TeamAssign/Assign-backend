@@ -1,6 +1,8 @@
 package com.team3.assign_back.domain.tastePreference.entity;
 
+import com.team3.assign_back.domain.intermediate.entity.TeamTastePreference;
 import com.team3.assign_back.domain.intermediate.entity.UserTastePreference;
+import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -10,8 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -42,7 +45,25 @@ public class TastePreference extends BaseEntity {
     @Digits(integer = 1, fraction = 2)
     private BigDecimal sweet;
 
+    @Column(nullable = true)
+    private String pros; // 호 데이터
+
+    @Column(nullable = true)
+    private String cons; // 불 데이터
+
     @Builder.Default
     @OneToMany(mappedBy = "tastePreference")
-    private Set<UserTastePreference> userTastePreferences = new HashSet<>();
+    private List<UserTastePreference> userTastePreferences = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "tastePreference")
+    private List<TeamTastePreference> TeamTastePreferences = new ArrayList<>();
+
+    public void updateTastePreferences(TastePreferenceUpdateRequestDTO tastePreferenceUpdateRequestDTO){
+        this.spicy = tastePreferenceUpdateRequestDTO.getSpicy();
+        this.salty = tastePreferenceUpdateRequestDTO.getSalty();
+        this.sweet = tastePreferenceUpdateRequestDTO.getSweet();
+        this.pros = tastePreferenceUpdateRequestDTO.getPros();
+        this.cons = tastePreferenceUpdateRequestDTO.getCons();
+    }
 }
