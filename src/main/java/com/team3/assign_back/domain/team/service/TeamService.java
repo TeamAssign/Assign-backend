@@ -1,6 +1,7 @@
 package com.team3.assign_back.domain.team.service;
 
 import com.team3.assign_back.domain.intermediate.entity.TeamTastePreference;
+import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceRepository;
 import com.team3.assign_back.domain.tastePreference.repository.TeamTastePreferenceRepository;
@@ -29,7 +30,7 @@ public class TeamService {
     }
 
     @Transactional
-    public void updateTeamTastePreference(Long teamId, TastePreference updatedPreference){
+    public void updateTeamTastePreference(Long teamId, TastePreferenceUpdateRequestDTO updatedPreference){
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 

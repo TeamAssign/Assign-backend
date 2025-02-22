@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.team.controller;
 
+import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.team.dto.TeamResponseDto;
 import com.team3.assign_back.domain.team.service.TeamService;
@@ -25,7 +26,7 @@ public class TeamController {
     @PutMapping("/{teamId}/profile")
     public ResponseEntity<String> updateTeamTastePreference(
             @PathVariable Long teamId,
-            @RequestBody TastePreference updatedPreference) {
+            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
 
         teamService.updateTeamTastePreference(teamId, updatedPreference);
         return ResponseEntity.ok(("팀 맛 선호도가 성공적으로 업데이트되었습니다."));
