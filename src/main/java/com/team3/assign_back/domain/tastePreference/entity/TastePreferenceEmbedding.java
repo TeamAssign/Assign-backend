@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.food.entity;
+package com.team3.assign_back.domain.tastePreference.entity;
 
 import com.team3.assign_back.global.common.BaseEntity;
 import com.team3.assign_back.global.common.FloatArrayToVectorConverter;
@@ -13,16 +13,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "taste_metrics_embedding")
-public class TasteMetricsEmbedding extends BaseEntity {
+@Table(name = "taste_preference_embedding")
+public class TastePreferenceEmbedding extends BaseEntity {
 
     @Id
-    private Long tasteMetricsId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne(optional = false)
-    @MapsId
+    @ManyToOne(optional = false)
     @JoinColumn(name = "taste_metrics_id")
-    private TasteMetrics tasteMetrics;
+    private TastePreference tastePreference;
 
 
     @Convert(converter = FloatArrayToVectorConverter.class)
@@ -31,8 +31,8 @@ public class TasteMetricsEmbedding extends BaseEntity {
 
 
     @Convert(converter = FloatArrayToVectorConverter.class)
-    @Column(name = "metrics_embedding", columnDefinition = "vector(3)")
-    private float[] metricsEmbedding;
+    @Column(name = "preference_embedding", columnDefinition = "vector(3)")
+    private float[] preferenceEmbedding;
 
 
 }
