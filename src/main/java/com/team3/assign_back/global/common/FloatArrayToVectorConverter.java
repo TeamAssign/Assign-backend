@@ -16,7 +16,7 @@ public class FloatArrayToVectorConverter implements AttributeConverter<float[], 
     @Override
     public float[] convertToEntityAttribute(String dbData) {
         if (dbData == null) return null;
-        String[] values = dbData.substring(1, dbData.length() - 1).split(",");
+        String[] values = dbData.replaceAll("[\\[\\]]", "").split(",");
         float[] result = new float[values.length];
         for (int i = 0; i < values.length; i++) {
             result[i] = Float.parseFloat(values[i]);
