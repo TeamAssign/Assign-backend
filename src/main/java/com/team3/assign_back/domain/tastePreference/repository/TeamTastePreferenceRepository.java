@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TeamTastePreferenceRepository extends JpaRepository<UserTastePreference, Long> {
+public interface TeamTastePreferenceRepository extends JpaRepository<TeamTastePreference, Long> {
     Optional<TeamTastePreference> findByTeam(Team team);
 }
