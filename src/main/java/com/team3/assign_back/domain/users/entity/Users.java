@@ -8,9 +8,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 
 @Entity
@@ -45,7 +44,7 @@ public class Users extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "users")
-    private Set<UserTastePreference> userTastePreferences = new HashSet<>();
+    private List<UserTastePreference> userTastePreferences = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "users")

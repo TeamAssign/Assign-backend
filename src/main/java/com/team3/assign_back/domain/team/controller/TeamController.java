@@ -1,12 +1,12 @@
 package com.team3.assign_back.domain.team.controller;
 
+import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
+import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.team.dto.TeamResponseDto;
 import com.team3.assign_back.domain.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,9 +16,19 @@ import java.util.List;
 public class TeamController {
     private final TeamService teamService;
 
+
     @GetMapping
     public ResponseEntity<List<TeamResponseDto>> getAllTeams() {
         List<TeamResponseDto> teams = teamService.getAllTeams();
         return ResponseEntity.ok(teams);
+    }
+
+    @PutMapping("/{teamId}/profile")
+    public ResponseEntity<String> updateTeamTastePreference(
+            @PathVariable Long teamId,
+            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
+
+        teamService.updateTeamTastePreference(teamId, updatedPreference);
+        return ResponseEntity.ok(("팀 맛 선호도가 성공적으로 업데이트되었습니다."));
     }
 }
