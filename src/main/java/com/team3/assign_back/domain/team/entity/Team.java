@@ -4,17 +4,14 @@ import com.team3.assign_back.domain.intermediate.entity.TeamTastePreference;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 @Entity
 @Table(name = "team")
@@ -35,5 +32,5 @@ public class Team extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "team")
-    private Set<TeamTastePreference> teamTastePreferences = new HashSet<>();
+    private List<TeamTastePreference> teamTastePreferences = new ArrayList<>();
 }
