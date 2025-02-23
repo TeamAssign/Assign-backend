@@ -59,7 +59,7 @@ public class DummyController {
     }
 
     @GetMapping("/recommendations/menu")
-    public ResponseEntity<ApiResponseDto<Map<String, Object>>> recommendationsMenu(){
+    public ResponseEntity<ApiResponseDto<Map<String, Object>>> recommendationsMenu(@RequestParam("random") boolean isRandom, @RequestParam("order") Integer order){
 
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("name", "짜장면");
