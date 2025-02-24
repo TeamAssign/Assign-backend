@@ -2,6 +2,7 @@ package com.team3.assign_back.domain.team.controller;
 
 import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
+import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
 import com.team3.assign_back.domain.team.dto.TeamResponseDto;
 import com.team3.assign_back.domain.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,14 @@ public class TeamController {
         List<TeamResponseDto> teams = teamService.getAllTeams();
         return ResponseEntity.ok(teams);
     }
+
+    @GetMapping("/{temaId}/profile")
+    public ResponseEntity<TeamProfileDTO> getTeamTastePreference(
+            @PathVariable Long teamId){
+        TeamProfileDTO teamProfileDTO = teamService.getTeamTastePreference(teamId);
+        return ResponseEntity.ok(teamProfileDTO);
+    }
+
 
     @PutMapping("/{teamId}/profile")
     public ResponseEntity<String> updateTeamTastePreference(
