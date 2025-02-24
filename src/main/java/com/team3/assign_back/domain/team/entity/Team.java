@@ -27,6 +27,7 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private String name; // 팀 이름
 
+    @Builder.Default
     @OneToMany(mappedBy = "team")
     private List<Users> users = new ArrayList<>(); // 팀에 속한 사용자 목록
 
