@@ -4,6 +4,9 @@ import com.querydsl.core.Tuple;
 import com.team3.assign_back.domain.food.entity.QFood;
 
 import com.team3.assign_back.domain.review.entity.QReview;
+import com.team3.assign_back.domain.statistics.dto.CompanySummaryMonthlyDto;
+import com.team3.assign_back.domain.statistics.dto.TeamSummaryMonthlyDto;
+import com.team3.assign_back.domain.statistics.dto.UserSummaryMonthlyDto;
 import com.team3.assign_back.domain.statistics.entity.CompanySummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.TeamSummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.UserSummaryMonthly;
@@ -14,6 +17,8 @@ import com.team3.assign_back.domain.statistics.repository.UserSummaryRepository;
 import com.team3.assign_back.domain.team.entity.QTeam;
 import com.team3.assign_back.domain.users.entity.QUsers;
 
+import com.team3.assign_back.global.exception.custom.CustomException;
+import com.team3.assign_back.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -128,20 +133,22 @@ public class SummaryService {
     }
 
 
-    // 특정 유저 최신 통계 조회
-    public UserSummaryMonthly getLatestUserSummary(long userId) {
-        return userSummaryRepository.findFirstByUserIdOrderByYearDescMonthDescDayDesc(userId);
+    public UserSummaryMonthlyDto getLatestUserSummary(long userId) {
+        return UserSummaryMonthlyDto.fromEntity(userSummaryRepository.findFirstByUserIdOrderByYearDescMonthDescDayDesc(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_SUMMARY_NOT_FOUND)));
     }
 
-    // 특정 팀의 최신 통계 조회
-    public TeamSummaryMonthly getLatestTeamSummary(long teamId) {
-        return teamSummaryRepository.findFirstByTeamIdOrderByYearDescMonthDescDayDesc(teamId);
+    public TeamSummaryMonthlyDto getLatestTeamSummary(long teamId) {
+        return TeamSummaryMonthlyDto.fromEntity(teamSummaryRepository.findFirstByTeamIdOrderByYearDescMonthDescDayDesc(teamId)
+                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_SUMMARY_NOT_FOUND)));
     }
 
-    // 전사 최신 통계 조회
-    public CompanySummaryMonthly getLatestCompanySummary(){
-        return companySummaryRepository.findFirstByOrderByYearDescMonthDescDayDesc();
+    public CompanySummaryMonthlyDto getLatestCompanySummary(){
+        return CompanySummaryMonthlyDto.fromEntity(companySummaryRepository.findFirstByOrderByYearDescMonthDescDayDesc()
+                .orElseThrow(() -> new CustomException(ErrorCode.COMPANY_SUMMARY_NOT_FOUND)));
     }
+
+
 
     private <T> T aggregateStatisticsForTuples(List<Tuple> tuples, Function<Tuple, String> categoryExtractor, Function<Tuple, Integer> countExtractor, BiFunction<Integer, Map<String, Integer>, T> statisticsConstructor) {
         Map<String, Integer> categories = tuples.stream()
