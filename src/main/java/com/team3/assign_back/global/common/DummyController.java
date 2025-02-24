@@ -117,6 +117,19 @@ public class DummyController {
 
         dataMap.put("pageInfo", pageInfoMap);
 
+        List<Map<String, Object>> participantList = new ArrayList<>();
+        for(int i = 0; i < 3; i ++){
+            Map<String, Object> participantMap = new HashMap<>();
+            participantMap.put("id", i + 1);
+            participantMap.put("name", "김말단" + (i + 1));
+            participantMap.put("team", "개발" + (i + 1) + "팀");
+            participantMap.put("profileImage", "https://search2.kakaocdn.net/argon/130x130_85_c/36hQpoTrVZp");
+
+            participantList.add(participantMap);
+
+        }
+
+
         Map<String, Object> contentMap = new HashMap<>();
         contentMap.put("recommendationId", 11L);
         contentMap.put("type", FoodEnum.FoodType.GROUP);
@@ -124,7 +137,7 @@ public class DummyController {
         contentMap.put("accuracy", 78.3);
         contentMap.put("imageUrl", "https://i.ibb.co/DfzGjPSr/butterfly-fairies-3840x2160-17273.jpg");
         contentMap.put("isReviewed", false);
-        contentMap.put("participants", List.of(1, 2, 3));
+        contentMap.put("participants", participantList);
 
         List<Map<String, Object>> contents = new ArrayList<>();
         for(int i = 0; i < totalElements; i++){
@@ -210,7 +223,7 @@ public class DummyController {
         contentMap.put("comment", "노맛");
         contentMap.put("imageUrl", "https://i.ibb.co/DfzGjPSr/butterfly-fairies-3840x2160-17273.jpg");
         contentMap.put("star", 1);
-        contentMap.put("participants", List.of(1));
+        contentMap.put("participants", null);
 
         List<Map<String, Object>> contents = new ArrayList<>();
         for(int i = 0; i < totalElements; i++){
@@ -291,6 +304,19 @@ public class DummyController {
         pageInfoMap.put("size", size);
 
         dataMap.put("pageInfo", pageInfoMap);
+
+        List<Map<String, Object>> participantList = new ArrayList<>();
+        for(int i = 0; i < 7; i ++){
+            Map<String, Object> participantMap = new HashMap<>();
+            participantMap.put("id", i + 1);
+            participantMap.put("name", "김말단" + (i + 1));
+            participantMap.put("team", "개발1팀");
+            participantMap.put("profileImage", "https://search2.kakaocdn.net/argon/130x130_85_c/36hQpoTrVZp");
+
+            participantList.add(participantMap);
+
+        }
+
 
         Map<String, Object> contentMap = new HashMap<>();
         contentMap.put("recommendationId", 11L);
