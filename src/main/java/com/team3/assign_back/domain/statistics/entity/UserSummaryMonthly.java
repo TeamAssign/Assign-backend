@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.stats.entity;
+package com.team3.assign_back.domain.statistics.entity;
 
 import jakarta.persistence.Id;
 import lombok.*;
@@ -8,24 +8,30 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Map;
 
-@Document(collection = "company_summary_monthly")
-@CompoundIndexes({@CompoundIndex(name = "year_month_idx", def = "{'year': 1, 'month': 1}")})
+
+@Document(collection = "user_summary_monthly")
+@CompoundIndexes({@CompoundIndex(name = "year_month_day_idx", def = "{'year': 1, 'month': 1, 'day' : 1}")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
-public class CompanySummaryMonthly {
+public class UserSummaryMonthly {
     @Id
     private String id;
+    private Long userId;
+
     private int year;
-    private int month; // 몇월 통계인지
+    private int month;
+    private int day;
 
     private Statistics statistics;
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Statistics {
-        private int totalCount; // 총 음식 먹은 수
-        private Map<String, Integer> categories; // 카테고리별 먹은 수
+        private int totalCount;
+        private Map<String, Integer> categories;
     }
 }
 
