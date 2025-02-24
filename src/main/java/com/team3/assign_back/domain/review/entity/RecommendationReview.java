@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.review.entity;
 
+import com.team3.assign_back.domain.recommandation.entity.Recommendation;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,5 +31,9 @@ public class RecommendationReview extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recommendation_id", nullable = false)
+    private Recommendation recommendation;
 
 }
