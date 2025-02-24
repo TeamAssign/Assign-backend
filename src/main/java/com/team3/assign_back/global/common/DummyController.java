@@ -239,29 +239,29 @@ public class DummyController {
     }
 
 
-
-    @GetMapping("/teams/{teamId}/profile")
-    public ResponseEntity<ApiResponseDto<Map<String, Object>>> teamsProfile(@PathVariable("teamId") Long teamId){
-
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("team", "개발1팀");
-        dataMap.put("spicy", 3.2);
-        dataMap.put("sweet", 1.5);
-        dataMap.put("salty", 2.4);
-        dataMap.put("pros", "저는 짜장면 좋음");
-        dataMap.put("cons", "짬뽕 싫음");
-
-        return ApiResponseDto.from(HttpStatus.OK, "팀의 정보입니다.", dataMap);
-
-    }
-
-    @PutMapping("/teams/{teamId}/profile")
-    public ResponseEntity<ApiResponseDto<Void>> teamsProfilePut(@PathVariable("teamId") Long teamId){
-
-
-        return ApiResponseDto.from(HttpStatus.OK, "팀의 정보를 수정하셨습니다.", null);
-
-    }
+//
+//    @GetMapping("/teams/{teamId}/profile")
+//    public ResponseEntity<ApiResponseDto<Map<String, Object>>> teamsProfile(@PathVariable("teamId") Long teamId){
+//
+//        Map<String, Object> dataMap = new HashMap<>();
+//        dataMap.put("team", "개발1팀");
+//        dataMap.put("spicy", 3.2);
+//        dataMap.put("sweet", 1.5);
+//        dataMap.put("salty", 2.4);
+//        dataMap.put("pros", "저는 짜장면 좋음");
+//        dataMap.put("cons", "짬뽕 싫음");
+//
+//        return ApiResponseDto.from(HttpStatus.OK, "팀의 정보입니다.", dataMap);
+//
+//    }
+//
+//    @PutMapping("/teams/{teamId}/profile")
+//    public ResponseEntity<ApiResponseDto<Void>> teamsProfilePut(@PathVariable("teamId") Long teamId){
+//
+//
+//        return ApiResponseDto.from(HttpStatus.OK, "팀의 정보를 수정하셨습니다.", null);
+//
+//    }
 
 
     @GetMapping("/teams/{teamId}/stats")
@@ -341,20 +341,20 @@ public class DummyController {
 
     }
 
-    @GetMapping("/team")
-    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> teams(){
-
-        List<Map<String, Object>> dataList = new ArrayList<>();
-        for(int i = 0; i < 15; i ++){
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("teamId", i + 1);
-            dataMap.put("teamName", "개발" + (i + 1) + "팀");
-            dataList.add(dataMap);
-        }
-
-        return ApiResponseDto.from(HttpStatus.OK, "팀 목록을 보내드립니다.", dataList);
-
-    }
+//    @GetMapping("/team")
+//    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> teams(){
+//
+//        List<Map<String, Object>> dataList = new ArrayList<>();
+//        for(int i = 0; i < 15; i ++){
+//            Map<String, Object> dataMap = new HashMap<>();
+//            dataMap.put("teamId", i + 1);
+//            dataMap.put("teamName", "개발" + (i + 1) + "팀");
+//            dataList.add(dataMap);
+//        }
+//
+//        return ApiResponseDto.from(HttpStatus.OK, "팀 목록을 보내드립니다.", dataList);
+//
+//    }
 
 
 
