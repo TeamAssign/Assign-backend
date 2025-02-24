@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.review.entity;
 
+import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.global.common.BaseEntity;
 import com.team3.assign_back.global.enums.FoodEnum;
 
@@ -37,4 +38,9 @@ public class DirectReview extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "food_id", nullable = false)
+    private Food food;
+
 }
