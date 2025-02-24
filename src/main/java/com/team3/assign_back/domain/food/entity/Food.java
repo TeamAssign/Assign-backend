@@ -24,13 +24,13 @@ public class Food extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Enumerated(EnumType.STRING)
     private FoodEnum.FoodCategory category;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer price;
 
     @Column(nullable = true, length = 2000)
@@ -41,4 +41,5 @@ public class Food extends BaseEntity {
 
     @OneToOne(mappedBy = "food", fetch = FetchType.LAZY)
     private TasteMetrics tasteMetrics;
+
 }

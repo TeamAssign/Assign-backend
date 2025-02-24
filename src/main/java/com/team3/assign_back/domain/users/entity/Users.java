@@ -8,9 +8,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 
 @Entity
@@ -21,7 +20,11 @@ import java.util.Set;
 @Table(name = "users")
 public class Users extends BaseEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String vendorId; // Auth0 ID(sub)
 
     @Column(nullable = false)
     private String name;
@@ -41,7 +44,7 @@ public class Users extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "users")
-    private Set<UserTastePreference> userTastePreferences = new HashSet<>();
+    private List<UserTastePreference> userTastePreferences = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "users")

@@ -29,7 +29,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://moon:moon@mycluster.wpc83.mongodb.net/?retryWrites=true&w=majority&appName=myCluster
+      uri: ${MONGO_DB_URI}
       database: assign
       auto-index-creation: true
 
