@@ -1,4 +1,4 @@
-package com.assgin.assignback;
+package com.assgin.assign_back;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
