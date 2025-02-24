@@ -24,7 +24,7 @@ public class TeamController {
         return ResponseEntity.ok(teams);
     }
 
-    @GetMapping("/{teamId}/profile")
+    @GetMapping("/{temaId}/profile")
     public ResponseEntity<TeamProfileDTO> getTeamTastePreference(
             @PathVariable Long teamId){
         TeamProfileDTO teamProfileDTO = teamService.getTeamTastePreference(teamId);

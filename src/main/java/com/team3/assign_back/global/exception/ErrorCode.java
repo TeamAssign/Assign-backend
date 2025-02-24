@@ -19,8 +19,13 @@ public enum ErrorCode {
 
     // 팀 관련 에러
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
-    TASTE_PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND, "팀의 맛 선호도를 찾을 수 없습니다.")
-    ;
+    TASTE_PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND, "팀의 맛 선호도를 찾을 수 없습니다."),
+
+    //통계 관련 에러
+    USER_SUMMARY_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 최신 통계를 찾을 수 없습니다."),
+    TEAM_SUMMARY_NOT_FOUND(HttpStatus.NOT_FOUND, "팀의 최신 통계를 찾을 수 없습니다."),
+    COMPANY_SUMMARY_NOT_FOUND(HttpStatus.NOT_FOUND, "전사의 최신 통계를 찾을 수 없습니다."),
+    BATCH_JOB_STATISTIC_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,  "통계 배치 작업 수행 중 오류가 발생했습니다.");
 
     private final HttpStatus status;
     private final String message;
