@@ -29,7 +29,7 @@ spring:
           time_zone: Asia/Seoul
   data:
     mongodb:
-      uri: ${MONGO_LOCAL_DB_URI}
+      uri: ${MONGO_DB_URI}
       database: assign
       auto-index-creation: true
 
