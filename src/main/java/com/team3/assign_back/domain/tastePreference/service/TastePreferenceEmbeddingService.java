@@ -26,13 +26,12 @@ public class TastePreferenceEmbeddingService {
 
         TastePreference tastePreference = tastePreferenceRepository.getReferenceById(tastePreferenceId);
 
-//        String prompt = String.format(USER_PROMPT,
-//                tastePreference.getPros(),
-//                tastePreference.getCons(),
-//                tastePreference.getSpicy(),
-//                tastePreference.getSweet(),
-//                tastePreference.getSpicy());
-        String prompt = null;
+        String prompt = String.format(USER_PROMPT,
+                tastePreference.getPros(),
+                tastePreference.getCons(),
+                tastePreference.getSpicy(),
+                tastePreference.getSweet(),
+                tastePreference.getSpicy());
         float[] embedVector = embeddingModel.embed(prompt);
 
         TastePreferenceEmbedding tastePreferenceEmbedding = TastePreferenceEmbedding.builder()
