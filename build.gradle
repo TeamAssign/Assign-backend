@@ -69,6 +69,9 @@ dependencies {
     // h2
     runtimeOnly 'com.h2database:h2'
 
+    //hibernate-vector
+    implementation 'org.hibernate.orm:hibernate-vector:6.4.0.Final'
+
 
 }
 
