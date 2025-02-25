@@ -69,6 +69,8 @@ dependencies {
     // h2
     runtimeOnly 'com.h2database:h2'
 
+    // batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
 
 }
 
@@ -76,6 +78,14 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
     }
+}
+def querydslSrcDir = 'src/main/generated'
+
+clean {
+    delete file(querydslSrcDir)
+}
+tasks.withType(JavaCompile) {
+    options.generatedSourceOutputDirectory = file(querydslSrcDir)
 }
 
 tasks.named('test') {
