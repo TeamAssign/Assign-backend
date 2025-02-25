@@ -59,29 +59,19 @@ dependencies {
     // MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
-    //querydsl
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-    annotationProcessor "org.hibernate:hibernate-jpamodelgen:6.2.0.Final"
-
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // h2
+    runtimeOnly 'com.h2database:h2'
+
     // batch
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
-
-}
-def querydslSrcDir = 'src/main/generated'
-clean {
-    delete file(querydslSrcDir)
-}
-tasks.withType(JavaCompile) {
-    options.generatedSourceOutputDirectory = file(querydslSrcDir)
 }
 
 dependencyManagement {
@@ -89,6 +79,15 @@ dependencyManagement {
         mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
     }
 }
+def querydslSrcDir = 'src/main/generated'
+
+clean {
+    delete file(querydslSrcDir)
+}
+tasks.withType(JavaCompile) {
+    options.generatedSourceOutputDirectory = file(querydslSrcDir)
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

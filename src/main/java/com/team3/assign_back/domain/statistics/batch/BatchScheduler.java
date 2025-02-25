@@ -17,7 +17,7 @@ public class BatchScheduler {
     private final JobLauncher jobLauncher;
     private final Job summaryJob;
 
-    @Scheduled(cron = "0 * * * * ?", zone = "Asia/Seoul") //
+    @Scheduled(cron = "0 0 2 * * ?", zone = "Asia/Seoul") //
     public void runBatchJob(){
         executeBatch();
     }

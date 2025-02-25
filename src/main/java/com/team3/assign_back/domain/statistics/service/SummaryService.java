@@ -1,12 +1,9 @@
 package com.team3.assign_back.domain.statistics.service;
-
-import com.querydsl.core.Tuple;
-import com.team3.assign_back.domain.food.entity.QFood;
-
-import com.team3.assign_back.domain.review.entity.QReview;
-import com.team3.assign_back.domain.statistics.dto.CompanySummaryMonthlyDto;
-import com.team3.assign_back.domain.statistics.dto.TeamSummaryMonthlyDto;
-import com.team3.assign_back.domain.statistics.dto.UserSummaryMonthlyDto;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.domain.Sort;
+import com.team3.assign_back.domain.statistics.dto.*;
 import com.team3.assign_back.domain.statistics.entity.CompanySummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.TeamSummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.UserSummaryMonthly;
@@ -14,21 +11,18 @@ import com.team3.assign_back.domain.statistics.repository.CompanySummaryReposito
 import com.team3.assign_back.domain.statistics.repository.CustomSummaryQueryRepository;
 import com.team3.assign_back.domain.statistics.repository.TeamSummaryRepository;
 import com.team3.assign_back.domain.statistics.repository.UserSummaryRepository;
-import com.team3.assign_back.domain.team.entity.QTeam;
-import com.team3.assign_back.domain.users.entity.QUsers;
 
 import com.team3.assign_back.global.exception.custom.CustomException;
 import com.team3.assign_back.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +36,7 @@ public class SummaryService {
     private final TeamSummaryRepository teamSummaryRepository;
     private final CompanySummaryRepository companySummaryRepository;
     private final CustomSummaryQueryRepository summaryQueryRepository;
+    private final MongoTemplate mongoTemplate;
 
     // 유저별 최근 3달 통계(기준 당일) 생성
     @Transactional
@@ -50,17 +45,17 @@ public class SummaryService {
         LocalDate MonthsAgo = today.minus(90, ChronoUnit.DAYS);
 
 
-        List<Tuple> directReviewResults = summaryQueryRepository.fetchDirectReviewForUser(MonthsAgo, today);
-        List<Tuple> recommendationReviewResults = summaryQueryRepository.fetchRecommendationReviewForUser(MonthsAgo, today);
+        List<UserReviewSummaryDto> directReviewResults = summaryQueryRepository.fetchDirectReviewForUser(MonthsAgo, today);
+        List<UserReviewSummaryDto> recommendationReviewResults = summaryQueryRepository.fetchRecommendationReviewForUser(MonthsAgo, today);
 
         //개인별 그룹화
         Map<Long, UserSummaryMonthly.Statistics> statisticsByUser = Stream.concat(directReviewResults.stream(), recommendationReviewResults.stream())
                 .collect(Collectors.groupingBy(
-                        tuple -> tuple.get(QUsers.users.id),
+                        UserReviewSummaryDto::getUserId,
                         Collectors.collectingAndThen(Collectors.toList(), this::aggregateUserStatistics)
                 ));
 
-        return statisticsByUser.entrySet().stream()
+        List<UserSummaryMonthly> summaries = statisticsByUser.entrySet().stream()
                 .map(entry -> UserSummaryMonthly.builder()
                         .userId(entry.getKey())
                         .year(today.getYear())
@@ -68,7 +63,10 @@ public class SummaryService {
                         .day(today.getDayOfMonth())
                         .statistics(entry.getValue())
                         .build())
-                .collect(Collectors.collectingAndThen(Collectors.toList(), userSummaryRepository::saveAll));
+                .collect(Collectors.toList());
+
+        mongoTemplate.insertAll(summaries);
+        return summaries;
     }
 
     // 팀별 최근 한달 통계 생성(기준 당일)
@@ -78,17 +76,17 @@ public class SummaryService {
         LocalDate today = LocalDate.now();
         LocalDate MonthAgo = today.minus(30, ChronoUnit.DAYS);
 
-        List<Tuple> directReviewResults = summaryQueryRepository.fetchDirectReviewForTeam(MonthAgo, today);
-        List<Tuple> recommendationReviewResults = summaryQueryRepository.fetchRecommendationReviewForTeam(MonthAgo, today);
+        List<TeamReviewSummaryDto> directReviewResults = summaryQueryRepository.fetchDirectReviewForTeam(MonthAgo, today);
+        List<TeamReviewSummaryDto> recommendationReviewResults = summaryQueryRepository.fetchRecommendationReviewForTeam(MonthAgo, today);
 
         //팀별 그룹화
         Map<Long, TeamSummaryMonthly.Statistics> statisticsByTeam = Stream.concat(directReviewResults.stream(), recommendationReviewResults.stream())
                 .collect(Collectors.groupingBy(
-                        tuple -> tuple.get(QTeam.team.id),
+                        TeamReviewSummaryDto::getTeamId,
                         Collectors.collectingAndThen(Collectors.toList(), this::aggregateTeamStatistics)
                 ));
 
-        return statisticsByTeam.entrySet().stream()
+        List<TeamSummaryMonthly> summaries = statisticsByTeam.entrySet().stream()
                 .map(entry -> TeamSummaryMonthly.builder()
                         .teamId(entry.getKey())
                         .year(today.getYear())
@@ -96,7 +94,10 @@ public class SummaryService {
                         .day(today.getDayOfMonth())
                         .statistics(entry.getValue())
                         .build())
-                .collect(Collectors.collectingAndThen(Collectors.toList(), teamSummaryRepository::saveAll));
+                .collect(Collectors.toList());
+
+        mongoTemplate.insertAll(summaries);
+        return summaries;
     }
 
     // 전사 최근 한달 통계 생성(기준 당일)
@@ -104,10 +105,14 @@ public class SummaryService {
     public CompanySummaryMonthly saveCompanySummary() {
         LocalDate today = LocalDate.now();
         LocalDate oneMonthAgo = today.minus(1, ChronoUnit.MONTHS);
-        List<UserSummaryMonthly> userSummaries = userSummaryRepository.findByYearAndMonthAndDayBetween(
-                oneMonthAgo.getYear(), oneMonthAgo.getMonthValue(), oneMonthAgo.getDayOfMonth(),
-                today.getYear(), today.getMonthValue(), today.getDayOfMonth()
-        );
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("year").gte(oneMonthAgo.getYear()).lte(today.getYear())
+                .and("month").gte(oneMonthAgo.getMonthValue()).lte(today.getMonthValue())
+                .and("day").gte(oneMonthAgo.getDayOfMonth()).lte(today.getDayOfMonth()));
+
+        List<UserSummaryMonthly> userSummaries = mongoTemplate.find(query, UserSummaryMonthly.class);
+
         int totalCount = 0;
         Map<String, Integer> categoryCounts = new HashMap<>();
 
@@ -132,60 +137,62 @@ public class SummaryService {
         return companySummaryRepository.save(summary);
     }
 
-
     public UserSummaryMonthlyDto getLatestUserSummary(long userId) {
-        return UserSummaryMonthlyDto.fromEntity(userSummaryRepository.findFirstByUserIdOrderByYearDescMonthDescDayDesc(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_SUMMARY_NOT_FOUND)));
+        Query query = new Query(Criteria.where("userId").is(userId))
+                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day"))
+                .limit(1);
+
+        UserSummaryMonthly result = mongoTemplate.findOne(query, UserSummaryMonthly.class);
+        if (result == null) { throw new CustomException(ErrorCode.USER_SUMMARY_NOT_FOUND); }
+        return UserSummaryMonthlyDto.fromEntity(result);
     }
 
     public TeamSummaryMonthlyDto getLatestTeamSummary(long teamId) {
-        return TeamSummaryMonthlyDto.fromEntity(teamSummaryRepository.findFirstByTeamIdOrderByYearDescMonthDescDayDesc(teamId)
-                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_SUMMARY_NOT_FOUND)));
+        Query query = new Query(Criteria.where("teamId").is(teamId))
+                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day"))
+                .limit(1);
+
+        TeamSummaryMonthly result = mongoTemplate.findOne(query, TeamSummaryMonthly.class);
+        if (result == null) { throw new CustomException(ErrorCode.TEAM_SUMMARY_NOT_FOUND); }
+        return TeamSummaryMonthlyDto.fromEntity(result);
     }
 
-    public CompanySummaryMonthlyDto getLatestCompanySummary(){
-        return CompanySummaryMonthlyDto.fromEntity(companySummaryRepository.findFirstByOrderByYearDescMonthDescDayDesc()
-                .orElseThrow(() -> new CustomException(ErrorCode.COMPANY_SUMMARY_NOT_FOUND)));
+    public CompanySummaryMonthlyDto getLatestCompanySummary() {
+        Query query = new Query()
+                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day"))
+                .limit(1);
+
+        CompanySummaryMonthly result = mongoTemplate.findOne(query, CompanySummaryMonthly.class);
+        if (result == null) { throw new CustomException(ErrorCode.COMPANY_SUMMARY_NOT_FOUND); }
+        return CompanySummaryMonthlyDto.fromEntity(result);
     }
 
-
-
-    private <T> T aggregateStatisticsForTuples(List<Tuple> tuples, Function<Tuple, String> categoryExtractor, Function<Tuple, Integer> countExtractor, BiFunction<Integer, Map<String, Integer>, T> statisticsConstructor) {
-        Map<String, Integer> categories = tuples.stream()
+    private UserSummaryMonthly.Statistics aggregateUserStatistics(List<UserReviewSummaryDto> dtos) {
+        Map<String, Integer> categoryCounts = dtos.stream()
                 .collect(Collectors.groupingBy(
-                        categoryExtractor,
-                        Collectors.summingInt(countExtractor::apply)
+                        dto -> dto.getCategory().name(),
+                        Collectors.summingInt(dto -> (int) dto.getCount())
                 ));
 
-        int totalCount = categories.values().stream().mapToInt(Integer::intValue).sum();
+        int totalCount = categoryCounts.values().stream().mapToInt(Integer::intValue).sum();
 
-        return statisticsConstructor.apply(totalCount, categories);
+        return new UserSummaryMonthly.Statistics(totalCount, categoryCounts);
     }
-
-    private UserSummaryMonthly.Statistics aggregateUserStatistics(List<Tuple> tuples) {
-        return aggregateStatisticsForTuples(
-                tuples,
-                tuple -> tuple.get(QFood.food.category).name(),
-                tuple -> tuple.get(QReview.review.count()).intValue(),
-                UserSummaryMonthly.Statistics::new
-        );
-    }
-
-    private TeamSummaryMonthly.Statistics aggregateTeamStatistics(List<Tuple> tuples) {
-        Map<String, Integer> menuCount = tuples.stream()
+    private TeamSummaryMonthly.Statistics aggregateTeamStatistics(List<TeamReviewSummaryDto> dtos) {
+        Map<String, Integer> categoryCounts = dtos.stream()
                 .collect(Collectors.groupingBy(
-                        tuple -> tuple.get(QFood.food.name),
-                        Collectors.summingInt(tuple -> tuple.get(QReview.review.id.countDistinct()).intValue())
+                        dto -> dto.getCategory().name(),
+                        Collectors.summingInt(dto -> (int) dto.getCount())
                 ));
 
-        TeamSummaryMonthly.Statistics stats = aggregateStatisticsForTuples(
-                tuples,
-                tuple -> tuple.get(QFood.food.category).name(),
-                tuple -> tuple.get(QReview.review.id.countDistinct()).intValue(),
-                (totalCount, categories) -> new TeamSummaryMonthly.Statistics(totalCount,categories, menuCount)
-        );
+        Map<String, Integer> menuCounts = dtos.stream()
+                .collect(Collectors.groupingBy(
+                        TeamReviewSummaryDto::getFoodName,
+                        Collectors.summingInt(dto -> (int) dto.getCount())
+                ));
 
-        return stats;
+        int totalCount = categoryCounts.values().stream().mapToInt(Integer::intValue).sum();
+
+        return new TeamSummaryMonthly.Statistics(totalCount, categoryCounts, menuCounts);
     }
-
 }

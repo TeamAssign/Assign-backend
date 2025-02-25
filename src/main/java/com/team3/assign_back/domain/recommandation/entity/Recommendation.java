@@ -32,9 +32,6 @@ public class Recommendation extends BaseEntity {
     @ColumnDefault("false")
     private Boolean isAgree;
 
-    @OneToMany(mappedBy = "recommendation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UsersRecommendation> usersRecommendation = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_id", nullable = false)
     private Food food;
