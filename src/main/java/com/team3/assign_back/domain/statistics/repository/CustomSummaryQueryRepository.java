@@ -1,6 +1,5 @@
 package com.team3.assign_back.domain.statistics.repository;
 
-import com.querydsl.core.Tuple;
 import com.team3.assign_back.domain.statistics.dto.TeamReviewSummaryDto;
 import com.team3.assign_back.domain.statistics.dto.UserReviewSummaryDto;
 
