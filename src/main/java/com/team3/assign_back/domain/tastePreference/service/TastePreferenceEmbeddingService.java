@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.stereotype.Service;
 
-import static com.team3.assign_back.domain.tastePreference.prompt.TastePreferencePrompt.USER_PROMPT;
+import static com.team3.assign_back.domain.tastePreference.prompt.TastePreferencePrompt.USER_PROMPT_DISLIKES;
+import static com.team3.assign_back.domain.tastePreference.prompt.TastePreferencePrompt.USER_PROMPT_LIKES;
 
 @Service
 @RequiredArgsConstructor
@@ -22,20 +23,25 @@ public class TastePreferenceEmbeddingService {
     private final OpenAiEmbeddingModel embeddingModel;
 
     @Transactional
-    public void saveUserEmbedding(Long tastePreferenceId){
+    public void saveEmbedding(Long tastePreferenceId){
 
         TastePreference tastePreference = tastePreferenceRepository.getReferenceById(tastePreferenceId);
 
-        String prompt = String.format(USER_PROMPT,
+        String likePrompt = String.format(USER_PROMPT_LIKES,
                 tastePreference.getPros(),
-                tastePreference.getCons(),
                 tastePreference.getSpicy(),
                 tastePreference.getSweet(),
                 tastePreference.getSpicy());
-        float[] embedVector = embeddingModel.embed(prompt);
+        float[] likeEmbedVector = embeddingModel.embed(likePrompt);
+
+        String dislikePrompt = String.format(USER_PROMPT_DISLIKES,
+                tastePreference.getCons());
+        float[] dislikeEmbedVector = embeddingModel.embed(dislikePrompt);
+
 
         TastePreferenceEmbedding tastePreferenceEmbedding = TastePreferenceEmbedding.builder()
-                .textEmbedding(embedVector)
+                .likeEmbedding(likeEmbedVector)
+                .dislikeEmbedding(dislikeEmbedVector)
                 .tastePreference(tastePreference)
                 .build();
 
