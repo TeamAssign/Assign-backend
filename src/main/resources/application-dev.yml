@@ -4,6 +4,13 @@ spring:
   config:
 #    import: classpath:/.env[.properties]”
     import: optional:classpath:.env[.properties]
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+  scheduling:
+    enable: true
 
   datasource:
     url: jdbc:postgresql://pgvectorDB:5432/assign
