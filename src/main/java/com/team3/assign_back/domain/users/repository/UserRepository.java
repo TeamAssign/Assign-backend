@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<Users, Long> {
-    Optional<Users> findByVendorId(String vendorId);
+public interface UserRepository extends JpaRepository<Users, Long>, UserRepositoryCustom {
+    Optional<Long> findByVendorId(String vendorId);
 }
