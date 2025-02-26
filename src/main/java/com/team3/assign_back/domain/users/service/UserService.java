@@ -14,10 +14,11 @@ import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -40,8 +41,9 @@ public class UserService {
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
 
-    public List<UserResponseDto> searchUsers(Long userId, int page, int size) {
-        return userRepository.searchUsersByFrequency(userId, page, size);
+    public Page<UserResponseDto> searchUsers(Long userId, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return userRepository.searchUsersByFrequency(userId, keyword, pageable);
     }
 
     public Long getIdUserByVendorId(String vendorId) {
