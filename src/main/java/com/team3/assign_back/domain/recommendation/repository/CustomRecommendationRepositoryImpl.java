@@ -1,7 +1,7 @@
 package com.team3.assign_back.domain.recommendation.repository;
 
 
-import com.team3.assign_back.domain.food.dto.FoodResponseDto;
+import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_QUERY_LIMIT_COUNT;
+
 @Repository
 public class CustomRecommendationRepositoryImpl implements CustomRecommendationRepository {
 
@@ -18,7 +20,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
     private EntityManager entityManager;
 
     @Override
-    public FoodResponseDto getRecommendation(Long userId, FoodEnum.FoodCategory category, List<Long> participants) {
+    public RecommendationResponseDto getRecommendation(FoodEnum.FoodCategory category, List<Long> participants, List<Long> rejectedFoodIds) {
         String nativeQuery = """
             WITH user_similarities AS (
                 SELECT
@@ -39,7 +41,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                     JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
                     WHERE u.id IN (?1)
                 ) AS user_prefs
-                WHERE f.category = ?2
+                WHERE f.category = ?2 AND f.id NOT IN (?4)
             )
             SELECT
                 name,
@@ -54,19 +56,20 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
         Query query = entityManager.createNativeQuery(nativeQuery);
         query.setParameter(1, participants.toArray(Long[]::new));
         query.setParameter(2, category.name());
-        query.setParameter(3, 1);
+        query.setParameter(3, RECOMMENDATION_QUERY_LIMIT_COUNT);
+        query.setParameter(4, rejectedFoodIds.toArray(Long[]::new));
 
         Object[] results = (Object[]) query.getSingleResult();
 
 
 
-        return new FoodResponseDto(
+        return new RecommendationResponseDto(
                 (String) results[0],
                 (String) results[1],
                 new BigDecimal(String.format("%.3f", ((double) results[2])/participants.size())));
     }
 
-    public FoodResponseDto getRecommendation(Long userId, FoodEnum.FoodCategory category) {
+    public RecommendationResponseDto getRecommendation(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds) {
         String nativeQuery = """
             SELECT
                 f.name,
@@ -79,7 +82,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
             JOIN user_taste_preference utp ON utp.users_id = u.id
             JOIN taste_preference tp ON utp.taste_preference_id = tp.id
             JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
-            WHERE f.category = ?2
+            WHERE f.category = ?2 AND f.id NOT IN (?4)
             ORDER BY similarity DESC
             LIMIT ?3
             """;
@@ -87,11 +90,12 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
         Query query = entityManager.createNativeQuery(nativeQuery);
         query.setParameter(1, userId);
         query.setParameter(2, category.name());
-        query.setParameter(3, 1);
+        query.setParameter(3, RECOMMENDATION_QUERY_LIMIT_COUNT);
+        query.setParameter(4, rejectedFoodIds.toArray(Long[]::new));
 
         Object[] results = (Object[]) query.getSingleResult();
 
-        return new FoodResponseDto(
+        return new RecommendationResponseDto(
                         (String) results[0],
                         (String) results[1],
                 new BigDecimal(String.format("%.3f", (double) results[2])));
@@ -100,7 +104,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
 
     @Override
-    public FoodResponseDto getRecommendationForTeam(Long userId, FoodEnum.FoodCategory category) {
+    public RecommendationResponseDto getRecommendationForTeam(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds) {
         String nativeQuery = """
             SELECT
                 f.name,
@@ -114,7 +118,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
             JOIN team_taste_preference ttp ON ttp.team_id = u.id
             JOIN taste_preference tp ON ttp.taste_preference_id = tp.id
             JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
-            WHERE f.category = ?2
+            WHERE f.category = ?2 AND f.id NOT IN (?4)
             ORDER BY similarity DESC
             LIMIT ?3
             """;
@@ -122,83 +126,15 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
         Query query = entityManager.createNativeQuery(nativeQuery);
         query.setParameter(1, userId);
         query.setParameter(2, category.name());
-        query.setParameter(3, 1);
+        query.setParameter(3, RECOMMENDATION_QUERY_LIMIT_COUNT);
+        query.setParameter(4, rejectedFoodIds.toArray(Long[]::new));
 
         Object[] results = (Object[]) query.getSingleResult();
 
-        return new FoodResponseDto(
+        return new RecommendationResponseDto(
                 (String) results[0],
                 (String) results[1],
                 new BigDecimal(String.format("%.3f", (double) results[2])));
     }
 
-
-
-
-//
-//
-//    private final JPAQueryFactory query;
-//
-//    private final QTastePreferenceEmbedding tastePreferenceEmbedding = QTastePreferenceEmbedding.tastePreferenceEmbedding;
-//    private final QTastePreference tastePreference = QTastePreference.tastePreference;
-//    private final QUserTastePreference userTastePreference = QUserTastePreference.userTastePreference;
-//    private final QUsers users = QUsers.users;
-//    private final QFood food = QFood.food;
-//    private final QTasteMetricsEmbedding tasteMetricsEmbedding = QTasteMetricsEmbedding.tasteMetricsEmbedding;
-//    private final QTasteMetrics tasteMetrics = QTasteMetrics.tasteMetrics;
-//
-//    @Override
-//    public FoodResponseDto getRecommendation(Long userId, FoodEnum.FoodCategory category, FoodEnum.FoodType type, List<Long> participants) {
-//
-//        NumberExpression<Double> similarity = cosineSimilarityExpression(tasteMetricsEmbedding.textEmbedding, getUserEmbeddingSubQuery(1L));
-//
-//        NumberExpression<BigDecimal> similarityBigDecimal = Expressions.numberTemplate(
-//                BigDecimal.class,
-//                "CAST({0} AS DECIMAL(3,3))",
-//                similarity
-//        );
-//
-//        return query
-//                .select(Projections.constructor(FoodResponseDto.class, food.name, food.imgUrl, similarityBigDecimal))
-//                .from(food)
-//                .join(tasteMetrics)
-//                .on(tasteMetrics.food.eq(food))
-//                .join(tasteMetricsEmbedding)
-//                .on(tasteMetricsEmbedding.tasteMetrics.eq(tasteMetrics))
-//                .where(food.category.eq(FoodEnum.FoodCategory.KOREAN))
-//                .orderBy(similarity.asc()).limit(1).fetchFirst();
-//
-//
-//    }
-//
-//    private NumberExpression<Double> cosineSimilarityExpression(ArrayPath<float[], Float> embedding, JPQLQuery<float[]> subQuery) {
-//        return Expressions.numberTemplate(
-//                Double.class,
-//                "1 - ({0} <=> ({1})) / 2",
-//                embedding,
-//                subQuery
-//        );
-//    }
-//
-//    private NumberExpression<Double> cosineSimilarityExpression(ArrayPath<float[], Float> embedding1, ArrayPath<float[], Float> embedding2) {
-//        return Expressions.numberTemplate(
-//                Double.class,
-//                "{0} <=> {1}",
-//                embedding1,
-//                embedding2
-//        );
-//    }
-//
-//    private JPQLQuery<float[]> getUserEmbeddingSubQuery(Long userId) {
-//        return JPAExpressions.select(tastePreferenceEmbedding.textEmbedding)
-//                .from(users)
-//                .join(userTastePreference)
-//                .on(userTastePreference.users.eq(users))
-//                .join(tastePreference)
-//                .on(userTastePreference.tastePreference.eq(tastePreference))
-//                .join(tastePreferenceEmbedding)
-//                .on(tastePreferenceEmbedding.tastePreference.eq(tastePreference))
-//                .select(tastePreferenceEmbedding.textEmbedding)
-//                .where(users.id.eq(userId)).limit(1L);
-//    }
 }
