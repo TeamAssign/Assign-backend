@@ -16,11 +16,12 @@ import java.util.List;
 public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
+    private final QUsers users = QUsers.users;
+    private final QTeam team = QTeam.team;
+    private final QParticipant participant = QParticipant.participant;
+
     @Override
     public List<UserResponseDto> searchUsersByFrequency(Long userId, int page, int size) {
-        QUsers users = QUsers.users;
-        QTeam team = QTeam.team;
-        QParticipant participant = QParticipant.participant;
 
         return queryFactory
                 .select(Projections.constructor(UserResponseDto.class,
@@ -30,11 +31,14 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                         users.profileImgUrl
                 ))
                 .from(users)
-                .leftJoin(users.team, team)
+                .join(users.team, team)
                 .leftJoin(users.participants, participant)
                 .where(participant.users.id.eq(userId))
                 .groupBy(users.id, team.name, users.profileImgUrl)
-                .orderBy(participant.id.count().desc()) // 자주 같이 먹은 순 정렬
+                .orderBy(
+                        participant.id.count().desc().nullsLast(), // 1. 자주 같이 먹은 순 정렬
+                        team.name.asc().nullsLast() // 2. 팀별 정렬
+                )
                 .offset((page - 1) * size)
                 .limit(size)
                 .fetch();
