@@ -21,7 +21,7 @@ public class UserTastePreference extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false)
+    @JoinColumn(name = "users_id", nullable = false)
     private Users users;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.recommandation.entity;
+package com.team3.assign_back.domain.recommendation.entity;
 
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
