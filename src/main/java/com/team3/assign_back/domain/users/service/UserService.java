@@ -40,14 +40,12 @@ public class UserService {
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
 
-    @Transactional(readOnly = true)
     public List<UserResponseDto> searchUsers(Long userId, int page, int size) {
         return userRepository.searchUsersByFrequency(userId, page, size);
     }
 
     public Long getIdUserByVendorId(String vendorId) {
         return userRepository.findByVendorId(vendorId)
-                .map(Users::getId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
