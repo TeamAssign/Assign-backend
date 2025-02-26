@@ -1,6 +1,6 @@
 package com.team3.assign_back.domain.review.entity;
 
-import com.team3.assign_back.domain.recommandation.entity.Recommendation;
+import com.team3.assign_back.domain.recommendation.entity.Recommendation;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

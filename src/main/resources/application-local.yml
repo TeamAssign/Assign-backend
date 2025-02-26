@@ -19,7 +19,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: false
     properties:
       hibernate:
@@ -37,12 +37,9 @@ spring:
     openai:
       api-key: ${OPEN_AI_API_KEY}
 
-  okta:
-    oauth2:
-      client-id: ${AUTH0_CLIENT_ID}
-      client-secret: ${AUTH0_CLIENT_SECRET}
-
 okta:
   oauth2:
     issuer: ${AUTH0_ISSUER}
-
+    client-id: ${AUTH0_CLIENT_ID}
+    client-secret: ${AUTH0_CLIENT_SECRET}
+    audience: ${AUTH0_AUDIENCE}
