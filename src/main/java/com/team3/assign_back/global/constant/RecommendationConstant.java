@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommendationConstant {
 
-    public final static int RECOMMENDATION_QUERY_LIMIT_COUNT = 1;
+    public static final int RECOMMENDATION_QUERY_LIMIT_COUNT = 1;
 
 }

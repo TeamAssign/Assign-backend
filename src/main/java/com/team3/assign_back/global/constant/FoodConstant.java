@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class FoodConstant {
 
-    public final static int FOOD_LIST_BATCH_SIZE = 500;
+    public static final int FOOD_LIST_BATCH_SIZE = 500;
 
 }
