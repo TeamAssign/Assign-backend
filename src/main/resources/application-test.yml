@@ -20,6 +20,12 @@ spring:
         jdbc:
           time_zone: Asia/Seoul
 
+  data:
+    mongodb:
+      uri: ${MONGO_LOCAL_DB_URI}
+      database: assign
+      auto-index-creation: true
+
   ai:
     openai:
       api-key: ${OPEN_AI_API_KEY}
