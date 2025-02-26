@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.team3.assign_back.global.exception.ErrorCode.EMPTY_PARTICIPANTS;
+import static com.team3.assign_back.global.exception.ErrorCode.RECOMMENDATION_EXHAUSTED;
 
 
 @Service
@@ -55,7 +56,7 @@ public class RecommendationService {
         }catch (EmptyResultDataAccessException e) {
             // 결과가 없는 경우 (NoResultException이 변환됨)
             log.warn("recommendation,{},{},{},{},결과없음", userId, category.name(), type.name(), participants);
-            throw e;
+            throw new CustomException(RECOMMENDATION_EXHAUSTED);
 
         } catch (IncorrectResultSizeDataAccessException e) {
             // 여러 결과가 있는 경우 (NonUniqueResultException이 변환됨)
