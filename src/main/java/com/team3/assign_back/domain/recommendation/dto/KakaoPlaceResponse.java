@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.recommandation.dto;
+package com.team3.assign_back.domain.recommendation.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

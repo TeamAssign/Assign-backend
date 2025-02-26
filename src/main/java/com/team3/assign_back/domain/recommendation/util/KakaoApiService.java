@@ -1,7 +1,7 @@
-package com.team3.assign_back.domain.recommandation.util;
+package com.team3.assign_back.domain.recommendation.util;
 
-import com.team3.assign_back.domain.recommandation.dto.KakaoImageResponse;
-import com.team3.assign_back.domain.recommandation.dto.KakaoPlaceResponse;
+import com.team3.assign_back.domain.recommendation.dto.KakaoImageResponse;
+import com.team3.assign_back.domain.recommendation.dto.KakaoPlaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -9,14 +9,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -45,17 +43,12 @@ public class KakaoApiService {
                 .queryParam("size", 15);
 
         String url = builder.build().toUriString();
-        log.info("Place 요청 URL: {}", url);
 
         ResponseEntity<KakaoPlaceResponse> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                KakaoPlaceResponse.class
-        );
+                url, HttpMethod.GET, entity, KakaoPlaceResponse.class);
 
-        log.info("Place 응답 확인: {}", response.getBody());
         List<KakaoPlaceResponse.Document> placeList = Objects.requireNonNull(response.getBody()).getDocuments();
+
         return placeList;
     }
       public String searchImage(String keyword) {
@@ -69,16 +62,12 @@ public class KakaoApiService {
                 .queryParam("sort","accuracy");
           String url = builder.build().toUriString();
 
-          log.info("Image 요청 URL: {}", url);
-
         ResponseEntity<KakaoImageResponse> response = restTemplate.exchange(
                 url, HttpMethod.GET, entity, KakaoImageResponse.class);
-        ;
+
 
         List<KakaoImageResponse.Document> image = Objects.requireNonNull(response.getBody()).getDocuments();
-        log.info("Image 응답 확인: {}", image);
+
         return image.isEmpty()? "이미지 정보 없음" : image.get(0).getThumbnailUrl();
-         // return image.isEmpty() ? "" : images.get(0).getImageUrl();
-          //return image;
     }
 }
