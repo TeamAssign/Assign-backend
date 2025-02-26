@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
+        log.error("CustomException 발생: {}", ex.getErrorCode().getMessage(), ex);
         return ResponseEntity
                 .status(ex.getErrorCode().getStatus())
                 .body(ErrorResponse.of(ex.getErrorCode()));
@@ -31,6 +32,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+        log.warn("유효성 검증 오류 발생: {}", ex.getMessage());
         return ResponseEntity
                 .status(ErrorCode.VALIDATION_ERROR.getStatus())
                 .body(new ErrorResponse(ex.getClass().getSimpleName(), ex.getMessage()));
@@ -41,6 +43,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        log.error("예상하지 못한 예외 발생: {}", ex.getMessage(), ex);
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
