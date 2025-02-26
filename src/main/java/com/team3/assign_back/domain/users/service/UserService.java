@@ -7,6 +7,7 @@ import com.team3.assign_back.domain.tastePreference.repository.UserTastePreferen
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
+import com.team3.assign_back.domain.users.dto.UserResponseDto;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.exception.ErrorCode;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -37,15 +40,30 @@ public class UserService {
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> searchUsers(Long userId, int page, int size) {
+        return userRepository.searchUsersByFrequency(userId, page, size);
+    }
+
+    public Long getIdUserByVendorId(String vendorId) {
+        return userRepository.findByVendorId(vendorId)
+                .map(Users::getId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
     private void validateUserNotExist(String vendorId) {
         if (userRepository.findByVendorId(vendorId).isPresent()) {
+            log.warn("이미 등록된 사용자: vendorId={}", vendorId);
             throw new CustomException(ErrorCode.ALREADY_REGISTERED);
         }
     }
 
     private Team getTeamByName(String teamName) {
         return teamRepository.findByName(teamName)
-                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("팀을 찾을 수 없습니다: teamName={}", teamName);
+                    return new CustomException(ErrorCode.TEAM_NOT_FOUND);
+                });
     }
 
     private TastePreference createTastePreference(UserRegisterRequestDto requestDto) {
