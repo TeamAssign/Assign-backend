@@ -28,7 +28,10 @@ public enum ErrorCode {
 
     //추천 관련 에러
     EMPTY_PARTICIPANTS(HttpStatus.BAD_REQUEST, "그룹인 경우 본인을 제외한 참가자를 반드시 추가해야 합니다."),
-    RECOMMENDATION_EXHAUSTED(HttpStatus.NOT_FOUND, "더 이상 추천을 받을 수 없습니다.");
+    RECOMMENDATION_EXHAUSTED(HttpStatus.NOT_FOUND, "더 이상 추천을 받을 수 없습니다."),
+    KAKAO_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "메뉴에 대한 맛집 리스트를 찾을 수 없습니다."),
+    KAKAO_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND,"음식점에 관한 이미지를 찾을 수 업습니다."),
+    INVALID_KEYWORD(HttpStatus.BAD_REQUEST,"유효하지 않은 메뉴명입니다." );
 
     private final HttpStatus status;
     private final String message;

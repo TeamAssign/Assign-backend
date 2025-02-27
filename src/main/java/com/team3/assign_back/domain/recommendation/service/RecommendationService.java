@@ -1,9 +1,12 @@
 package com.team3.assign_back.domain.recommendation.service;
 
 
+import com.team3.assign_back.domain.recommendation.dto.KakaoPlaceResponse;
+import com.team3.assign_back.domain.recommendation.dto.PlaceResponseDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationRequestDto;
 import com.team3.assign_back.domain.recommendation.repository.CustomRecommendationRepository;
+import com.team3.assign_back.domain.recommendation.util.KakaoApiService;
 import com.team3.assign_back.global.enums.FoodEnum;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import static com.team3.assign_back.global.exception.ErrorCode.EMPTY_PARTICIPANTS;
 import static com.team3.assign_back.global.exception.ErrorCode.RECOMMENDATION_EXHAUSTED;
@@ -26,7 +32,8 @@ import static com.team3.assign_back.global.exception.ErrorCode.RECOMMENDATION_EX
 public class RecommendationService {
 
     private final CustomRecommendationRepository customRecommendationRepository;
-
+    private final KakaoApiService kakaoApiService;
+    private final ExecutorService executorService;
 
 
     public RecommendationResponseDto getRecommendation(Long userId, RecommendationRequestDto recommendationRequestDto){
@@ -82,6 +89,22 @@ public class RecommendationService {
 
 
 
+    }
+
+    public List<PlaceResponseDto> search(String keyword) {
+        List<KakaoPlaceResponse.Document> places = kakaoApiService.findPlaces(keyword);
+
+        List<CompletableFuture<PlaceResponseDto>> futures = places.stream()
+                .map(place -> CompletableFuture.supplyAsync(() -> {
+                    String imageUrl = kakaoApiService.searchImage(place.getPlaceName());
+                    return new PlaceResponseDto(place, imageUrl);
+                }, executorService))
+                .collect(Collectors.toList());
+        List<PlaceResponseDto> result = futures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+
+        return result;
     }
 
 
