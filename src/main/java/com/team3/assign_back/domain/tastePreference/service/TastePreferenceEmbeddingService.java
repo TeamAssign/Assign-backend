@@ -1,6 +1,8 @@
 package com.team3.assign_back.domain.tastePreference.service;
 
 
+import com.team3.assign_back.domain.food.repository.TasteMetricsEmbeddingRepository;
+import com.team3.assign_back.domain.tastePreference.dao.TastePreferenceEmbeddingDao;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreferenceEmbedding;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceEmbeddingRepository;
@@ -10,8 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.team3.assign_back.domain.tastePreference.prompt.TastePreferencePrompt.USER_PROMPT_DISLIKES;
 import static com.team3.assign_back.domain.tastePreference.prompt.TastePreferencePrompt.USER_PROMPT_LIKES;
+import static com.team3.assign_back.global.constant.RecommendationConstant.*;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +25,7 @@ public class TastePreferenceEmbeddingService {
 
     private final TastePreferenceRepository tastePreferenceRepository;
     private final TastePreferenceEmbeddingRepository tastePreferenceEmbeddingRepository;
+    private final TasteMetricsEmbeddingRepository tasteMetricsEmbeddingRepository;
 
     private final OpenAiEmbeddingModel embeddingModel;
 
@@ -48,4 +55,71 @@ public class TastePreferenceEmbeddingService {
         tastePreferenceEmbeddingRepository.save(tastePreferenceEmbedding);
 
     }
+
+
+
+
+    @Transactional
+    public void updateLikeEmbedding(Long teamId, List<Long> participants, Long foodId) {
+
+        List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos;
+        if(teamId == null){
+            tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findLikeEmbeddingAndRateByUserIds(participants);
+        } else{
+            tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findLikeEmbeddingAndRateForTeam(teamId);
+        }
+
+        float[] foodEmbed = tasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
+
+        for(TastePreferenceEmbeddingDao tastePreferenceEmbeddingDao : tastePreferenceEmbeddingDaos){
+            float learningRate = tastePreferenceEmbeddingDao.getLearningRate();
+            calculateUpdatingEmbedding(tastePreferenceEmbeddingDao.getEmbedding(),foodEmbed ,tastePreferenceEmbeddingDao.getLearningRate());
+            tastePreferenceEmbeddingDao.setLearningRate(Math.max(learningRate * LIKE_EMBEDDING_DECAY_FACTOR, EMBEDDING_LEARNING_RATE_MINIMUM));
+        }
+
+        tastePreferenceEmbeddingRepository.saveLikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
+
+
+    }
+
+    @Transactional
+    public void updateDislikeEmbedding(Long teamId, List<Long> participants, Long foodId) {
+
+        List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos;
+        if(teamId == null){
+            tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findDislikeEmbeddingAndRateByUserIds(participants);
+        } else{
+            tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findDislikeEmbeddingAndRateForTeam(teamId);
+        }
+
+        float[] foodEmbed = tasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
+
+        for(TastePreferenceEmbeddingDao tastePreferenceEmbeddingDao : tastePreferenceEmbeddingDaos){
+            float learningRate = tastePreferenceEmbeddingDao.getLearningRate();
+            calculateUpdatingEmbedding(tastePreferenceEmbeddingDao.getEmbedding(),foodEmbed ,tastePreferenceEmbeddingDao.getLearningRate());
+            tastePreferenceEmbeddingDao.setLearningRate(Math.max(learningRate * DISLIKE_EMBEDDING_DECAY_FACTOR, EMBEDDING_LEARNING_RATE_MINIMUM));
+        }
+
+        tastePreferenceEmbeddingRepository.saveDislikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
+
+
+    }
+
+    private void calculateUpdatingEmbedding(float[] updatingEmbed, float[] foodEmbed, float learningRate){
+        float squareSum = 0;
+        for(int i = 0; i < updatingEmbed.length; i++){
+            updatingEmbed[i] += learningRate * (foodEmbed[i] - updatingEmbed[i]);
+            squareSum += updatingEmbed[i] * updatingEmbed[i];
+        }
+        for(int i = 0; i < updatingEmbed.length; i++){
+            updatingEmbed[i] /= squareSum;
+        }
+
+    }
+
+
+
+
+
+
 }

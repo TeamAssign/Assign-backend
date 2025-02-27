@@ -20,7 +20,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
     private EntityManager entityManager;
 
     @Override
-    public RecommendationResponseDto getRecommendation(FoodEnum.FoodCategory category, List<Long> participants, List<Long> rejectedFoodIds) {
+    public List<RecommendationResponseDto> getRecommendation(List<Long> participants, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds) {
         String nativeQuery = """
             WITH user_similarities AS (
                 SELECT
@@ -59,17 +59,19 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
         query.setParameter(3, RECOMMENDATION_QUERY_LIMIT_COUNT);
         query.setParameter(4, rejectedFoodIds.toArray(Long[]::new));
 
-        Object[] results = (Object[]) query.getSingleResult();
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = (List<Object[]>) query.getResultList();
 
+        return results.stream()
+                .map(result -> new RecommendationResponseDto(
+                        (String) result[0],
+                        (String) result[1],
+                        new BigDecimal(String.format("%.3f", ((double) result[2])/participants.size()))))
+                .toList();
 
-
-        return new RecommendationResponseDto(
-                (String) results[0],
-                (String) results[1],
-                new BigDecimal(String.format("%.3f", ((double) results[2])/participants.size())));
     }
 
-    public RecommendationResponseDto getRecommendation(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds) {
+    public List<RecommendationResponseDto> getRecommendation(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds) {
         String nativeQuery = """
             SELECT
                 f.name,
@@ -93,35 +95,38 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
         query.setParameter(3, RECOMMENDATION_QUERY_LIMIT_COUNT);
         query.setParameter(4, rejectedFoodIds.toArray(Long[]::new));
 
-        Object[] results = (Object[]) query.getSingleResult();
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = (List<Object[]>) query.getResultList();
 
-        return new RecommendationResponseDto(
-                        (String) results[0],
-                        (String) results[1],
-                new BigDecimal(String.format("%.3f", (double) results[2])));
+        return results.stream()
+                .map(result -> new RecommendationResponseDto(
+                        (String) result[0],
+                        (String) result[1],
+                        new BigDecimal(String.format("%.3f", (double) result[2] ))))
+                .toList();
     }
 
 
 
     @Override
-    public RecommendationResponseDto getRecommendationForTeam(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds) {
+    public List<RecommendationResponseDto> getRecommendationForTeam(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds) {
         String nativeQuery = """
-            SELECT
-                f.name,
-                f.img_url,
-                (2 -(tme.text_embedding <=> tpe.like_embedding) + (tme.text_embedding <=> tpe.dislike_embedding)) / 4 as similarity
-            FROM food f
-            JOIN taste_metrics tm ON tm.food_id = f.id
-            JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
-            JOIN users u ON u.id =?1
-            JOIN team t ON u.team_id = t.id
-            JOIN team_taste_preference ttp ON ttp.team_id = u.id
-            JOIN taste_preference tp ON ttp.taste_preference_id = tp.id
-            JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
-            WHERE f.category = ?2 AND f.id NOT IN (?4)
-            ORDER BY similarity DESC
-            LIMIT ?3
-            """;
+                SELECT
+                    f.name,
+                    f.img_url,
+                    (2 -(tme.text_embedding <=> tpe.like_embedding) + (tme.text_embedding <=> tpe.dislike_embedding)) / 4 as similarity
+                FROM food f
+                JOIN taste_metrics tm ON tm.food_id = f.id
+                JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
+                JOIN users u ON u.id =?1
+                JOIN team t ON u.team_id = t.id
+                JOIN team_taste_preference ttp ON ttp.team_id = u.id
+                JOIN taste_preference tp ON ttp.taste_preference_id = tp.id
+                JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
+                WHERE f.category = ?2 AND f.id NOT IN (?4)
+                ORDER BY similarity DESC
+                LIMIT ?3
+                """;
 
         Query query = entityManager.createNativeQuery(nativeQuery);
         query.setParameter(1, userId);
@@ -129,12 +134,15 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
         query.setParameter(3, RECOMMENDATION_QUERY_LIMIT_COUNT);
         query.setParameter(4, rejectedFoodIds.toArray(Long[]::new));
 
-        Object[] results = (Object[]) query.getSingleResult();
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = (List<Object[]>) query.getResultList();
 
-        return new RecommendationResponseDto(
-                (String) results[0],
-                (String) results[1],
-                new BigDecimal(String.format("%.3f", (double) results[2])));
+        return results.stream()
+                .map(result -> new RecommendationResponseDto(
+                        (String) result[0],
+                        (String) result[1],
+                        new BigDecimal(String.format("%.3f", (double) result[2]))))
+                .toList();
     }
 
 }

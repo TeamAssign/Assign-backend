@@ -10,6 +10,9 @@ import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import static com.team3.assign_back.global.constant.RecommendationConstant.DISLIKE_EMBEDDING_INITIAL_LEARNING_RATE;
+import static com.team3.assign_back.global.constant.RecommendationConstant.LIKE_EMBEDDING_INITIAL_LEARNING_RATE;
+
 @Entity
 @Getter
 @Builder
@@ -36,6 +39,12 @@ public class TastePreferenceEmbedding extends BaseEntity {
     @Array(length = 256)
     @Column(name = "dislike_embedding")
     private float[] dislikeEmbedding;
+
+    @Builder.Default
+    private float likeLearningRate = LIKE_EMBEDDING_INITIAL_LEARNING_RATE;
+
+    @Builder.Default
+    private float dislikeLearningRate = DISLIKE_EMBEDDING_INITIAL_LEARNING_RATE;
 
 
 }
