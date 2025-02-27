@@ -43,6 +43,7 @@ public class RecommendationService {
     private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
 
 
+    @Transactional
     public RecommendationResponseDto getRecommendation(Long userId, RecommendationRequestDto recommendationRequestDto){
 
         //Redis 사용 후 로직 추가할 계획
@@ -89,7 +90,6 @@ public class RecommendationService {
     }
 
 
-    @Transactional
     private void updateDislike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
 
         if(type == FoodEnum.FoodType.COMPANYDINNER){
@@ -105,7 +105,6 @@ public class RecommendationService {
 
     }
 
-    @Transactional
     private void updateLike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
 
         if(type == FoodEnum.FoodType.COMPANYDINNER){
