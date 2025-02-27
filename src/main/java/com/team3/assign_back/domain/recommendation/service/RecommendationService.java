@@ -50,7 +50,7 @@ public class RecommendationService {
         rejectedFoodIds.add(-1L);
 
         FoodEnum.FoodCategory category = recommendationRequestDto.getCategory();
-        List<Long> participants = recommendationRequestDto.getParticipants();
+        List<Long> participants = recommendationRequestDto.getParticipants() == null? new ArrayList<>(): new ArrayList<>(recommendationRequestDto.getParticipants());
         FoodEnum.FoodType type = recommendationRequestDto.getType();
         List<RecommendationResponseDto> recommendationCandidates;
         try{
@@ -58,7 +58,7 @@ public class RecommendationService {
                 case SOLO -> customRecommendationRepository.getRecommendation(userId, category, rejectedFoodIds);
                 case COMPANYDINNER -> customRecommendationRepository.getRecommendationForTeam(userId, category, rejectedFoodIds);
                 case GROUP -> {
-                    if (participants == null || participants.isEmpty() || (participants.contains(userId) && participants.size() == 1)) {
+                    if (participants.isEmpty() || (participants.contains(userId) && participants.size() == 1)) {
                         throw new CustomException(EMPTY_PARTICIPANTS);
                     }
                     if (!participants.contains(userId)) {
@@ -96,10 +96,6 @@ public class RecommendationService {
             Long teamId = userRepository.findTeamIdByUsersId(userId);
             tastePreferenceEmbeddingService.updateDislikeEmbedding(teamId, null, foodId);
         } else{
-
-            if (participants == null) {
-                participants = new ArrayList<>();
-            }
             if (!participants.contains(userId)) {
                 participants.add(userId);
             }

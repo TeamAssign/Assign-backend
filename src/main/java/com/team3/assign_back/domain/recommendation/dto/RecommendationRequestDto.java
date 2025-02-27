@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -16,5 +16,5 @@ import java.util.List;
 public class RecommendationRequestDto {
     private FoodEnum.FoodCategory category;
     private FoodEnum.FoodType type;
-    private List<Long> participants;
+    private Set<Long> participants;
 }
