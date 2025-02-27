@@ -7,7 +7,7 @@ build/
 
 # .env
 .env
-
+.application-local.yml
 ### STS ###
 .apt_generated
 .classpath
@@ -19,7 +19,7 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-.application-local.yml
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
