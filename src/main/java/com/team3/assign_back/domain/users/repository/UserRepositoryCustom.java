@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserRepositoryCustom {
-    Page<UserResponseDto> searchUsersByFrequency(Long userId, String keyword, Pageable pageable);
+    Page<UserResponseDto> searchUsersByFrequency(Long userId, String name, Pageable pageable);
 }
