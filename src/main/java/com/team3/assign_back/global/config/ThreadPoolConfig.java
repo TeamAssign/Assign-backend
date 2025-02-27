@@ -11,8 +11,8 @@ public class ThreadPoolConfig {
     @Bean
     public ExecutorService executorService() {
         return new ThreadPoolExecutor(
-                5,  // 코어 스레드 개수
-                10,  // 최대 스레드 개수
+                2,  // 코어 스레드 개수
+                4,  // 최대 스레드 개수
                 60L, TimeUnit.SECONDS,  // 유휴 스레드 유지 시간
                 new LinkedBlockingQueue<>(50), //
                 Executors.defaultThreadFactory(),
