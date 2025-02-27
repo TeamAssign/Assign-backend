@@ -13,7 +13,7 @@ public class FoodEnum {
         JAPANESE("일식"),
         WESTERN("양식"),
         STREET_FOOD("분식"),
-        SOUTHEAST_ASIAN("동남아"),
+        SOUTHEAST_ASIAN("아시안"),
         FAST_FOOD("패스트푸드"),
         OTHERS("기타");
 
