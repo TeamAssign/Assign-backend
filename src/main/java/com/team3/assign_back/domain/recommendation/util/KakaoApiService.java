@@ -2,6 +2,7 @@ package com.team3.assign_back.domain.recommendation.util;
 
 import com.team3.assign_back.domain.recommendation.dto.KakaoImageResponse;
 import com.team3.assign_back.domain.recommendation.dto.KakaoPlaceResponse;
+import com.team3.assign_back.global.constant.KakaoConstant;
 import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,6 @@ import java.util.Objects;
 public class KakaoApiService {
 
     private final RestTemplate restTemplate;
-    private final String PLACE_API_URL = "https://dapi.kakao.com/v2/local/search/keyword.json";
-    private final String IMAGE_API_URL = "https://dapi.kakao.com/v2/search/image";
-    private final String longitude = "127.0487824";
-    private final String latitude = "37.5037511";
-    private final int radius = 3000;
 
     @Value("${kakao.api-key}")
     private String apiKey;
@@ -42,11 +38,11 @@ public class KakaoApiService {
         headers.set("Authorization", "KakaoAK " + apiKey);
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(PLACE_API_URL)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(KakaoConstant.PLACE_API_URL)
                 .queryParam("query", keyword + " 맛집")
-                .queryParam("x", longitude)
-                .queryParam("y", latitude)
-                .queryParam("radius", radius)
+                .queryParam("x", KakaoConstant.longitude)
+                .queryParam("y", KakaoConstant.latitude)
+                .queryParam("radius", KakaoConstant.radius)
                 .queryParam("sort", "accuracy")
                 .queryParam("category_group_code", "FD6")
                 .queryParam("size", 15);
@@ -70,7 +66,7 @@ public class KakaoApiService {
         headers.set("Authorization", "KakaoAK " + apiKey);
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(IMAGE_API_URL)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(KakaoConstant.IMAGE_API_URL)
                 .queryParam("query", keyword)
                 .queryParam("size", 3)
                 .queryParam("sort","accuracy");
