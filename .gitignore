@@ -7,7 +7,9 @@ build/
 
 # .env
 .env
-.application-local.yml
+application-local.yml
+application.properties
+
 ### STS ###
 .apt_generated
 .classpath
