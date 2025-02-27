@@ -14,7 +14,10 @@ import com.team3.assign_back.global.exception.custom.CustomException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -124,7 +127,7 @@ public class RecommendationService {
 
     }
 
-
+    @Cacheable(value = "longCache", key = "#root.args[0]", cacheManager = "cacheManager",unless = "#result == null")
     public List<PlaceResponseDto> search(String keyword) {
         List<KakaoPlaceResponse.Document> places = kakaoApiService.findPlaces(keyword);
 
@@ -137,7 +140,6 @@ public class RecommendationService {
         List<PlaceResponseDto> result = futures.stream()
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
-
         return result;
     }
 
