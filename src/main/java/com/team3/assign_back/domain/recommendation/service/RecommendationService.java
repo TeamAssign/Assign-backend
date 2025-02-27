@@ -7,17 +7,19 @@ import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto
 import com.team3.assign_back.domain.recommendation.dto.RecommendationRequestDto;
 import com.team3.assign_back.domain.recommendation.repository.CustomRecommendationRepository;
 import com.team3.assign_back.domain.recommendation.util.KakaoApiService;
+import com.team3.assign_back.domain.tastePreference.service.TastePreferenceEmbeddingService;
+import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.enums.FoodEnum;
 import com.team3.assign_back.global.exception.custom.CustomException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -32,10 +34,16 @@ import static com.team3.assign_back.global.exception.ErrorCode.RECOMMENDATION_EX
 public class RecommendationService {
 
     private final CustomRecommendationRepository customRecommendationRepository;
+    private final UserRepository userRepository;
+
+
+
     private final KakaoApiService kakaoApiService;
     private final ExecutorService executorService;
+    private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
 
 
+    @Transactional
     public RecommendationResponseDto getRecommendation(Long userId, RecommendationRequestDto recommendationRequestDto){
 
         //Redis 사용 후 로직 추가할 계획
@@ -43,34 +51,24 @@ public class RecommendationService {
         rejectedFoodIds.add(-1L);
 
         FoodEnum.FoodCategory category = recommendationRequestDto.getCategory();
-        List<Long> participants = recommendationRequestDto.getParticipants();
+        List<Long> participants = recommendationRequestDto.getParticipants() == null? new ArrayList<>(): new ArrayList<>(recommendationRequestDto.getParticipants());
         FoodEnum.FoodType type = recommendationRequestDto.getType();
-
+        List<RecommendationResponseDto> recommendationCandidates;
         try{
-            return switch (type) {
+            recommendationCandidates = switch (type) {
                 case SOLO -> customRecommendationRepository.getRecommendation(userId, category, rejectedFoodIds);
                 case COMPANYDINNER -> customRecommendationRepository.getRecommendationForTeam(userId, category, rejectedFoodIds);
                 case GROUP -> {
-                    if (participants == null || participants.isEmpty() || (participants.contains(userId) && participants.size() == 1)) {
+                    if (participants.isEmpty() || (participants.contains(userId) && participants.size() == 1)) {
                         throw new CustomException(EMPTY_PARTICIPANTS);
                     }
                     if (!participants.contains(userId)) {
                         participants.add(userId);
                     }
-                    yield customRecommendationRepository.getRecommendation(category, participants, rejectedFoodIds);
+                    yield customRecommendationRepository.getRecommendation(participants, category, rejectedFoodIds);
                 }
             };
-        }catch (EmptyResultDataAccessException e) {
-            // 결과가 없는 경우 (NoResultException이 변환됨)
-            log.warn("recommendation,{},{},{},{},결과없음", userId, category.name(), type.name(), participants);
-            throw new CustomException(RECOMMENDATION_EXHAUSTED);
-
-        } catch (IncorrectResultSizeDataAccessException e) {
-            // 여러 결과가 있는 경우 (NonUniqueResultException이 변환됨)
-            log.warn("recommendation,{},{},{},{},다중결과발생", userId, category.name(), type.name(), participants);
-            throw e;
-
-        } catch (DataAccessException e) {
+        }catch (DataAccessException e) {
             // 기타 데이터 접근 예외
             log.warn("recommendation,{},{},{},{},데이터접근오류", userId, category.name(), type.name(), participants, e);
             throw e;
@@ -84,12 +82,48 @@ public class RecommendationService {
             throw e;
         }
 
+        if(recommendationCandidates.isEmpty()){
+            throw new CustomException(RECOMMENDATION_EXHAUSTED);
+        }
+
+        return recommendationCandidates.get(new Random().nextInt(recommendationCandidates.size()));
+    }
 
 
+    private void updateDislike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
 
+        if(type == FoodEnum.FoodType.COMPANYDINNER){
+            Long teamId = userRepository.findTeamIdByUsersId(userId);
+            tastePreferenceEmbeddingService.updateDislikeEmbedding(teamId, null, foodId);
+        } else{
+            if (!participants.contains(userId)) {
+                participants.add(userId);
+            }
+            tastePreferenceEmbeddingService.updateDislikeEmbedding(null, participants, foodId);
 
+        }
 
     }
+
+    private void updateLike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
+
+        if(type == FoodEnum.FoodType.COMPANYDINNER){
+            Long teamId = userRepository.findTeamIdByUsersId(userId);
+            tastePreferenceEmbeddingService.updateLikeEmbedding(teamId, null, foodId);
+        } else{
+
+            if (participants == null) {
+                participants = new ArrayList<>();
+            }
+            if (!participants.contains(userId)) {
+                participants.add(userId);
+            }
+            tastePreferenceEmbeddingService.updateLikeEmbedding(null, participants, foodId);
+
+        }
+
+    }
+
 
     public List<PlaceResponseDto> search(String keyword) {
         List<KakaoPlaceResponse.Document> places = kakaoApiService.findPlaces(keyword);
@@ -99,7 +133,7 @@ public class RecommendationService {
                     String imageUrl = kakaoApiService.searchImage(place.getPlaceName());
                     return new PlaceResponseDto(place, imageUrl);
                 }, executorService))
-                .collect(Collectors.toList());
+                .toList();
         List<PlaceResponseDto> result = futures.stream()
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
