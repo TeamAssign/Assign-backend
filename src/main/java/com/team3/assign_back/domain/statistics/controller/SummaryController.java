@@ -22,14 +22,14 @@ public class SummaryController {
     private final BatchScheduler batchScheduler;
 
 
-    // --- 통계 데이터 조회 -> 데이터 생성 후 주석 제거
-   /* @GetMapping("/user/{userId}")
+    // --- 통계 데이터 조회
+   /* @GetMapping("/users/{userId}")
     public ResponseEntity<ApiResponseDto<UserSummaryMonthlyDto>> getUserSummary(@PathVariable(name = "userId") Long userId){
         UserSummaryMonthlyDto userSummaryMonthlyDto = summaryService.getLatestUserSummary(userId);
         return ApiResponseDto.from(HttpStatus.OK,"유저 통계 조회 성공",userSummaryMonthlyDto);
     }
 
-    @GetMapping("/team/{teamId}")
+    @GetMapping("/teams/{teamId}")
     public ResponseEntity<ApiResponseDto<TeamSummaryMonthlyDto>> getTeamSummary(@PathVariable(name = "teamId") Long teamId) {
         TeamSummaryMonthlyDto teamSummaryMonthlyDto = summaryService.getLatestTeamSummary(teamId);
         return ApiResponseDto.from(HttpStatus.OK,"팀 통계 조회 성공",teamSummaryMonthlyDto);
