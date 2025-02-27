@@ -14,6 +14,7 @@ import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Value("${spring.cloud.aws.s3.default-profile-image}")
+    private String defaultProfileImageUrl;
+
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final TastePreferenceRepository tastePreferenceRepository;
@@ -41,9 +45,9 @@ public class UserService {
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
 
-    public Page<UserResponseDto> searchUsers(Long userId, String keyword, int page, int size) {
+    public Page<UserResponseDto> searchUsers(Long userId, String name, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return userRepository.searchUsersByFrequency(userId, keyword, pageable);
+        return userRepository.searchUsersByFrequency(userId, name, pageable);
     }
 
     public Long getIdUserByVendorId(String vendorId) {
@@ -83,7 +87,7 @@ public class UserService {
                 .vendorId(vendorId)
                 .name(requestDto.getName())
                 .team(team)
-                .profileImgUrl("default-profile.png")
+                .profileImgUrl(defaultProfileImageUrl)
                 .build();
 
         return userRepository.save(user);
