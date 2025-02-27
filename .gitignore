@@ -7,8 +7,8 @@ build/
 
 # .env
 .env
-application-local.yml
-application.properties
+src/main/resources/application-local.yml
+src/main/resources/application.properties
 
 ### STS ###
 .apt_generated
