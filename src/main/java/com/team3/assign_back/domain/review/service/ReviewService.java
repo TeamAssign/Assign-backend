@@ -67,20 +67,21 @@ public class ReviewService {
                 .orElseGet(() -> foodRepository.save(
                         Food.builder()
                                 .name(reviewRequestDto.getMenu())
-                                .category(FoodEnum.FoodCategory.valueOf(reviewRequestDto.getCategory().toUpperCase()))
+                                .category(reviewRequestDto.getCategory())
                                 .build()
                 ));
 
         DirectReview directReview = directReviewRepository.save(
                 DirectReview.builder()
                         .review(review)
-                        .type(FoodEnum.FoodType.valueOf(reviewRequestDto.getType().toUpperCase()))
+                        .type(reviewRequestDto.getType())
                         .food(food)
                         .comment(reviewRequestDto.getComment())
                         .star(reviewRequestDto.getStar())
                         .imgUrl(reviewRequestDto.getImgurl())
                         .build()
         );
+
 
         saveParticipants(review, reviewRequestDto.getParticipants());
 

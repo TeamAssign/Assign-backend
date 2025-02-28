@@ -16,7 +16,7 @@ public class ReviewRequestDto {
     private String imgurl;
     private FoodEnum.FoodCategory category;
     private String menu;
-    private FoodEnum.FoodCategory type;
+    private FoodEnum.FoodType type;
     private String comment;
     private Integer star;
     private List<Long> participants;
