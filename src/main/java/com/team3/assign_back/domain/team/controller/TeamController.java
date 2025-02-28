@@ -21,6 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -70,36 +72,36 @@ public class TeamController {
         return ResponseEntity.ok(teamProfileDTO);
     }
 
-    @Operation(
-            summary = "팀 맛 선호도 업데이트",
-            description = "특정 팀의 맛 선호도를 수정합니다."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "팀 맛 선호도 업데이트 성공",
-            content = @Content(mediaType = "text/plain")
-    )
-    @Parameter(name = "teamId", description = "업데이트할 팀 ID", required = true, example = "1")
-    @PutMapping("/{teamId}/profile")
-    public ResponseEntity<String> updateTeamTastePreference(
-            @PathVariable Long teamId,
-            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
-
-        String vendorId = jwt.getSubject();
-        Long userId = userService.getUserIdByVendorId(vendorId);
-
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        Long userTeamId = user.getTeam().getId();
-        if(teamId != null && !teamId.equals(userTeamId)){
-            throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
-        }
-
-        teamService.updateTeamTastePreference(userId, teamId, updatedPreference);
-        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
-    }
-
+//    @Operation(
+//            summary = "팀 맛 선호도 업데이트",
+//            description = "특정 팀의 맛 선호도를 수정합니다."
+//    )
+//    @ApiResponse(
+//            responseCode = "200",
+//            description = "팀 맛 선호도 업데이트 성공",
+//            content = @Content(mediaType = "text/plain")
+//    )
+//    @Parameter(name = "teamId", description = "업데이트할 팀 ID", required = true, example = "1")
+//    @PutMapping("/{teamId}/profile")
+//    public ResponseEntity<String> updateTeamTastePreference(
+//            @AuthenticationPrincipal Jwt jwt,
+//            @PathVariable Long teamId,
+//            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
+//
+//        String vendorId = jwt.getSubject();
+//        Long userId = userService.getUserIdByVendorId(vendorId);
+//
+//        Users user = userRepository.findById(userId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+//
+//        Long userTeamId = user.getTeam().getId();
+//        if(teamId != null && !teamId.equals(userTeamId)){
+//            throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
+//        }
+//
+//        teamService.updateTeamTastePreference(userId, teamId, updatedPreference);
+//        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
+//    }
 
     @Operation(
             summary = "팀 리뷰 조회",
