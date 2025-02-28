@@ -1,5 +1,7 @@
 package com.team3.assign_back.domain.review.dto;
 
+import com.team3.assign_back.domain.food.entity.Food;
+import com.team3.assign_back.global.enums.FoodEnum;
 import lombok.*;
 
 import java.util.List;
@@ -12,9 +14,9 @@ import java.util.List;
 public class ReviewRequestDto {
     private Long recommendationId;
     private String imgurl;
-    private String category;
+    private FoodEnum.FoodCategory category;
     private String menu;
-    private String type;
+    private FoodEnum.FoodCategory type;
     private String comment;
     private Integer star;
     private List<Long> participants;
