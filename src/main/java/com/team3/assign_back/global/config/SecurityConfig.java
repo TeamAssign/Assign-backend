@@ -1,10 +1,11 @@
 package com.team3.assign_back.global.config;
 
-import com.team3.assign_back.domain.users.security.Auth0JwtAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -15,7 +16,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain configure(HttpSecurity http, Auth0JwtAuthenticationConverter auth0JwtAuthenticationConverter) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -24,12 +25,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2ResourceServer ->
-                        oauth2ResourceServer.jwt(jwtConfigurer ->
-                                jwtConfigurer.jwtAuthenticationConverter(auth0JwtAuthenticationConverter)
-                        )
+                .oauth2ResourceServer(oauth ->
+                        oauth.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
                 );
         return http.build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withJwkSetUri("https://dev-aqq0w41zxvftci4m.jp.auth0.com/.well-known/jwks.json").build();
     }
 
     @Bean
@@ -44,5 +48,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }
