@@ -2,12 +2,13 @@ package com.team3.assign_back.domain.recommendation.controller;
 
 import com.team3.assign_back.domain.recommendation.dto.PlaceResponseDto;
 
+import com.team3.assign_back.domain.recommendation.dto.RecommendationHistoryResponseDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationRequestDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
 import com.team3.assign_back.domain.recommendation.service.RecommendationService;
-import com.team3.assign_back.domain.users.dto.CustomUserDetails;
 import com.team3.assign_back.domain.users.service.UserService;
 import com.team3.assign_back.global.common.ApiResponseDto;
+import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,13 +20,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -97,6 +95,15 @@ public class RecommendationController {
         recommendationService.acceptRecommendation(userId, recommendationRequestDto);
 
         return ApiResponseDto.from(HttpStatus.OK,"메뉴 추천 성공", null);
+    }
+
+    public ResponseEntity<ApiResponseDto<PageResponseDto<RecommendationHistoryResponseDto>>> getRecommendations(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size){
+
+        String vendorId = jwt.getSubject();
+        Long userId = userService.getUserIdByVendorId(vendorId);
+
+        return ApiResponseDto.from(HttpStatus.OK,"메뉴 히스토리 조회 성공", recommendationService.getRecommendationHistories(userId, page, size));
+
     }
 
 
