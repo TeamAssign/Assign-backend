@@ -67,7 +67,7 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
 
         String vendorId = jwt.getSubject();
-        Long userId = userService.getUseIdByVendorId(vendorId);
+        Long userId = userService.getUserIdByVendorId(vendorId);
 
         Page<UserResponseDto> userPage = userService.searchUsers(userId, name, page, size);
         PageResponseDto<UserResponseDto> response = new PageResponseDto<>(userPage);

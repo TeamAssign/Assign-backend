@@ -50,7 +50,7 @@ public class UserService {
         return userRepository.searchUsersByFrequency(userId, name, pageable);
     }
 
-    public Long getUseIdByVendorId(String vendorId) {
+    public Long getUserIdByVendorId(String vendorId) {
         return userRepository.findUserIdByVendorId(vendorId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
