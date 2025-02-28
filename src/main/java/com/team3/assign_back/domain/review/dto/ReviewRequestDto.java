@@ -10,9 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewRequestDto {
-    private Long userId;
     private Long recommendationId;
-    private Long teamId;
     private String imgurl;
     private String category;
     private String menu;
@@ -20,7 +18,5 @@ public class ReviewRequestDto {
     private String comment;
     private Integer star;
     private List<Long> participants;
-
-    private String teamName;
 
 }

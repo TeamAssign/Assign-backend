@@ -19,8 +19,10 @@ public enum ErrorCode {
     // 팀 관련 에러
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
     TASTE_PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND, "팀의 맛 선호도를 찾을 수 없습니다."),
+    TEAM_REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "팀 리뷰를 찾을 수 없습니다."),
+    INVALID_TEAM_SELECTION(HttpStatus.BAD_REQUEST, "본인이 속한 팀만 선택할 수 있습니다."),
 
-    //통계 관련 에러
+    // 통계 관련 에러
     USER_SUMMARY_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 최신 통계를 찾을 수 없습니다."),
     TEAM_SUMMARY_NOT_FOUND(HttpStatus.NOT_FOUND, "팀의 최신 통계를 찾을 수 없습니다."),
     COMPANY_SUMMARY_NOT_FOUND(HttpStatus.NOT_FOUND, "전사의 최신 통계를 찾을 수 없습니다."),

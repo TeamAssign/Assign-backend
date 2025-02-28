@@ -41,17 +41,15 @@ public class ReviewController {
             description = "리뷰 생성 성공",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))
     )
-    @Parameter(name = "teamId", description = "조회할 팀 ID", required = false, example = "1")
     @PostMapping("/reviews")
     public ResponseEntity<ApiResponseDto<ReviewResponseDto>> createReviews(@RequestBody ReviewRequestDto reviewRequestDto,
-                                                                           @AuthenticationPrincipal Jwt jwt,
-                                                                           @RequestParam(value = "teamId", required = false) Long teamId
+                                                                           @AuthenticationPrincipal Jwt jwt
                                                         ){
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
         log.info("Received userId: {}", userId);
 
-        ReviewResponseDto reviewResponseDto = reviewService.createReview(userId, teamId, reviewRequestDto);
+        ReviewResponseDto reviewResponseDto = reviewService.createReview(userId, reviewRequestDto);
         return ApiResponseDto.from(HttpStatus.CREATED, "후기가 성공적으로 등록되었습니다.", reviewResponseDto);
     }
 }

@@ -4,8 +4,8 @@ import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.domain.food.repository.FoodRepository;
 import com.team3.assign_back.domain.intermediate.entity.Participant;
 import com.team3.assign_back.domain.intermediate.repository.ParticipantRepository;
-import com.team3.assign_back.domain.recommandation.repository.RecommendationRepository;
 import com.team3.assign_back.domain.recommendation.entity.Recommendation;
+import com.team3.assign_back.domain.recommendation.repository.RecommendationRepository;
 import com.team3.assign_back.domain.review.dto.ReviewRequestDto;
 import com.team3.assign_back.domain.review.dto.ReviewResponseDto;
 import com.team3.assign_back.domain.review.entity.DirectReview;
@@ -14,7 +14,6 @@ import com.team3.assign_back.domain.review.entity.Review;
 import com.team3.assign_back.domain.review.repository.DirectReviewRepository;
 import com.team3.assign_back.domain.review.repository.RecommendationReviewRepository;
 import com.team3.assign_back.domain.review.repository.ReviewRepository;
-import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.domain.users.repository.UserRepository;
@@ -47,19 +46,10 @@ public class ReviewService {
     private final RecommendationReviewRepository recommendationReviewRepository;
 
     @Transactional
-    public ReviewResponseDto createReview(Long userId, Long teamId, ReviewRequestDto reviewRequestDto) {
+    public ReviewResponseDto createReview(Long userId, ReviewRequestDto reviewRequestDto) {
         Users users = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Team team = null;
-        if (teamId != null) {
-            team = teamRepository.findById(teamId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
-
-            if (!teamId.equals(users.getTeam().getId())) {
-                throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
-            }
-        }
 
         Review review = reviewRepository.save(
                 Review.builder()
@@ -68,11 +58,11 @@ public class ReviewService {
         );
 
         return (reviewRequestDto.getRecommendationId() != null) ?
-                createRecommendationReview(reviewRequestDto, review, users, team) :
-                createDirectReview(reviewRequestDto, review, users, team);
+                createRecommendationReview(reviewRequestDto, review) :
+                createDirectReview(reviewRequestDto, review);
     }
 
-    private ReviewResponseDto createDirectReview(ReviewRequestDto reviewRequestDto, Review review, Users users, Team team) {
+    private ReviewResponseDto createDirectReview(ReviewRequestDto reviewRequestDto, Review review) {
         Food food = foodRepository.findByName(reviewRequestDto.getMenu())
                 .orElseGet(() -> foodRepository.save(
                         Food.builder()
@@ -92,20 +82,18 @@ public class ReviewService {
                         .build()
         );
 
-        saveParticipants(review, reviewRequestDto.getParticipants(), users);
+        saveParticipants(review, reviewRequestDto.getParticipants());
 
-        Long teamId =(team != null) ? team.getId() : null;
 
-        return convertToDirectReviewDTO(directReview, teamId);
+        return convertToDirectReviewDTO(directReview);
     }
 
-    private ReviewResponseDto createRecommendationReview(ReviewRequestDto reviewRequestDto, Review review, Users users, Team team) {
+    private ReviewResponseDto createRecommendationReview(ReviewRequestDto reviewRequestDto, Review review) {
         Recommendation recommendation = recommendationRepository.findById(reviewRequestDto.getRecommendationId())
                 .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_NOT_FOUND));
 
         Food food = recommendation.getFood();
         String foodName = (food != null) ? food.getName() : "기타 음식";
-        String foodCategory = (food != null && food.getCategory() != null) ? food.getCategory().name() : "기타";
 
         RecommendationReview recommendationReview = recommendationReviewRepository.save(
                 RecommendationReview.builder()
@@ -117,20 +105,14 @@ public class ReviewService {
                         .build()
         );
 
-        saveParticipants(review, reviewRequestDto.getParticipants(), users);
+        saveParticipants(review, reviewRequestDto.getParticipants());
 
-        Long teamId = (team != null) ? team.getId() : null;
-
-        return convertToRecommendationReviewDTO(recommendationReview, foodName, foodCategory, recommendation, teamId);
+        return convertToRecommendationReviewDTO(recommendationReview, foodName, recommendation);
     }
 
-    private void saveParticipants(Review review, List<Long> participantIds, Users users) {
+    private void saveParticipants(Review review, List<Long> participantIds) {
         if (participantIds == null) {
             participantIds = new ArrayList<>();
-        }
-
-        if (!participantIds.contains(users.getId())) {
-            participantIds.add(users.getId());
         }
 
         List<Participant> participantList = participantIds.stream()
@@ -144,7 +126,6 @@ public class ReviewService {
                 })
                 .collect(Collectors.toList());
 
-        review.getParticipants().clear();
         review.getParticipants().addAll(participantList);
 
         participantRepository.saveAll(participantList);
@@ -178,42 +159,44 @@ public class ReviewService {
         return new PageResponseDto<>(teamReviews.map(this::convertToReviewResponse));
     }
 
-    private ReviewResponseDto convertToDirectReviewDTO(DirectReview directReview, Long teamId) {
-        List<Long> participantIds = directReview.getReview().getParticipants().stream()
+    private ReviewResponseDto convertToDirectReviewDTO(DirectReview directReview) {
+        Review review = reviewRepository.findReviewWithParticipants(directReview.getReview().getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+        List<Long> participantIds = review.getParticipants().stream()
                 .map(participant -> participant.getUsers().getId())
                 .collect(Collectors.toList());
 
         return ReviewResponseDto.builder()
-                .reviewId(directReview.getReview().getId())
-                .userId(directReview.getReview().getUsers().getId())
-                .type(directReview.getType().name())
+                .reviewId(review.getId())
                 .comment(directReview.getComment())
                 .star(directReview.getStar())
                 .food(directReview.getFood().getName())
-                .category(directReview.getFood().getCategory().getKoreanName())
+                .type(directReview.getType())
+                .category(directReview.getFood().getCategory())
                 .imgurl(directReview.getImgUrl())
                 .participants(participantIds)
-                .teamId(teamId)
                 .build();
     }
 
-    private ReviewResponseDto convertToRecommendationReviewDTO(RecommendationReview recommendationReview, String foodName, String foodCategory, Recommendation recommendation, Long teamId) {
-        List<Long> participantIds = recommendationReview.getReview().getParticipants().stream()
+    private ReviewResponseDto convertToRecommendationReviewDTO(RecommendationReview recommendationReview, String foodName, Recommendation recommendation) {
+        Review review = reviewRepository.findReviewWithParticipants(recommendationReview.getReview().getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+        List<Long> participantIds = review.getParticipants().stream()
                 .map(participant -> participant.getUsers().getId())
                 .collect(Collectors.toList());
 
         return ReviewResponseDto.builder()
-                .reviewId(recommendationReview.getReview().getId())
-                .userId(recommendationReview.getReview().getUsers().getId())
+                .reviewId(review.getId())
                 .recommendationId(recommendationReview.getRecommendation().getId())
                 .comment(recommendationReview.getComment())
                 .star(recommendationReview.getStar())
                 .imgurl(recommendationReview.getImgUrl())
-                .type(recommendation.getType().getKoreanName())
+                .type(recommendation.getType())
                 .food(foodName)
-                .category(foodCategory)
+                .category(recommendation.getFood().getCategory())
                 .participants(participantIds)
-                .teamId(teamId)
                 .build();
     }
 
@@ -222,10 +205,9 @@ public class ReviewService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Long teamId = (review.getUsers().getTeam() != null) ? review.getUsers().getTeam().getId() : null;
 
         if (review.getDirectReview() != null) {
-            return convertToDirectReviewDTO(review.getDirectReview(), teamId);
+            return convertToDirectReviewDTO(review.getDirectReview());
         }
 
         if (review.getRecommendationReview() != null) {
@@ -242,12 +224,10 @@ public class ReviewService {
             }
 
             Food food = recommendation.getFood();
-            String foodCategory = (food.getCategory() != null) ? food.getCategory().name() : "기타";
             String foodName = food.getName();
 
-            return convertToRecommendationReviewDTO(recommendationReview, foodName, foodCategory, recommendation, teamId);
+            return convertToRecommendationReviewDTO(recommendationReview, foodName, recommendation);
         }
-
 
         throw new CustomException(ErrorCode.REVIEW_NOT_FOUND);
     }
