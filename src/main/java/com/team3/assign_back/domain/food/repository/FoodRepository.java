@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FoodRepository extends JpaRepository<Food, Long> {
-    boolean existsByName(String foodName);
 
     @Query("SELECT f.name FROM Food f WHERE f.name IN :names")
     List<String> findNamesNotIn(@Param("names") List<String> names);
@@ -16,4 +16,6 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
 
     @Query("SELECT f FROM Food f LEFT JOIN TasteMetrics t ON f.id = t.foodId WHERE t.foodId IS NULL")
     List<Food> customFindFoodsWithoutTasteMetrics();
+
+    Optional<Food> findByName(String name);
 }
