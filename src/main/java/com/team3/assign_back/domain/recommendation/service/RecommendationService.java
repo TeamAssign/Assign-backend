@@ -4,16 +4,14 @@ package com.team3.assign_back.domain.recommendation.service;
 import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.domain.food.repository.FoodRedisRepository;
 import com.team3.assign_back.domain.food.repository.FoodRepository;
-import com.team3.assign_back.domain.recommendation.dto.KakaoPlaceResponse;
-import com.team3.assign_back.domain.recommendation.dto.PlaceResponseDto;
-import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
-import com.team3.assign_back.domain.recommendation.dto.RecommendationRequestDto;
+import com.team3.assign_back.domain.recommendation.dto.*;
 import com.team3.assign_back.domain.recommendation.entity.Recommendation;
 import com.team3.assign_back.domain.recommendation.repository.CustomRecommendationRepository;
 import com.team3.assign_back.domain.recommendation.repository.RecommendationRepository;
 import com.team3.assign_back.domain.recommendation.util.KakaoApiService;
 import com.team3.assign_back.domain.tastePreference.service.TastePreferenceEmbeddingService;
 import com.team3.assign_back.domain.users.repository.UserRepository;
+import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import jakarta.transaction.Transactional;
@@ -21,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -272,9 +272,10 @@ public class RecommendationService {
     }
 
 
+    public PageResponseDto<RecommendationHistoryResponseDto> getRecommendationHistories(Long userId, int page, int size) {
 
+        Pageable pageable = PageRequest.of(page - 1, size);
 
-
-
-
+        return customRecommendationRepository.getRecommendationHistories(userId, pageable);
+    }
 }
