@@ -17,5 +17,5 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
     @Query("SELECT f FROM Food f LEFT JOIN TasteMetrics t ON f.id = t.foodId WHERE t.foodId IS NULL")
     List<Food> customFindFoodsWithoutTasteMetrics();
 
-    Optional<Food> findByName(String name);
+    Optional<Food> findByName(String menu);
 }

@@ -10,6 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users, Long>, UserRepositoryCustom {
+    Optional<Users> findById(Long id);
+
     Optional<Users> findByVendorId(String vendorId);
 
     @Query("SELECT u.id FROM Users u WHERE u.vendorId = :vendorId")
