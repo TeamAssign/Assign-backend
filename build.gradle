@@ -46,6 +46,10 @@ dependencies {
     // Auth0
     implementation 'com.okta.spring:okta-spring-boot-starter:3.0.6'
 
+    // OAuth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+
     // jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
