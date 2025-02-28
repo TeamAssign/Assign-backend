@@ -97,12 +97,23 @@ public class RecommendationController {
         return ApiResponseDto.from(HttpStatus.OK,"메뉴 추천 성공", null);
     }
 
+
+    @Operation(
+            summary = "메뉴 추천 히스토리 조회",
+            description = "사용자가 추천받은 음식 메뉴 추천 히스토리를 조회 합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "메뉴 추천 히스토리 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PageResponseDto.class))
+    )
+    @GetMapping
     public ResponseEntity<ApiResponseDto<PageResponseDto<RecommendationHistoryResponseDto>>> getRecommendations(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size){
 
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
 
-        return ApiResponseDto.from(HttpStatus.OK,"메뉴 히스토리 조회 성공", recommendationService.getRecommendationHistories(userId, page, size));
+        return ApiResponseDto.from(HttpStatus.OK,"메뉴 추천 히스토리 조회 성공", recommendationService.getRecommendationHistories(userId, page, size));
 
     }
 
