@@ -145,18 +145,23 @@ public class RecommendationService {
         recommendationRepository.save(recommendation);
 
         List<Long> participantIds;
+        Long teamId = null;
 
-        if(recommendationRequestDto.getType() == FoodEnum.FoodType.COMPANYDINNER){
+        if(recommendationRequestDto.getType() == FoodEnum.FoodType.GROUP){
             recommendationRequestDto.getParticipantIds().add(userId);
             participantIds = new ArrayList<>(recommendationRequestDto.getParticipantIds());
 
-        } else{
+        }else{
             participantIds = new ArrayList<>();
             participantIds.add(userId);
         }
+        if(recommendationRequestDto.getType() == FoodEnum.FoodType.GROUP){
+            teamId = userRepository.findTeamIdByUsersId(userId);
+        }
+
 
         customRecommendationRepository.batchSaveUsersRecommendation(recommendation.getId(), participantIds);
-
+        tastePreferenceEmbeddingService.updateLikeEmbedding(teamId, participantIds, food.getId());
 
 
 
