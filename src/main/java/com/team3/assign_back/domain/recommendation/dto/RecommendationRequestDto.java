@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Getter
@@ -14,7 +15,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecommendationRequestDto {
-    private FoodEnum.FoodCategory category;
     private FoodEnum.FoodType type;
-    private Set<Long> participants;
+    private String name;
+    private BigDecimal accuracy;
+    private Set<Long> participantIds;
 }
