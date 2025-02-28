@@ -50,6 +50,7 @@ spring:
 
   sql:
     init:
+      mode: always
       data-locations:
         - optional:classpath:data/food.sql
         - optional:classpath:data/taste_metrics.sql
