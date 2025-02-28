@@ -6,10 +6,13 @@ import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto
 import com.team3.assign_back.global.enums.FoodEnum;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,34 +28,48 @@ public class FoodRedisRepository {
 
 
     public void deleteRejectedFood(String keyPrefix) {
-        String FoodIdsKey = keyPrefix + ":foodIds";
-        String AccuraciesKey = keyPrefix + ":accuracies";
-        redisTemplate.delete(FoodIdsKey);
-        redisTemplate.delete(AccuraciesKey);
+        String foodIdsKey = keyPrefix + ":foodIds";
+        String accuraciesKey = keyPrefix + ":accuracies";
+
+        redisTemplate.executePipelined((RedisCallback<Object>) status-> {
+            StringRedisConnection connection = (StringRedisConnection) status;
+            connection.del(foodIdsKey);
+            connection.del(accuraciesKey);
+
+            return null;
+        } );
     }
 
     public void saveRejectedFood(String keyPrefix, Long foodId, BigDecimal accuracy) {
 
 
-        String FoodIdsKey = keyPrefix + ":foodIds";
-        String AccuraciesKey = keyPrefix + ":accuracies";
-        redisTemplate.opsForList().rightPush(FoodIdsKey, foodId.toString());
-        redisTemplate.opsForList().rightPush(AccuraciesKey, accuracy.toString());
+        String foodIdsKey = keyPrefix + ":foodIds";
+        String accuraciesKey = keyPrefix + ":accuracies";
+
+        redisTemplate.executePipelined((RedisCallback<Object>) status-> {
+            StringRedisConnection connection = (StringRedisConnection) status;
+            connection.rPush(foodIdsKey, foodId.toString());
+            connection.rPush(accuraciesKey, accuracy.toString());
+            connection.expire(foodIdsKey, Duration.ofMinutes(10).toSeconds());
+            connection.expire(accuraciesKey, Duration.ofMinutes(10).toSeconds());
+
+            return null;
+        } );
 
     }
 
     public List<String> getRejectedFoodIds(String keyPrefix) {
 
-        String FoodIdsKey = keyPrefix + ":foodIds";
+        String foodIdsKey = keyPrefix + ":foodIds";
 
-        return redisTemplate.opsForList().range(FoodIdsKey, 0, -1);
+        return redisTemplate.opsForList().range(foodIdsKey, 0, -1);
     }
 
     public String getAccuracy(String keyPrefix, int index) {
 
-        String AccuraciesKey = keyPrefix + ":accuracies";
+        String accuraciesKey = keyPrefix + ":accuracies";
 
-        return redisTemplate.opsForList().index(AccuraciesKey, index);
+        return redisTemplate.opsForList().index(accuraciesKey, index);
     }
 
 }
