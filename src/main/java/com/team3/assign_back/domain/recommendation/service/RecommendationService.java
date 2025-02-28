@@ -155,7 +155,7 @@ public class RecommendationService {
             participantIds = new ArrayList<>();
             participantIds.add(userId);
         }
-        if(recommendationRequestDto.getType() == FoodEnum.FoodType.GROUP){
+        if(recommendationRequestDto.getType() == FoodEnum.FoodType.COMPANYDINNER){
             teamId = userRepository.findTeamIdByUsersId(userId);
         }
 
