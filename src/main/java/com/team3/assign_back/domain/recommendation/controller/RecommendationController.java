@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class RecommendationController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = RecommendationResponseDto.class))
     )
     @GetMapping("/category/{category}/type/{type}")
-    public ResponseEntity<ApiResponseDto<RecommendationResponseDto>> getRecommendation(@AuthenticationPrincipal Jwt jwt, @PathVariable("category")FoodEnum.FoodCategory category, @PathVariable("type")FoodEnum.FoodType type, @RequestParam(name = "participantIds") Set<Long> participantIds) {
+    public ResponseEntity<ApiResponseDto<RecommendationResponseDto>> getRecommendation(@AuthenticationPrincipal Jwt jwt, @PathVariable("category")FoodEnum.FoodCategory category, @PathVariable("type")FoodEnum.FoodType type, @RequestParam(name = "participantIds", required = false) Set<Long> participantIds) {
 
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
