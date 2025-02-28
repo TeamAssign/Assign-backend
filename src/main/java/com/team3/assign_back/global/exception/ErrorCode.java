@@ -31,7 +31,10 @@ public enum ErrorCode {
     RECOMMENDATION_EXHAUSTED(HttpStatus.NOT_FOUND, "더 이상 추천을 받을 수 없습니다."),
     KAKAO_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "메뉴에 대한 맛집 리스트를 찾을 수 없습니다."),
     KAKAO_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND,"음식점에 관한 이미지를 찾을 수 업습니다."),
-    INVALID_KEYWORD(HttpStatus.BAD_REQUEST,"유효하지 않은 메뉴명입니다." );
+    INVALID_KEYWORD(HttpStatus.BAD_REQUEST,"유효하지 않은 메뉴명입니다." ),
+
+    //음식 관련 에러
+    INVALID_FOOD_NAME(HttpStatus.BAD_REQUEST, "추천으로 받지 않은 메뉴명입니다.");
 
     private final HttpStatus status;
     private final String message;
