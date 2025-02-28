@@ -9,4 +9,6 @@ public interface CustomRecommendationRepository {
     List<RecommendationResponseDto> getRecommendation(List<Long> participants, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds);
     List<RecommendationResponseDto> getRecommendation(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds);
     List<RecommendationResponseDto> getRecommendationForTeam(Long userId, FoodEnum.FoodCategory category, List<Long> rejectedFoodIds);
+
+    void batchSaveUsersRecommendation(Long recommendationId, List<Long> participants);
 }
