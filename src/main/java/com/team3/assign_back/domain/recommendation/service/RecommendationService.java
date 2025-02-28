@@ -25,10 +25,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -57,7 +54,9 @@ public class RecommendationService {
     @Transactional
     public RecommendationResponseDto getRecommendation(Long userId, FoodEnum.FoodCategory category, FoodEnum.FoodType type, Set<Long> participantIdsSet){
 
-
+        if(participantIdsSet == null){
+            participantIdsSet = new HashSet<>();
+        }
         participantIdsSet.add(userId);
 
         List<Long> participantIds = new ArrayList<>(participantIdsSet);
