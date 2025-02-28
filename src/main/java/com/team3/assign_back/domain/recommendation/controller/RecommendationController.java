@@ -69,7 +69,7 @@ public class RecommendationController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = RecommendationResponseDto.class))
     )
     @GetMapping("/category/{category}/type/{type}")
-    public ResponseEntity<ApiResponseDto<RecommendationResponseDto>> getRecommendation(@AuthenticationPrincipal Jwt jwt, @PathVariable("category")FoodEnum.FoodCategory category, @PathVariable("type")FoodEnum.FoodType type, @RequestParam(name = "participant") Set<Long> participantIds) {
+    public ResponseEntity<ApiResponseDto<RecommendationResponseDto>> getRecommendation(@AuthenticationPrincipal Jwt jwt, @PathVariable("category")FoodEnum.FoodCategory category, @PathVariable("type")FoodEnum.FoodType type, @RequestParam(name = "participantIds") Set<Long> participantIds) {
 
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);

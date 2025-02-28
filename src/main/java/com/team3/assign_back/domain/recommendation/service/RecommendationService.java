@@ -144,18 +144,18 @@ public class RecommendationService {
 
         recommendationRepository.save(recommendation);
 
-        List<Long> participants;
+        List<Long> participantIds;
 
         if(recommendationRequestDto.getType() == FoodEnum.FoodType.COMPANYDINNER){
-            recommendationRequestDto.getParticipants().add(userId);
-            participants = new ArrayList<>(recommendationRequestDto.getParticipants());
+            recommendationRequestDto.getParticipantIds().add(userId);
+            participantIds = new ArrayList<>(recommendationRequestDto.getParticipantIds());
 
         } else{
-            participants = new ArrayList<>();
-            participants.add(userId);
+            participantIds = new ArrayList<>();
+            participantIds.add(userId);
         }
 
-        customRecommendationRepository.batchSaveUsersRecommendation(recommendation.getId(), participants);
+        customRecommendationRepository.batchSaveUsersRecommendation(recommendation.getId(), participantIds);
 
 
 

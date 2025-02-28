@@ -18,5 +18,5 @@ public class RecommendationRequestDto {
     private FoodEnum.FoodType type;
     private String name;
     private BigDecimal accuracy;
-    private Set<Long> participants;
+    private Set<Long> participantIds;
 }

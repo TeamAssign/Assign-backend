@@ -157,13 +157,13 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
 
     @Override
-    public void batchSaveUsersRecommendation(Long recommendationId, List<Long> participants){
+    public void batchSaveUsersRecommendation(Long recommendationId, List<Long> participantIds){
         String sql = "INSERT INTO users_recommendation (users_id, recommendation_id,  created_at, updated_at) VALUES (?, ?, ?, ?)";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setLong(1, participants.get(i));
+                ps.setLong(1, participantIds.get(i));
                 ps.setLong(2, recommendationId);
                 ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
                 ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
@@ -172,7 +172,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
             @Override
             public int getBatchSize() {
-                return participants.size();
+                return participantIds.size();
             }
         });
     }
