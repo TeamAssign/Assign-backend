@@ -15,5 +15,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query("SELECT new com.team3.assign_back.domain.team.dto.TeamResponseDto(t.id, t.name) FROM Team t")
     List<TeamResponseDto> findAllTeams();
 
-    Optional<Team> findByName(String name);
+    Optional<Team> findById(Long teamId);
+
+    Optional<Team> findByName(String teamName);
 }

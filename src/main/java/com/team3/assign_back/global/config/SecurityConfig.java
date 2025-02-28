@@ -11,6 +11,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SecurityConfig {
@@ -26,14 +27,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth ->
-                        oauth.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+                        oauth.jwt(withDefaults())
                 );
         return http.build();
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withJwkSetUri("https://dev-aqq0w41zxvftci4m.jp.auth0.com/.well-known/jwks.json").build();
     }
 
     @Bean
@@ -42,7 +38,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:3000",
-                "http://kdt-pt-1-pj-2-team03.elicecoding.com"
+                "http://kdt-pt-1-pj-2-team03.elicecoding.com",
+                "https://kdt-pt-1-pj-2-team03.elicecoding.com"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
