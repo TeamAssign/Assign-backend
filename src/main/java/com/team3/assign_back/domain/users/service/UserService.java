@@ -8,6 +8,7 @@ import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
 import com.team3.assign_back.domain.users.dto.UserResponseDto;
+import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.exception.ErrorCode;
@@ -39,15 +40,33 @@ public class UserService {
 
         Team team = getTeamByName(requestDto.getTeamName());
         TastePreference tastePreference = createTastePreference(requestDto);
-        Users user = createUser(vendorId, requestDto, team);
-        createUserTastePreference(user, tastePreference);
+        Users users = createUser(vendorId, requestDto, team);
+        createUserTastePreference(users, tastePreference);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
 
-    public Page<UserResponseDto> searchUsers(Long userId, String name, int page, int size) {
+    public UserResponseDto getUserInfo(String vendorId) {
+        Users users = getUserByVendorId(vendorId);
+        Team team = users.getTeam();
+
+        return UserResponseDto.builder()
+                .id(users.getId())
+                .name(users.getName())
+                .teamId(team != null ? team.getId() : null)
+                .teamName(team != null ? team.getName() : null)
+                .profileImageUrl(users.getProfileImgUrl() != null ? users.getProfileImgUrl() : defaultProfileImageUrl)
+                .build();
+    }
+
+    public Page<UserSearchResponseDto> searchUsers(Long userId, String name, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return userRepository.searchUsersByFrequency(userId, name, pageable);
+    }
+
+    public Users getUserByVendorId(String vendorId) {
+        return userRepository.findByVendorId(vendorId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     public Long getUserIdByVendorId(String vendorId) {
@@ -83,19 +102,19 @@ public class UserService {
     }
 
     private Users createUser(String vendorId, UserRegisterRequestDto requestDto, Team team) {
-        Users user = Users.builder()
+        Users users = Users.builder()
                 .vendorId(vendorId)
                 .name(requestDto.getName())
                 .team(team)
                 .profileImgUrl(defaultProfileImageUrl)
                 .build();
 
-        return userRepository.save(user);
+        return userRepository.save(users);
     }
 
-    private void createUserTastePreference(Users user, TastePreference tastePreference) {
+    private void createUserTastePreference(Users users, TastePreference tastePreference) {
         UserTastePreference userTastePreference = UserTastePreference.builder()
-                .users(user)
+                .users(users)
                 .tastePreference(tastePreference)
                 .build();
 
