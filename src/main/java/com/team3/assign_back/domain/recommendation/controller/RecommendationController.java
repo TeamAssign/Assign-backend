@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/recommendation")
+@RequestMapping("/api/recommendations")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Recommendation API", description = "맛집 추천 관련 API")
