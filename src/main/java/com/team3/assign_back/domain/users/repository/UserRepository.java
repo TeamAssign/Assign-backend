@@ -13,4 +13,8 @@ public interface UserRepository extends JpaRepository<Users, Long>, UserReposito
 
     @Query("SELECT u.id FROM Users u WHERE u.vendorId = :vendorId")
     Optional<Long> findUserIdByVendorId(String vendorId);
+
+    @Query("SELECT u.team.id FROM Users u WHERE u.id = :userId")
+    Long findTeamIdByUsersId(Long userId);
+
 }
