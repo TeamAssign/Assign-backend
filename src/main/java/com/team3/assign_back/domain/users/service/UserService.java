@@ -4,6 +4,7 @@ import com.team3.assign_back.domain.intermediate.entity.UserTastePreference;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceRepository;
 import com.team3.assign_back.domain.tastePreference.repository.UserTastePreferenceRepository;
+import com.team3.assign_back.domain.tastePreference.service.TastePreferenceEmbeddingService;
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
@@ -33,6 +34,8 @@ public class UserService {
     private final TastePreferenceRepository tastePreferenceRepository;
     private final UserTastePreferenceRepository userTastePreferenceRepository;
 
+    private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
+
     @Transactional
     public void registerUser(String vendorId, UserRegisterRequestDto requestDto) {
         validateUserNotExist(vendorId);
@@ -41,6 +44,7 @@ public class UserService {
         TastePreference tastePreference = createTastePreference(requestDto);
         Users user = createUser(vendorId, requestDto, team);
         createUserTastePreference(user, tastePreference);
+        tastePreferenceEmbeddingService.saveEmbedding(tastePreference.getId());
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }

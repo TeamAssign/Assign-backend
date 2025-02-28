@@ -2,6 +2,7 @@ package com.team3.assign_back.domain.recommendation.service;
 
 
 import com.team3.assign_back.domain.food.entity.Food;
+import com.team3.assign_back.domain.food.repository.FoodRedisRepository;
 import com.team3.assign_back.domain.food.repository.FoodRepository;
 import com.team3.assign_back.domain.recommendation.dto.KakaoPlaceResponse;
 import com.team3.assign_back.domain.recommendation.dto.PlaceResponseDto;
@@ -20,8 +21,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -30,6 +33,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
+import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_REJECT_LIST_SIZE_LIMIT;
+import static com.team3.assign_back.global.enums.FoodEnum.FoodType.COMPANYDINNER;
 import static com.team3.assign_back.global.exception.ErrorCode.*;
 
 
@@ -42,8 +47,7 @@ public class RecommendationService {
     private final UserRepository userRepository;
     private final FoodRepository foodRepository;
     private final RecommendationRepository recommendationRepository;
-
-
+    private final FoodRedisRepository foodRedisRepository;
 
     private final KakaoApiService kakaoApiService;
     private final ExecutorService executorService;
@@ -53,11 +57,25 @@ public class RecommendationService {
     @Transactional
     public RecommendationResponseDto getRecommendation(Long userId, FoodEnum.FoodCategory category, FoodEnum.FoodType type, Set<Long> participantIdsSet){
 
-        //Redis 사용 후 로직 추가할 계획
-        List<Long> rejectedFoodIds = new ArrayList<>();
+
+        participantIdsSet.add(userId);
+
+        List<Long> participantIds = new ArrayList<>(participantIdsSet);
+
+
+        List<Long> rejectedFoodIds = getRejectedFoodIds(userId, participantIds, type);
+        if(!rejectedFoodIds.isEmpty()){
+            rejectRecommendation(userId, type, rejectedFoodIds, participantIds);
+        }
+        if(rejectedFoodIds.size() > RECOMMENDATION_REJECT_LIST_SIZE_LIMIT){
+
+            deleteRejectedFood(userId, type, participantIds);
+
+            throw new CustomException(RECOMMENDATION_EXHAUSTED);
+        }
         rejectedFoodIds.add(-1L);
 
-        List<Long> participantIds = (participantIdsSet == null) ? new ArrayList<>(): new ArrayList<>(participantIdsSet);
+
 
         List<RecommendationResponseDto> recommendationCandidates;
 
@@ -66,11 +84,8 @@ public class RecommendationService {
                 case SOLO -> customRecommendationRepository.getRecommendation(userId, category, rejectedFoodIds);
                 case COMPANYDINNER -> customRecommendationRepository.getRecommendationForTeam(userId, category, rejectedFoodIds);
                 case GROUP -> {
-                    if (participantIds.isEmpty() || (participantIds.contains(userId) && participantIds.size() == 1)) {
+                    if (participantIds.size() == 1) {
                         throw new CustomException(EMPTY_PARTICIPANTS);
-                    }
-                    if (!participantIds.contains(userId)) {
-                        participantIds.add(userId);
                     }
                     yield customRecommendationRepository.getRecommendation(participantIds, category, rejectedFoodIds);
                 }
@@ -89,17 +104,53 @@ public class RecommendationService {
             throw e;
         }
 
-        if(recommendationCandidates.isEmpty()){
-            throw new CustomException(RECOMMENDATION_EXHAUSTED);
-        }
 
-        return recommendationCandidates.get(new Random().nextInt(recommendationCandidates.size()));
+        RecommendationResponseDto recommendationResponseDto = recommendationCandidates.get(new Random().nextInt(recommendationCandidates.size()));
+
+        saveRejectedFood(userId, type, participantIds, recommendationResponseDto);
+
+        return recommendationResponseDto;
+    }
+
+    private void deleteRejectedFood(Long userId, FoodEnum.FoodType type, List<Long> participantIds) {
+
+        String keyPrefix = generateKeyPrefix(userId, participantIds, type);
+
+        foodRedisRepository.deleteRejectedFood(keyPrefix);
+
+    }
+
+    private void saveRejectedFood(Long userId, FoodEnum.FoodType type, List<Long> participantIds, RecommendationResponseDto recommendationResponseDto) {
+
+        Food food = foodRepository.findByName(recommendationResponseDto.getName()).orElseThrow(()-> new CustomException(INVALID_FOOD_NAME));
+
+        String keyPrefix = generateKeyPrefix(userId, participantIds, type);
+
+        foodRedisRepository.saveRejectedFood(keyPrefix, food.getId(), recommendationResponseDto.getAccuracy());
+
+    }
+
+    private List<Long> getRejectedFoodIds(Long userId, List<Long> participantIds, FoodEnum.FoodType type) {
+
+        String keyPrefix = generateKeyPrefix(userId, participantIds, type);
+
+        List<String> rejectedFoodIdsString = foodRedisRepository.getRejectedFoodIds(keyPrefix);
+        if(rejectedFoodIdsString == null || rejectedFoodIdsString.isEmpty()){
+            return new ArrayList<>();
+        }
+        return rejectedFoodIdsString.stream().map(Long::parseLong).collect(Collectors.toList());
+    }
+
+    private String generateKeyPrefix(Long userId, List<Long> participantIds, FoodEnum.FoodType type) {
+        return (type == COMPANYDINNER) ?
+                "team:" + userRepository.findTeamIdByUsersId(userId):
+                "users:" + participantIds.stream().sorted().map(String::valueOf).collect(Collectors.joining(","));
     }
 
 
     private void updateDislike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
 
-        if(type == FoodEnum.FoodType.COMPANYDINNER){
+        if(type == COMPANYDINNER){
             Long teamId = userRepository.findTeamIdByUsersId(userId);
             tastePreferenceEmbeddingService.updateDislikeEmbedding(teamId, null, foodId);
         } else{
@@ -114,7 +165,7 @@ public class RecommendationService {
 
     private void updateLike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
 
-        if(type == FoodEnum.FoodType.COMPANYDINNER){
+        if(type == COMPANYDINNER){
             Long teamId = userRepository.findTeamIdByUsersId(userId);
             tastePreferenceEmbeddingService.updateLikeEmbedding(teamId, null, foodId);
         } else{
@@ -130,6 +181,43 @@ public class RecommendationService {
         }
 
     }
+
+
+    public void rejectRecommendation(Long userId, FoodEnum.FoodType type, List<Long> rejectedFoodIds, List<Long> participantIds) {
+
+        String key = (type == COMPANYDINNER) ?
+                "team:" + userRepository.findTeamIdByUsersId(userId) + ":accuracies":
+                "users:" + participantIds.stream().sorted().map(String::valueOf).collect(Collectors.joining(",")) + ":accuracies";
+
+        int index = rejectedFoodIds.size() - 1;
+
+        Food food = foodRepository.getReferenceById(rejectedFoodIds.get(index));
+
+        String keyPrefix = generateKeyPrefix(userId, participantIds, type);
+
+        BigDecimal accuracy = new BigDecimal(foodRedisRepository.getAccuracy(keyPrefix, index));
+
+        Recommendation recommendation = Recommendation.builder()
+                .type(type)
+                .isAgree(false)
+                .accuracy(accuracy)
+                .food(food).build();
+
+        recommendationRepository.save(recommendation);
+
+        Long teamId = null;
+        if(type == COMPANYDINNER){
+            teamId = userRepository.findTeamIdByUsersId(userId);
+        }
+
+
+        customRecommendationRepository.batchSaveUsersRecommendation(recommendation.getId(), participantIds);
+        tastePreferenceEmbeddingService.updateDislikeEmbedding(teamId, participantIds, food.getId());
+
+
+
+    }
+
 
     @Transactional
     public void acceptRecommendation(Long userId, RecommendationRequestDto recommendationRequestDto) {
@@ -155,7 +243,7 @@ public class RecommendationService {
             participantIds = new ArrayList<>();
             participantIds.add(userId);
         }
-        if(recommendationRequestDto.getType() == FoodEnum.FoodType.COMPANYDINNER){
+        if(recommendationRequestDto.getType() == COMPANYDINNER){
             teamId = userRepository.findTeamIdByUsersId(userId);
         }
 
@@ -163,6 +251,7 @@ public class RecommendationService {
         customRecommendationRepository.batchSaveUsersRecommendation(recommendation.getId(), participantIds);
         tastePreferenceEmbeddingService.updateLikeEmbedding(teamId, participantIds, food.getId());
 
+        deleteRejectedFood(userId, recommendationRequestDto.getType(), participantIds);
 
 
     }

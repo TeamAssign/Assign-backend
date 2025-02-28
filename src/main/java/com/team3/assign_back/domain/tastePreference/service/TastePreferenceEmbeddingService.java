@@ -1,7 +1,7 @@
 package com.team3.assign_back.domain.tastePreference.service;
 
 
-import com.team3.assign_back.domain.food.repository.TasteMetricsEmbeddingRepository;
+import com.team3.assign_back.domain.food.repository.CustomTasteMetricsEmbeddingRepository;
 import com.team3.assign_back.domain.tastePreference.dao.TastePreferenceEmbeddingDao;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreferenceEmbedding;
@@ -24,7 +24,7 @@ public class TastePreferenceEmbeddingService {
 
     private final TastePreferenceRepository tastePreferenceRepository;
     private final TastePreferenceEmbeddingRepository tastePreferenceEmbeddingRepository;
-    private final TasteMetricsEmbeddingRepository tasteMetricsEmbeddingRepository;
+    private final CustomTasteMetricsEmbeddingRepository customTasteMetricsEmbeddingRepository;
 
     private final OpenAiEmbeddingModel embeddingModel;
 
@@ -68,7 +68,7 @@ public class TastePreferenceEmbeddingService {
             tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findLikeEmbeddingAndRateForTeam(teamId);
         }
 
-        float[] foodEmbed = tasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
+        float[] foodEmbed = customTasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
 
         for(TastePreferenceEmbeddingDao tastePreferenceEmbeddingDao : tastePreferenceEmbeddingDaos){
             float learningRate = tastePreferenceEmbeddingDao.getLearningRate();
@@ -91,7 +91,8 @@ public class TastePreferenceEmbeddingService {
             tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findDislikeEmbeddingAndRateForTeam(teamId);
         }
 
-        float[] foodEmbed = tasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
+        float[] foodEmbed =  customTasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
+
 
         for(TastePreferenceEmbeddingDao tastePreferenceEmbeddingDao : tastePreferenceEmbeddingDaos){
             float learningRate = tastePreferenceEmbeddingDao.getLearningRate();
@@ -105,13 +106,13 @@ public class TastePreferenceEmbeddingService {
     }
 
     private void calculateUpdatingEmbedding(float[] updatingEmbed, float[] foodEmbed, float learningRate){
-        float squareSum = 0;
+        double squareSum = 0;
         for(int i = 0; i < updatingEmbed.length; i++){
             updatingEmbed[i] += learningRate * (foodEmbed[i] - updatingEmbed[i]);
             squareSum += updatingEmbed[i] * updatingEmbed[i];
         }
         for(int i = 0; i < updatingEmbed.length; i++){
-            updatingEmbed[i] /= squareSum;
+            updatingEmbed[i] /= (float) Math.sqrt(squareSum);
         }
 
     }
