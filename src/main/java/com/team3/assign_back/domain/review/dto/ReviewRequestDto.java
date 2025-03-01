@@ -1,6 +1,5 @@
 package com.team3.assign_back.domain.review.dto;
 
-import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.global.enums.FoodEnum;
 import lombok.*;
 

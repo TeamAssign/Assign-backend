@@ -4,6 +4,7 @@ import com.team3.assign_back.domain.review.dto.ReviewResponseDto;
 import com.team3.assign_back.domain.review.service.ReviewService;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
 import com.team3.assign_back.domain.users.dto.UserResponseDto;
+import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
 import com.team3.assign_back.domain.users.service.UserService;
 import com.team3.assign_back.global.common.ApiResponseDto;
 import com.team3.assign_back.global.common.PageResponseDto;
@@ -53,6 +54,22 @@ public class UserController {
     }
 
     @Operation(
+            summary = "현재 로그인한 유저 정보 조회",
+            description = "현재 로그인한 유저의 정보를 반환하는 API입니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "유저 정보 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))
+    )
+    @GetMapping("/userInfo")
+    public ResponseEntity<ApiResponseDto<UserResponseDto>> getUserInfo(@AuthenticationPrincipal Jwt jwt) {
+        String vendorId = jwt.getSubject();
+        UserResponseDto userInfo = userService.getUserInfo(vendorId);
+        return ApiResponseDto.from(HttpStatus.OK, "유저 정보 조회 성공.", userInfo);
+    }
+
+    @Operation(
             summary = "사용자 리뷰 조회",
             description = "특정 사용자의 리뷰를 조회합니다."
     )
@@ -83,13 +100,13 @@ public class UserController {
     @ApiResponse(
             responseCode = "200",
             description = "사용자 검색 성공",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PageResponseDto.class))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserSearchResponseDto.class))
     )
     @Parameter(name = "name", description = "검색할 유저의 이름 (빈 문자열이면 전체 검색)", example = "홍길동")
     @Parameter(name = "page", description = "페이지 번호 (기본값: 1)", example = "1")
     @Parameter(name = "size", description = "페이지 크기 (기본값: 10)", example = "10")
     @GetMapping("/search")
-    public ResponseEntity<ApiResponseDto<PageResponseDto<UserResponseDto>>> searchUsers(
+    public ResponseEntity<ApiResponseDto<PageResponseDto<UserSearchResponseDto>>> searchUsers(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam(required = false, defaultValue = "") String name,
             @RequestParam(defaultValue = "1") int page,
@@ -98,8 +115,8 @@ public class UserController {
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
 
-        Page<UserResponseDto> userPage = userService.searchUsers(userId, name, page, size);
-        PageResponseDto<UserResponseDto> response = new PageResponseDto<>(userPage);
+        Page<UserSearchResponseDto> userPage = userService.searchUsers(userId, name, page, size);
+        PageResponseDto<UserSearchResponseDto> response = new PageResponseDto<>(userPage);
 
         return ApiResponseDto.from(HttpStatus.OK, "사용자 검색 결과입니다.", response);
     }
