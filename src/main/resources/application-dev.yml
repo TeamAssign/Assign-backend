@@ -55,6 +55,7 @@ spring:
         - optional:classpath:data/food.sql
         - optional:classpath:data/taste_metrics.sql
         - optional:classpath:data/taste_metrics_embedding.sql
+        - optional:classpath:data/team.sql
   ai:
     openai:
       api-key: ${OPEN_AI_API_KEY}
