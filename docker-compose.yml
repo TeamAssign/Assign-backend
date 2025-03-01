@@ -2,7 +2,7 @@ version: "3"
 services:
   assign:
     container_name: assign_BE
-    image: moonsunmean/assign_BE:latest
+    image: moonsunmean/assign_back:latest
     ports:
       - "8080:8080"
     depends_on:
