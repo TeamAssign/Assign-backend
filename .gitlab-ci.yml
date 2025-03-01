@@ -10,7 +10,7 @@ stages:
 
 variables:
   DOCKER_REGISTRY: docker.io
-  DOCKER_IMAGE: assign_BE
+  DOCKER_IMAGE: assign_back
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
