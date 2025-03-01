@@ -23,7 +23,7 @@ build_job:
     - unset DOCKER_HOST
     - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
     - cat "$ENV_FILE" > src/main/resources/.env
-    - cat "
+    - cat "$PROPERTIES" > src/main/resources/application.properties
   script:
     - echo "빌드를 시작합니다...."
     - docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest .
@@ -43,7 +43,6 @@ deploy_job:
     - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
   script:
     - echo "Deploying the project..."
-    - docker stop assign_BE || true && docker rm assign_BE || true
     - docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
     - docker-compose up -d --build assign
   after_script:
