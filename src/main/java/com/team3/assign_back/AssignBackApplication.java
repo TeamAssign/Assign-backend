@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @EnableCaching
 @EnableScheduling
@@ -21,6 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         ))
 @EnableJpaAuditing
 @EnableAsync
+@EnableWebSecurity
 @SpringBootApplication
 public class AssignBackApplication {
 

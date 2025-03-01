@@ -9,6 +9,7 @@ import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
 import com.team3.assign_back.domain.team.dto.TeamResponseDto;
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
+import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TeamService {
+    private final UserRepository userRepository;
     private final TastePreferenceRepository tastePreferenceRepository;
     private final TeamTastePreferenceRepository teamTastePreferenceRepository;
     private final TeamRepository teamRepository;
