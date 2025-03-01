@@ -8,4 +8,3 @@ FROM openjdk:17-slim
 WORKDIR /app
 COPY --from=builder /app/build/libs/*SNAPSHOT.jar app.jar
 CMD java -jar app.jar
-~
