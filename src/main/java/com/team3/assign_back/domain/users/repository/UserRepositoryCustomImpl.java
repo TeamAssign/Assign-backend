@@ -40,7 +40,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                 .select(Projections.constructor(UserSearchResponseDto.class,
                         users.id,
                         users.name,
-                        team.name.as("teamName"),
+                        team.name,
                         users.profileImgUrl
                 ))
                 .from(users)
@@ -56,8 +56,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                         new CaseBuilder()
                                 .when(users.team.id.eq(userTeamId)).then(1)
                                 .otherwise(0)
-                                .desc()
-                                .nullsLast(), // 같은 팀 우선 정렬
+                                .desc(), // 같은 팀 우선 정렬
                         users.name.asc()
                 )
                 .offset(pageable.getOffset())

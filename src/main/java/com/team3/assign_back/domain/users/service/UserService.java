@@ -57,8 +57,8 @@ public class UserService {
         return UserResponseDto.builder()
                 .id(users.getId())
                 .name(users.getName())
-                .teamId(team != null ? team.getId() : null)
-                .teamName(team != null ? team.getName() : null)
+                .teamId(team.getId())
+                .teamName(team.getName())
                 .profileImageUrl(users.getProfileImgUrl() != null ? users.getProfileImgUrl() : defaultProfileImageUrl)
                 .build();
     }
