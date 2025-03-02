@@ -23,4 +23,12 @@ public class CustomTasteMetricsEmbeddingRepositoryImpl implements CustomTasteMet
                 .fetchFirst();
 
     }
+
+    @Override
+    public float[] findTextForCompanyDinnerEmbeddingByTasteMetricsId(Long tasteMetricsId) {
+        return query
+                .from(tasteMetricsEmbedding)
+                .where(tasteMetricsEmbedding.tasteMetricsId.eq(tasteMetricsId))
+                .select(tasteMetricsEmbedding.textForCompanyDinnerEmbedding)
+                .fetchFirst();    }
 }
