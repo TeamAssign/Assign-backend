@@ -18,7 +18,6 @@ import com.team3.assign_back.domain.team.repository.TeamRepository;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.common.PageResponseDto;
-import com.team3.assign_back.global.enums.FoodEnum;
 import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
