@@ -62,13 +62,15 @@ public class TastePreferenceEmbeddingService {
     public void updateLikeEmbedding(Long teamId, List<Long> participants, Long foodId) {
 
         List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos;
+        float[] foodEmbed;
         if(teamId == null){
             tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findLikeEmbeddingAndRateByUserIds(participants);
+            foodEmbed =  customTasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
         } else{
             tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findLikeEmbeddingAndRateForTeam(teamId);
-        }
+            foodEmbed =  customTasteMetricsEmbeddingRepository.findTextForCompanyDinnerEmbeddingByTasteMetricsId(foodId);
 
-        float[] foodEmbed = customTasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
+        }
 
         for(TastePreferenceEmbeddingDao tastePreferenceEmbeddingDao : tastePreferenceEmbeddingDaos){
             float learningRate = tastePreferenceEmbeddingDao.getLearningRate();
@@ -85,13 +87,16 @@ public class TastePreferenceEmbeddingService {
     public void updateDislikeEmbedding(Long teamId, List<Long> participants, Long foodId) {
 
         List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos;
+        float[] foodEmbed;
         if(teamId == null){
             tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findDislikeEmbeddingAndRateByUserIds(participants);
+            foodEmbed =  customTasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
         } else{
             tastePreferenceEmbeddingDaos = tastePreferenceEmbeddingRepository.findDislikeEmbeddingAndRateForTeam(teamId);
+            foodEmbed =  customTasteMetricsEmbeddingRepository.findTextForCompanyDinnerEmbeddingByTasteMetricsId(foodId);
+
         }
 
-        float[] foodEmbed =  customTasteMetricsEmbeddingRepository.findTextEmbeddingByTasteMetricsId(foodId);
 
 
         for(TastePreferenceEmbeddingDao tastePreferenceEmbeddingDao : tastePreferenceEmbeddingDaos){
