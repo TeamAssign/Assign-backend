@@ -6,6 +6,7 @@ import com.team3.assign_back.domain.intermediate.entity.Participant;
 import com.team3.assign_back.domain.intermediate.repository.ParticipantRepository;
 import com.team3.assign_back.domain.recommendation.entity.Recommendation;
 import com.team3.assign_back.domain.recommendation.repository.RecommendationRepository;
+import com.team3.assign_back.domain.intermediate.dto.ParticipantsDto;
 import com.team3.assign_back.domain.review.dto.ReviewRequestDto;
 import com.team3.assign_back.domain.review.dto.ReviewResponseDto;
 import com.team3.assign_back.domain.review.entity.DirectReview;
@@ -77,7 +78,7 @@ public class ReviewService {
                         .food(food)
                         .comment(reviewRequestDto.getComment())
                         .star(reviewRequestDto.getStar())
-                        .imgUrl(reviewRequestDto.getImgurl())
+                        .imgUrl(reviewRequestDto.getProfileImageUrl())
                         .build()
         );
 
@@ -101,7 +102,7 @@ public class ReviewService {
                         .recommendation(recommendation)
                         .comment(reviewRequestDto.getComment())
                         .star(reviewRequestDto.getStar())
-                        .imgUrl(reviewRequestDto.getImgurl())
+                        .imgUrl(reviewRequestDto.getProfileImageUrl())
                         .build()
         );
 
@@ -163,8 +164,8 @@ public class ReviewService {
         Review review = reviewRepository.findReviewWithParticipants(directReview.getReview().getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
-        List<Long> participantIds = review.getParticipants().stream()
-                .map(participant -> participant.getUsers().getId())
+        List<ParticipantsDto> participantsDtoList = review.getParticipants().stream()
+                .map(participant -> ParticipantsDto.from(participant.getUsers()))
                 .collect(Collectors.toList());
 
         return ReviewResponseDto.builder()
@@ -175,7 +176,7 @@ public class ReviewService {
                 .type(directReview.getType())
                 .category(directReview.getFood().getCategory())
                 .imgurl(directReview.getImgUrl())
-                .participants(participantIds)
+                .participants(participantsDtoList)
                 .build();
     }
 
@@ -183,8 +184,8 @@ public class ReviewService {
         Review review = reviewRepository.findReviewWithParticipants(recommendationReview.getReview().getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
-        List<Long> participantIds = review.getParticipants().stream()
-                .map(participant -> participant.getUsers().getId())
+        List<ParticipantsDto> participantsDtoList = review.getParticipants().stream()
+                .map(participant -> ParticipantsDto.from(participant.getUsers()))
                 .collect(Collectors.toList());
 
         return ReviewResponseDto.builder()
@@ -196,7 +197,7 @@ public class ReviewService {
                 .type(recommendation.getType())
                 .food(foodName)
                 .category(recommendation.getFood().getCategory())
-                .participants(participantIds)
+                .participants(participantsDtoList)
                 .build();
     }
 

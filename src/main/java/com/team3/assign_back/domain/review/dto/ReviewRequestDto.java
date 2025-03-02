@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ReviewRequestDto {
     private Long recommendationId;
-    private String imgurl;
+    private String profileImageUrl;
     private FoodEnum.FoodCategory category;
     private String menu;
     private FoodEnum.FoodType type;
