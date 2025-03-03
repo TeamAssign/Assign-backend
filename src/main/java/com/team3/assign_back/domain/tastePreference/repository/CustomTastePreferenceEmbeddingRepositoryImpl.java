@@ -86,7 +86,7 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
                 .where(team.id.eq(teamId));
     }
 
-    public void saveLikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
+    public void updateLikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
 
         for(TastePreferenceEmbeddingDao dao : tastePreferenceEmbeddingDaos){
             query
@@ -99,7 +99,7 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
 
     }
 
-    public void saveDislikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
+    public void updateDislikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
 
         for(TastePreferenceEmbeddingDao dao : tastePreferenceEmbeddingDaos){
             query
@@ -111,8 +111,6 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
         }
 
     }
-
-
 
 
 }
