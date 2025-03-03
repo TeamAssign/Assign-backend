@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.recommandation.entity;
+package com.team3.assign_back.domain.recommendation.entity;
 
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
@@ -20,7 +20,7 @@ public class UsersRecommendation extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "users_id", nullable = false)
     private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)

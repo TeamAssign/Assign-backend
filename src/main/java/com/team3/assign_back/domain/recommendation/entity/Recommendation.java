@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.recommandation.entity;
+package com.team3.assign_back.domain.recommendation.entity;
 
 import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.global.common.BaseEntity;
@@ -10,8 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "recommendation")
@@ -31,6 +30,9 @@ public class Recommendation extends BaseEntity {
     @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean isAgree;
+
+    @Column(nullable = false)
+    private BigDecimal accuracy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_id", nullable = false)

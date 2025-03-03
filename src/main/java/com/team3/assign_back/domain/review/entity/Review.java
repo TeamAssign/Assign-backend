@@ -25,7 +25,8 @@ public class Review extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Users users; // 리뷰 작성자 (FK)
+    private Users users;
+
 
     @OneToOne(mappedBy = "review")
     private DirectReview directReview;
@@ -36,4 +37,5 @@ public class Review extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "review")
     private List<Participant> participants = new ArrayList<>();
+
 }

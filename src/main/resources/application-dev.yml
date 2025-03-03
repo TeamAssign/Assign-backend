@@ -11,6 +11,17 @@ spring:
       initialize-schema: always
   scheduling:
     enable: true
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        bucket: ${AWS_S3_BUCKET}
+        default-profile-image: https://elice-assign-bucket.s3.ap-northeast-2.amazonaws.com/default_profile_image.jpeg
+      region:
+        static: ${AWS_S3_REGION}
+
 
   datasource:
     url: jdbc:postgresql://pgvectorDB:5432/assign
@@ -21,6 +32,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+    defer-datasource-initialization: true
     show-sql: false
     properties:
       hibernate:
@@ -32,7 +44,18 @@ spring:
       uri: ${MONGO_DB_URI}
       database: assign
       auto-index-creation: true
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
+  sql:
+    init:
+      mode: always
+      data-locations:
+        - optional:classpath:data/food.sql
+        - optional:classpath:data/taste_metrics.sql
+        - optional:classpath:data/taste_metrics_embedding.sql
+        - optional:classpath:data/team.sql
   ai:
     openai:
       api-key: ${OPEN_AI_API_KEY}
@@ -44,9 +67,24 @@ spring:
           model: text-embedding-3-small
           dimensions: 256
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: method
+    tags-sorter: alpha
+
 okta:
   oauth2:
     issuer: ${AUTH0_ISSUER}
     client-id: ${AUTH0_CLIENT_ID}
     client-secret: ${AUTH0_CLIENT_SECRET}
     audience: ${AUTH0_AUDIENCE}
+
+kakao:
+  api-key: ${KAKAO_API_KEY}
