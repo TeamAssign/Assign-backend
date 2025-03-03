@@ -2,11 +2,13 @@ package com.team3.assign_back.global.common;
 
 
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Builder
 public record ApiResponseDto<T> (String message, T data, LocalDateTime timestamp){
 
