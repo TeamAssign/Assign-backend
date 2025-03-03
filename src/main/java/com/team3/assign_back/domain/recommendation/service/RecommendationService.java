@@ -21,7 +21,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -103,6 +102,12 @@ public class RecommendationService {
             throw e;
         }
 
+        if(recommendationCandidates.isEmpty()){
+
+            deleteRejectedFood(userId, type, participantIds);
+
+            throw new CustomException(RECOMMENDATION_EXHAUSTED);
+        }
 
         RecommendationResponseDto recommendationResponseDto = recommendationCandidates.get(new Random().nextInt(recommendationCandidates.size()));
 
@@ -146,47 +151,8 @@ public class RecommendationService {
                 "users:" + participantIds.stream().sorted().map(String::valueOf).collect(Collectors.joining(","));
     }
 
-
-    private void updateDislike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
-
-        if(type == COMPANYDINNER){
-            Long teamId = userRepository.findTeamIdByUsersId(userId);
-            tastePreferenceEmbeddingService.updateDislikeEmbedding(teamId, null, foodId);
-        } else{
-            if (!participants.contains(userId)) {
-                participants.add(userId);
-            }
-            tastePreferenceEmbeddingService.updateDislikeEmbedding(null, participants, foodId);
-
-        }
-
-    }
-
-    private void updateLike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
-
-        if(type == COMPANYDINNER){
-            Long teamId = userRepository.findTeamIdByUsersId(userId);
-            tastePreferenceEmbeddingService.updateLikeEmbedding(teamId, null, foodId);
-        } else{
-
-            if (participants == null) {
-                participants = new ArrayList<>();
-            }
-            if (!participants.contains(userId)) {
-                participants.add(userId);
-            }
-            tastePreferenceEmbeddingService.updateLikeEmbedding(null, participants, foodId);
-
-        }
-
-    }
-
-
     public void rejectRecommendation(Long userId, FoodEnum.FoodType type, List<Long> rejectedFoodIds, List<Long> participantIds) {
 
-        String key = (type == COMPANYDINNER) ?
-                "team:" + userRepository.findTeamIdByUsersId(userId) + ":accuracies":
-                "users:" + participantIds.stream().sorted().map(String::valueOf).collect(Collectors.joining(",")) + ":accuracies";
 
         int index = rejectedFoodIds.size() - 1;
 
@@ -277,5 +243,20 @@ public class RecommendationService {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         return customRecommendationRepository.getRecommendationHistories(userId, pageable);
+    }
+
+    public RecommendationResponseDto getRecommendationToday(Long userId) {
+
+
+        RecommendationResponseDto recommendationResponseDto = foodRedisRepository.getFoodToday(userId);
+        if(recommendationResponseDto != null){
+            return recommendationResponseDto;
+        }
+
+        List<RecommendationResponseDto> recommendationCandidates = customRecommendationRepository.getRecommendationToday(userId);
+        recommendationResponseDto = recommendationCandidates.get(new Random().nextInt(recommendationCandidates.size()));
+        foodRedisRepository.saveFoodToday(userId, recommendationResponseDto);
+
+        return recommendationResponseDto;
     }
 }

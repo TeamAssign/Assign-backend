@@ -1,12 +1,14 @@
 package com.team3.assign_back.domain.users.service;
 
 import com.team3.assign_back.domain.intermediate.entity.UserTastePreference;
+import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceRepository;
 import com.team3.assign_back.domain.tastePreference.repository.UserTastePreferenceRepository;
 import com.team3.assign_back.domain.tastePreference.service.TastePreferenceEmbeddingService;
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
+import com.team3.assign_back.domain.users.dto.UserProfileDto;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
 import com.team3.assign_back.domain.users.dto.UserResponseDto;
 import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
@@ -45,7 +47,7 @@ public class UserService {
         TastePreference tastePreference = createTastePreference(requestDto);
         Users users = createUser(vendorId, requestDto, team);
         createUserTastePreference(users, tastePreference);
-        tastePreferenceEmbeddingService.saveEmbedding(tastePreference.getId());
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
@@ -124,4 +126,39 @@ public class UserService {
 
         userTastePreferenceRepository.save(userTastePreference);
     }
+
+    @Transactional(readOnly = true)
+    public UserProfileDto getUserProfile(Long userId) {
+        Users users = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        UserTastePreference userTastePreference = userTastePreferenceRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
+
+        TastePreference getPreference = userTastePreference.getTastePreference();
+        return new UserProfileDto(
+                users.getName(),
+                users.getTeam().getName(),
+                getPreference.getSpicy(),
+                getPreference.getSweet(),
+                getPreference.getSalty(),
+                getPreference.getPros(),
+                getPreference.getCons(),
+                users.getProfileImgUrl()
+        );
+    }
+
+    @Transactional
+    public void updateUserTastePreference(Long userId, TastePreferenceUpdateRequestDTO updateRequestDTO){
+        UserTastePreference userTastePreference = userTastePreferenceRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
+
+        TastePreference existingPreference = userTastePreference.getTastePreference();
+        existingPreference.updateTastePreferences(updateRequestDTO);
+
+        tastePreferenceRepository.save(existingPreference);
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference);
+
+    }
+
 }

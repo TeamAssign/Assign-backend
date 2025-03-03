@@ -62,14 +62,14 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
 
         return findEmbeddingAndRateForTeamSubquery(teamId)
                 .select(
-                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.likeEmbedding, tastePreferenceEmbedding.likeLearningRate))
+                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.id, tastePreferenceEmbedding.likeEmbedding, tastePreferenceEmbedding.likeLearningRate))
                 .fetch();
     }
     public List<TastePreferenceEmbeddingDao> findDislikeEmbeddingAndRateForTeam(Long teamId){
 
         return findEmbeddingAndRateForTeamSubquery(teamId)
                 .select(
-                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.dislikeEmbedding, tastePreferenceEmbedding.dislikeLearningRate))
+                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.id, tastePreferenceEmbedding.dislikeEmbedding, tastePreferenceEmbedding.dislikeLearningRate))
                 .fetch();
     }
 
@@ -86,7 +86,7 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
                 .where(team.id.eq(teamId));
     }
 
-    public void saveLikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
+    public void updateLikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
 
         for(TastePreferenceEmbeddingDao dao : tastePreferenceEmbeddingDaos){
             query
@@ -99,7 +99,7 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
 
     }
 
-    public void saveDislikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
+    public void updateDislikeEmbeddingAndRate(List<TastePreferenceEmbeddingDao> tastePreferenceEmbeddingDaos){
 
         for(TastePreferenceEmbeddingDao dao : tastePreferenceEmbeddingDaos){
             query
@@ -111,8 +111,6 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
         }
 
     }
-
-
 
 
 }

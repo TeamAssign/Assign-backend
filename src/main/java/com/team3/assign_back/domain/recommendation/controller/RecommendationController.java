@@ -108,12 +108,33 @@ public class RecommendationController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = PageResponseDto.class))
     )
     @GetMapping
-    public ResponseEntity<ApiResponseDto<PageResponseDto<RecommendationHistoryResponseDto>>> getRecommendations(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size){
+    public ResponseEntity<ApiResponseDto<PageResponseDto<RecommendationHistoryResponseDto>>> getRecommendations(@AuthenticationPrincipal Jwt jwt, @RequestParam(name = "page", defaultValue = "1") int page, @RequestParam(name = "size", defaultValue = "10") int size){
 
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
 
         return ApiResponseDto.from(HttpStatus.OK,"메뉴 추천 히스토리 조회 성공", recommendationService.getRecommendationHistories(userId, page, size));
+
+    }
+
+
+
+    @Operation(
+            summary = "오늘의 추천 메뉴 조회",
+            description = "사용자가 오늘의 추천 메뉴를 조회 합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "오늘의 추천 메뉴 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RecommendationResponseDto.class))
+    )
+    @GetMapping("/today")
+    public ResponseEntity<ApiResponseDto<RecommendationResponseDto>> getRecommendationToday(@AuthenticationPrincipal Jwt jwt){
+
+        String vendorId = jwt.getSubject();
+        Long userId = userService.getUserIdByVendorId(vendorId);
+
+        return ApiResponseDto.from(HttpStatus.OK,"오늘의 메뉴 조회 성공", recommendationService.getRecommendationToday(userId));
 
     }
 

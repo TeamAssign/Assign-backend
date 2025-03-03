@@ -29,9 +29,8 @@ public class TastePreferenceEmbeddingService {
     private final OpenAiEmbeddingModel embeddingModel;
 
     @Transactional
-    public void saveEmbedding(Long tastePreferenceId){
+    public void saveOrUpdateEmbedding(TastePreference tastePreference){
 
-        TastePreference tastePreference = tastePreferenceRepository.getReferenceById(tastePreferenceId);
 
         String likePrompt = String.format(USER_PROMPT_LIKES,
                 tastePreference.getPros(),
@@ -78,7 +77,7 @@ public class TastePreferenceEmbeddingService {
             tastePreferenceEmbeddingDao.setLearningRate(Math.max(learningRate * LIKE_EMBEDDING_DECAY_FACTOR, EMBEDDING_LEARNING_RATE_MINIMUM));
         }
 
-        tastePreferenceEmbeddingRepository.saveLikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
+        tastePreferenceEmbeddingRepository.updateLikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
 
 
     }
@@ -105,7 +104,7 @@ public class TastePreferenceEmbeddingService {
             tastePreferenceEmbeddingDao.setLearningRate(Math.max(learningRate * DISLIKE_EMBEDDING_DECAY_FACTOR, EMBEDDING_LEARNING_RATE_MINIMUM));
         }
 
-        tastePreferenceEmbeddingRepository.saveDislikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
+        tastePreferenceEmbeddingRepository.updateDislikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
 
 
     }
