@@ -78,7 +78,7 @@ public class ReviewService {
                         .food(food)
                         .comment(reviewRequestDto.getComment())
                         .star(reviewRequestDto.getStar())
-                        .imgUrl(reviewRequestDto.getProfileImageUrl())
+                        .imgUrl(reviewRequestDto.getImgurl())
                         .build()
         );
 
@@ -94,7 +94,7 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_NOT_FOUND));
 
         Food food = recommendation.getFood();
-        String foodName = (food != null) ? food.getName() : "기타 음식";
+        String foodName = food.getName();
 
         RecommendationReview recommendationReview = recommendationReviewRepository.save(
                 RecommendationReview.builder()
@@ -102,7 +102,7 @@ public class ReviewService {
                         .recommendation(recommendation)
                         .comment(reviewRequestDto.getComment())
                         .star(reviewRequestDto.getStar())
-                        .imgUrl(reviewRequestDto.getProfileImageUrl())
+                        .imgUrl(reviewRequestDto.getImgurl())
                         .build()
         );
 
