@@ -218,11 +218,12 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
         CompletableFuture<Long> total = CompletableFuture.supplyAsync(()-> getPaginationQuery(userId)
                 .select(recommendation.count())
-                .where(users.id.eq(userId)).fetchFirst());
+                .where(users.id.eq(userId).and(recommendation.isAgree.eq(true))).fetchFirst());
 
 
         List<Long> recommendationIds = getPaginationQuery(userId)
                 .select(recommendation.id)
+                .where(recommendation.isAgree.eq(true))
                 .orderBy(recommendation.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -236,7 +237,8 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .on(usersRecommendation.recommendation.eq(recommendation))
                 .join(users)
                 .on(usersRecommendation.user.eq(users))
-                .join(users.team, team)
+                .join(team)
+                .on(users.team.eq(team))
                 .leftJoin(recommendationReview)
                 .on(recommendationReview.recommendation.eq(recommendation))
                 .leftJoin(review)
