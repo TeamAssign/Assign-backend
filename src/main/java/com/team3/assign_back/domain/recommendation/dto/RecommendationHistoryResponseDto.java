@@ -1,6 +1,7 @@
 package com.team3.assign_back.domain.recommendation.dto;
 
 
+import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
 import lombok.*;
 
@@ -21,6 +22,6 @@ public class RecommendationHistoryResponseDto {
     private BigDecimal accuracy;
     private String imageUrl;
     private boolean isReviewed;
-    private List<Long> participantIds;
+    private List<UserSearchResponseDto> participants;
 
 }
