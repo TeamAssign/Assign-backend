@@ -47,7 +47,7 @@ public class UserService {
         TastePreference tastePreference = createTastePreference(requestDto);
         Users users = createUser(vendorId, requestDto, team);
         createUserTastePreference(users, tastePreference);
-        tastePreferenceEmbeddingService.saveEmbedding(tastePreference.getId());
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
@@ -157,6 +157,8 @@ public class UserService {
         existingPreference.updateTastePreferences(updateRequestDTO);
 
         tastePreferenceRepository.save(existingPreference);
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference);
+
     }
 
 }
