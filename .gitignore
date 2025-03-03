@@ -7,6 +7,8 @@ build/
 
 # .env
 .env
+src/main/resources/application-local.yml
+src/main/resources/application.properties
 
 ### STS ###
 .apt_generated
@@ -19,7 +21,7 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-.application-local.yml
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

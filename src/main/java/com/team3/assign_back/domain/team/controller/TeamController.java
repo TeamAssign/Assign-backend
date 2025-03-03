@@ -1,12 +1,31 @@
 package com.team3.assign_back.domain.team.controller;
 
+import com.team3.assign_back.domain.review.dto.ReviewResponseDto;
+import com.team3.assign_back.domain.review.service.ReviewService;
 import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
-import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
 import com.team3.assign_back.domain.team.dto.TeamResponseDto;
 import com.team3.assign_back.domain.team.service.TeamService;
+import com.team3.assign_back.domain.users.entity.Users;
+import com.team3.assign_back.domain.users.repository.UserRepository;
+import com.team3.assign_back.domain.users.service.UserService;
+import com.team3.assign_back.global.common.ApiResponseDto;
+import com.team3.assign_back.global.common.PageResponseDto;
+import com.team3.assign_back.global.exception.ErrorCode;
+import com.team3.assign_back.global.exception.custom.CustomException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,16 +33,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/teams")
 @RequiredArgsConstructor
+@Tag(name = "Team API", description = "팀 관련 API")
 public class TeamController {
+    private final UserService userService;
     private final TeamService teamService;
+    private final ReviewService reviewService;
+    private final UserRepository userRepository;
 
-
+    @Operation(
+            summary = "모든 팀 목록 조회",
+            description = "현재 존재하는 모든 팀 목록을 반환합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "팀 목록 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeamResponseDto.class))
+    )
     @GetMapping
     public ResponseEntity<List<TeamResponseDto>> getAllTeams() {
         List<TeamResponseDto> teams = teamService.getAllTeams();
         return ResponseEntity.ok(teams);
     }
 
+    @Operation(
+            summary = "팀 프로필 조회",
+            description = "특정 팀의 맛 선호도를 포함한 프로필 정보를 조회합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "팀 프로필 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeamProfileDTO.class))
+    )
+    @Parameter(name = "teamId", description = "조회할 팀 ID", required = true, example = "1")
     @GetMapping("/{teamId}/profile")
     public ResponseEntity<TeamProfileDTO> getTeamTastePreference(
             @PathVariable Long teamId){
@@ -31,13 +72,71 @@ public class TeamController {
         return ResponseEntity.ok(teamProfileDTO);
     }
 
+//    @Operation(
+//            summary = "팀 맛 선호도 업데이트",
+//            description = "특정 팀의 맛 선호도를 수정합니다."
+//    )
+//    @ApiResponse(
+//            responseCode = "200",
+//            description = "팀 맛 선호도 업데이트 성공",
+//            content = @Content(mediaType = "text/plain")
+//    )
+//    @Parameter(name = "teamId", description = "업데이트할 팀 ID", required = true, example = "1")
+//    @PutMapping("/{teamId}/profile")
+//    public ResponseEntity<String> updateTeamTastePreference(
+//            @AuthenticationPrincipal Jwt jwt,
+//            @PathVariable Long teamId,
+//            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
+//
+//        String vendorId = jwt.getSubject();
+//        Long userId = userService.getUserIdByVendorId(vendorId);
+//
+//        Users user = userRepository.findById(userId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+//
+//        Long userTeamId = user.getTeam().getId();
+//        if(teamId != null && !teamId.equals(userTeamId)){
+//            throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
+//        }
+//
+//        teamService.updateTeamTastePreference(userId, teamId, updatedPreference);
+//        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
+//    }
 
-    @PutMapping("/{teamId}/profile")
-    public ResponseEntity<String> updateTeamTastePreference(
-            @PathVariable Long teamId,
-            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
+    @Operation(
+            summary = "팀 리뷰 조회",
+            description = "특정 팀의 리뷰를 조회합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "팀 리뷰 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewResponseDto.class))
+    )
+    @Parameter(name = "teamId", description = "조회할 팀 ID", required = false, example = "1")
+    @Parameter(name = "page", description = "페이지 번호", example = "0")
+    @Parameter(name = "size", description = "페이지 크기", example = "10")
+    @GetMapping("/reviews")
+    public ResponseEntity<ApiResponseDto<PageResponseDto<ReviewResponseDto>>> getReviewByTeam(
+           @AuthenticationPrincipal Jwt jwt,
+           @RequestParam(value = "teamId", required = false) Long teamId,
+           @RequestParam(name = "page", defaultValue = "0") int page,
+           @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        teamService.updateTeamTastePreference(teamId, updatedPreference);
-        return ResponseEntity.ok(("팀 맛 선호도가 성공적으로 업데이트되었습니다."));
-    }
+       String vendorId = jwt.getSubject();
+       Long userId = userService.getUserIdByVendorId(vendorId);
+
+       Users user = userRepository.findById(userId)
+               .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+       Long userTeamId = user.getTeam().getId();
+       if(teamId != null && !teamId.equals(userTeamId)){
+           throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
+       }
+
+       Pageable pageable = PageRequest.of(page, size);
+
+       PageResponseDto<ReviewResponseDto> reviewResponses = reviewService.getReviewByTeam(userTeamId, pageable);
+
+       return ApiResponseDto.from(HttpStatus.OK, "팀 후기 조회 결과입니다.", reviewResponses);
+   }
 }

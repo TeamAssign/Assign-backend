@@ -1,0 +1,7 @@
+package com.team3.assign_back.domain.review.repository;
+
+import com.team3.assign_back.domain.review.entity.RecommendationReview;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RecommendationReviewRepository extends JpaRepository<RecommendationReview, Long> {
+}

@@ -21,4 +21,5 @@ public record ApiResponseDto<T> (String message, T data, LocalDateTime timestamp
                         .data(data)
                         .timestamp(LocalDateTime.now())
                         .build());
-    }}
+    }
+}

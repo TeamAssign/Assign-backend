@@ -1,0 +1,13 @@
+version: "3"
+networks:
+  kdt_default:
+    external: true
+    
+services:
+  assign:
+    container_name: assign_back
+    image: moonsunmean/assign_back:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - kdt_default

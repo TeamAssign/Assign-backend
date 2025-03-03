@@ -1,12 +1,14 @@
 package com.team3.assign_back.domain.food.entity;
 
 import com.team3.assign_back.global.common.BaseEntity;
-import com.team3.assign_back.global.common.FloatArrayToVectorConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Array;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -25,14 +27,16 @@ public class TasteMetricsEmbedding extends BaseEntity {
     private TasteMetrics tasteMetrics;
 
 
-    @Convert(converter = FloatArrayToVectorConverter.class)
-    @Column(name = "text_embedding", columnDefinition = "vector(256)")
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 256)
+    @Column(name = "text_embedding")
     private float[] textEmbedding;
 
 
-    @Convert(converter = FloatArrayToVectorConverter.class)
-    @Column(name = "metrics_embedding", columnDefinition = "vector(3)")
-    private float[] metricsEmbedding;
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 256)
+    @Column(name = "text_for_company_dinner_embedding")
+    private float[] textForCompanyDinnerEmbedding;
 
 
 }
