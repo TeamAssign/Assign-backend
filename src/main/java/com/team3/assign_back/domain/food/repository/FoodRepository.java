@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface FoodRepository extends JpaRepository<Food, Long> {
 
     @Query("SELECT f.name FROM Food f WHERE f.name IN :names")
-    List<String> findNamesNotIn(@Param("names") List<String> names);
+    List<String> findNamesIn(@Param("names") List<String> names);
 
 
     @Query("SELECT f FROM Food f LEFT JOIN TasteMetrics t ON f.id = t.foodId WHERE t.foodId IS NULL")

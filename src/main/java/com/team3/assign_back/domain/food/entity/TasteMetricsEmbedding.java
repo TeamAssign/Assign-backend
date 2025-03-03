@@ -35,8 +35,8 @@ public class TasteMetricsEmbedding extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = 256)
-    @Column(name = "metrics_embedding")
-    private float[] metricsEmbedding;
+    @Column(name = "text_for_company_dinner_embedding")
+    private float[] textForCompanyDinnerEmbedding;
 
 
 }

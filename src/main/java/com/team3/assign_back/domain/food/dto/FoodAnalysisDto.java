@@ -43,6 +43,12 @@ public class FoodAnalysisDto {
     @Size(min = 100, max = 1000, message = "내용은 100자 이상 1000자 이하여야 합니다")
     private String description;
 
+    @JsonAlias("d2")
+    @Size(min = 100, max = 1000, message = "내용은 100자 이상 1000자 이하여야 합니다")
+    private String descriptionForCompanyDinner;
+
+
+
     @JsonAlias("p")
     @Positive(message = "가격은 양수입니다.")
     private Integer price;
@@ -52,6 +58,7 @@ public class FoodAnalysisDto {
         return TasteMetrics.builder()
                 .food(food)
                 .description(description.trim())
+                .descriptionForCompanyDinner(descriptionForCompanyDinner.trim())
                 .salty(salty)
                 .sweet(sweet)
                 .spicy((spicy))

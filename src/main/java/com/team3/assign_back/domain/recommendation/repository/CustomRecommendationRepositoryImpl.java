@@ -1,22 +1,15 @@
 package com.team3.assign_back.domain.recommendation.repository;
 
 
-import com.querydsl.core.group.GroupBy;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team3.assign_back.domain.food.entity.QFood;
-import com.team3.assign_back.domain.intermediate.entity.QTeamTastePreference;
-import com.team3.assign_back.domain.intermediate.entity.QUserTastePreference;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationHistoryResponseDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
 import com.team3.assign_back.domain.recommendation.entity.QRecommendation;
 import com.team3.assign_back.domain.recommendation.entity.QUsersRecommendation;
 import com.team3.assign_back.domain.review.entity.QRecommendationReview;
 import com.team3.assign_back.domain.review.entity.QReview;
-import com.team3.assign_back.domain.tastePreference.entity.QTastePreference;
-import com.team3.assign_back.domain.tastePreference.entity.QTastePreferenceEmbedding;
-import com.team3.assign_back.domain.team.entity.QTeam;
 import com.team3.assign_back.domain.users.entity.QUsers;
 import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
@@ -161,7 +154,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 SELECT
                     f.name,
                     f.img_url,
-                    (2 -(tme.text_embedding <=> tpe.like_embedding) + (tme.text_embedding <=> tpe.dislike_embedding)) / 4 as similarity
+                    (2 -(tme.text_for_company_dinner_embedding <=> tpe.like_embedding) + (tme.text_for_company_dinner_embedding <=> tpe.dislike_embedding)) / 4 as similarity
                 FROM food f
                 JOIN taste_metrics tm ON tm.food_id = f.id
                 JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
