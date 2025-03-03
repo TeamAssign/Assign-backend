@@ -6,8 +6,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommendationConstant {
 
-    public static final int RECOMMENDATION_REJECT_LIST_SIZE_LIMIT = 100;
+    public static final int RECOMMENDATION_REJECT_LIST_SIZE_LIMIT = 20;
     public static final int RECOMMENDATION_QUERY_LIMIT_COUNT = 5;
+    public static final int RECOMMENDATION_TODAY_QUERY_LIMIT_COUNT = 20;
 
     public static final float LIKE_EMBEDDING_INITIAL_LEARNING_RATE = 0.07f;
     public static final float DISLIKE_EMBEDDING_INITIAL_LEARNING_RATE = 0.05f;

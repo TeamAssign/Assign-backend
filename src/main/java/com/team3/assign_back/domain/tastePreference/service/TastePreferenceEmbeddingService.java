@@ -78,7 +78,7 @@ public class TastePreferenceEmbeddingService {
             tastePreferenceEmbeddingDao.setLearningRate(Math.max(learningRate * LIKE_EMBEDDING_DECAY_FACTOR, EMBEDDING_LEARNING_RATE_MINIMUM));
         }
 
-        tastePreferenceEmbeddingRepository.saveLikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
+        tastePreferenceEmbeddingRepository.updateLikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
 
 
     }
@@ -105,7 +105,7 @@ public class TastePreferenceEmbeddingService {
             tastePreferenceEmbeddingDao.setLearningRate(Math.max(learningRate * DISLIKE_EMBEDDING_DECAY_FACTOR, EMBEDDING_LEARNING_RATE_MINIMUM));
         }
 
-        tastePreferenceEmbeddingRepository.saveDislikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
+        tastePreferenceEmbeddingRepository.updateDislikeEmbeddingAndRate(tastePreferenceEmbeddingDaos);
 
 
     }

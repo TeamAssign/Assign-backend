@@ -21,7 +21,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -277,5 +276,20 @@ public class RecommendationService {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         return customRecommendationRepository.getRecommendationHistories(userId, pageable);
+    }
+
+    public RecommendationResponseDto getRecommendationToday(Long userId) {
+
+
+        RecommendationResponseDto recommendationResponseDto = foodRedisRepository.getFoodToday(userId);
+        if(recommendationResponseDto != null){
+            return recommendationResponseDto;
+        }
+
+        List<RecommendationResponseDto> recommendationCandidates = customRecommendationRepository.getRecommendationToday(userId);
+        recommendationResponseDto = recommendationCandidates.get(new Random().nextInt(recommendationCandidates.size()));
+        foodRedisRepository.saveFoodToday(userId, recommendationResponseDto);
+
+        return recommendationResponseDto;
     }
 }
