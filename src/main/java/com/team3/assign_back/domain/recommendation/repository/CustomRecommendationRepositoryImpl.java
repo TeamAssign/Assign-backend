@@ -215,14 +215,13 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
     @Override
     public PageResponseDto<RecommendationHistoryResponseDto> getRecommendationHistories(Long userId, Pageable pageable) {
 
-        JPAQuery<?> paginationQuery = getPaginationQuery(userId);
 
-        CompletableFuture<Long> total = CompletableFuture.supplyAsync(()-> paginationQuery
+        CompletableFuture<Long> total = CompletableFuture.supplyAsync(()-> getPaginationQuery(userId)
                 .select(recommendation.count())
                 .where(users.id.eq(userId)).fetchFirst());
 
 
-        List<Long> recommendationIds = paginationQuery
+        List<Long> recommendationIds = getPaginationQuery(userId)
                 .select(recommendation.id)
                 .orderBy(recommendation.createdAt.desc())
                 .offset(pageable.getOffset())
