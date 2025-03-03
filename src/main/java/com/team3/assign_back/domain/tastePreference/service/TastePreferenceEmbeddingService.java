@@ -29,9 +29,8 @@ public class TastePreferenceEmbeddingService {
     private final OpenAiEmbeddingModel embeddingModel;
 
     @Transactional
-    public void saveEmbedding(Long tastePreferenceId){
+    public void saveOrUpdateEmbedding(TastePreference tastePreference){
 
-        TastePreference tastePreference = tastePreferenceRepository.getReferenceById(tastePreferenceId);
 
         String likePrompt = String.format(USER_PROMPT_LIKES,
                 tastePreference.getPros(),
