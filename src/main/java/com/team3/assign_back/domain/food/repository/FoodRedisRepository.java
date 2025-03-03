@@ -1,30 +1,25 @@
 package com.team3.assign_back.domain.food.repository;
 
 
-import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
-import com.team3.assign_back.global.enums.FoodEnum;
-import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.StringRedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.team3.assign_back.global.enums.FoodEnum.FoodType.COMPANYDINNER;
-import static com.team3.assign_back.global.exception.ErrorCode.INVALID_FOOD_NAME;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 @RequiredArgsConstructor
 public class FoodRedisRepository {
 
     private final StringRedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplateObject;
 
 
     public void deleteRejectedFood(String keyPrefix) {
@@ -72,4 +67,16 @@ public class FoodRedisRepository {
         return redisTemplate.opsForList().index(accuraciesKey, index);
     }
 
+
+    public RecommendationResponseDto getFoodToday(Long userId) {
+        String key = "users:" + userId + ":today";
+        return (RecommendationResponseDto) redisTemplateObject.opsForValue().get(key);
+    }
+
+
+    public void saveFoodToday(Long userId, RecommendationResponseDto recommendationResponseDto) {
+        String key = "users:" + userId + ":today";
+        redisTemplateObject.opsForValue().set(key, recommendationResponseDto, 20, TimeUnit.HOURS);
+
+    }
 }

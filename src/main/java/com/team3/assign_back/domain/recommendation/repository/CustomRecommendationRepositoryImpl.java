@@ -1,22 +1,17 @@
 package com.team3.assign_back.domain.recommendation.repository;
 
 
-import com.querydsl.core.group.GroupBy;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team3.assign_back.domain.food.entity.QFood;
-import com.team3.assign_back.domain.intermediate.entity.QTeamTastePreference;
-import com.team3.assign_back.domain.intermediate.entity.QUserTastePreference;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationHistoryResponseDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
 import com.team3.assign_back.domain.recommendation.entity.QRecommendation;
 import com.team3.assign_back.domain.recommendation.entity.QUsersRecommendation;
 import com.team3.assign_back.domain.review.entity.QRecommendationReview;
 import com.team3.assign_back.domain.review.entity.QReview;
-import com.team3.assign_back.domain.tastePreference.entity.QTastePreference;
-import com.team3.assign_back.domain.tastePreference.entity.QTastePreferenceEmbedding;
 import com.team3.assign_back.domain.team.entity.QTeam;
+import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
 import com.team3.assign_back.domain.users.entity.QUsers;
 import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
@@ -44,6 +39,7 @@ import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.Projections.constructor;
 import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_QUERY_LIMIT_COUNT;
+import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_TODAY_QUERY_LIMIT_COUNT;
 import static com.team3.assign_back.global.exception.ErrorCode.INTERNAL_SERVER_ERROR;
 
 @Repository
@@ -57,6 +53,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
     private final JPAQueryFactory query;
     private static final QUsers users = QUsers.users;
+    private static final QTeam team = QTeam.team;
     private static final QRecommendation recommendation = QRecommendation.recommendation;
     private static final QUsersRecommendation usersRecommendation = QUsersRecommendation.usersRecommendation;
     private static final QRecommendationReview recommendationReview = QRecommendationReview.recommendationReview;
@@ -86,7 +83,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                     JOIN user_taste_preference utp ON utp.users_id = u.id
                     JOIN taste_preference tp ON utp.taste_preference_id = tp.id
                     JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
-                    WHERE u.id IN (?1)
+                    WHERE u.id = ANY(?1)
                 ) AS user_prefs
                 WHERE f.category = ?2 AND f.id != ALL(?4)
             )
@@ -161,7 +158,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 SELECT
                     f.name,
                     f.img_url,
-                    (2 -(tme.text_embedding <=> tpe.like_embedding) + (tme.text_embedding <=> tpe.dislike_embedding)) / 4 as similarity
+                    (2 -(tme.text_for_company_dinner_embedding <=> tpe.like_embedding) + (tme.text_for_company_dinner_embedding <=> tpe.dislike_embedding)) / 4 as similarity
                 FROM food f
                 JOIN taste_metrics tm ON tm.food_id = f.id
                 JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
@@ -240,6 +237,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .on(usersRecommendation.recommendation.eq(recommendation))
                 .join(users)
                 .on(usersRecommendation.user.eq(users))
+                .join(users.team, team)
                 .leftJoin(recommendationReview)
                 .on(recommendationReview.recommendation.eq(recommendation))
                 .join(review)
@@ -255,13 +253,18 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                         recommendation.accuracy,
                         food.imgUrl,
                         recommendationReview.id.isNotNull(),
-                        list(users.id)
+                        list(constructor(UserSearchResponseDto.class,
+                                users.id,
+                                users.name,
+                                team.name,
+                                users.profileImgUrl
+                        ))
                 )));
 
 
         //이 과정 꼭 넣어야 할지 고민됨.
         for(RecommendationHistoryResponseDto dto : results){
-            dto.getParticipantIds().remove(userId);
+            dto.getParticipants().removeIf(userSearchResponseDto -> userSearchResponseDto.getId().equals(userId));
         }
 
 
@@ -271,6 +274,39 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
             throw new CustomException(INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @Override
+    public List<RecommendationResponseDto> getRecommendationToday(Long userId) {
+        String nativeQuery = """
+            SELECT
+                f.name,
+                f.img_url,
+                (2 -(tme.text_embedding <=> tpe.like_embedding) + (tme.text_embedding <=> tpe.dislike_embedding)) / 4  as similarity
+            FROM food f
+            JOIN taste_metrics tm ON tm.food_id = f.id
+            JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
+            JOIN users u ON u.id =?1
+            JOIN user_taste_preference utp ON utp.users_id = u.id
+            JOIN taste_preference tp ON utp.taste_preference_id = tp.id
+            JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
+            ORDER BY similarity DESC
+            LIMIT ?2
+            """;
+
+        Query query = entityManager.createNativeQuery(nativeQuery);
+        query.setParameter(1, userId);
+        query.setParameter(2, RECOMMENDATION_TODAY_QUERY_LIMIT_COUNT);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = (List<Object[]>) query.getResultList();
+
+        return results.stream()
+                .map(result -> new RecommendationResponseDto(
+                        (String) result[0],
+                        (String) result[1],
+                        new BigDecimal(String.format("%.3f", (double) result[2] ))))
+                .toList();
     }
 
     private JPAQuery<?> getPaginationQuery(Long userId) {

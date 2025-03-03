@@ -16,4 +16,6 @@ public interface CustomRecommendationRepository {
     void batchSaveUsersRecommendation(Long recommendationId, List<Long> participantIds);
 
     PageResponseDto<RecommendationHistoryResponseDto> getRecommendationHistories(Long userId, Pageable pageable);
+
+    List<RecommendationResponseDto> getRecommendationToday(Long userId);
 }

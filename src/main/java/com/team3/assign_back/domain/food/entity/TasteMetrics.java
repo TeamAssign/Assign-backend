@@ -10,6 +10,16 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+import com.team3.assign_back.global.common.BaseEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Builder
@@ -21,8 +31,12 @@ public class TasteMetrics extends BaseEntity {
     @Id
     private Long foodId;
 
-    @Column(nullable = false, length = 400)
+    @Column(nullable = false, length = 500)
     private String description;
+
+    @Column(nullable = false, length = 500)
+    private String descriptionForCompanyDinner;
+
 
     @Column(nullable = false)
     @DecimalMin("1.0")
