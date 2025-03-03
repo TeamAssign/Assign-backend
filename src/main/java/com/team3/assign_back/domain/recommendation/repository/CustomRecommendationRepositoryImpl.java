@@ -239,7 +239,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .join(users.team, team)
                 .leftJoin(recommendationReview)
                 .on(recommendationReview.recommendation.eq(recommendation))
-                .join(review)
+                .leftJoin(review)
                 .on(recommendationReview.review.eq(review).and(review.users.id.eq(userId)))
                 .join(food)
                 .on(recommendation.food.eq(food))
