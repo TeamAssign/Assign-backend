@@ -62,14 +62,14 @@ public class CustomTastePreferenceEmbeddingRepositoryImpl implements CustomTaste
 
         return findEmbeddingAndRateForTeamSubquery(teamId)
                 .select(
-                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.likeEmbedding, tastePreferenceEmbedding.likeLearningRate))
+                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.id, tastePreferenceEmbedding.likeEmbedding, tastePreferenceEmbedding.likeLearningRate))
                 .fetch();
     }
     public List<TastePreferenceEmbeddingDao> findDislikeEmbeddingAndRateForTeam(Long teamId){
 
         return findEmbeddingAndRateForTeamSubquery(teamId)
                 .select(
-                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.dislikeEmbedding, tastePreferenceEmbedding.dislikeLearningRate))
+                        Projections.constructor(TastePreferenceEmbeddingDao.class, tastePreferenceEmbedding.id, tastePreferenceEmbedding.dislikeEmbedding, tastePreferenceEmbedding.dislikeLearningRate))
                 .fetch();
     }
 

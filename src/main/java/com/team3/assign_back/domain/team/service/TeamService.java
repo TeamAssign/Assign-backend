@@ -5,6 +5,7 @@ import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateReq
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceRepository;
 import com.team3.assign_back.domain.tastePreference.repository.TeamTastePreferenceRepository;
+import com.team3.assign_back.domain.tastePreference.service.TastePreferenceEmbeddingService;
 import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
 import com.team3.assign_back.domain.team.dto.TeamResponseDto;
 import com.team3.assign_back.domain.team.entity.Team;
@@ -25,6 +26,7 @@ public class TeamService {
     private final TastePreferenceRepository tastePreferenceRepository;
     private final TeamTastePreferenceRepository teamTastePreferenceRepository;
     private final TeamRepository teamRepository;
+    private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
 
     public List<TeamResponseDto> getAllTeams() {
         return teamRepository.findAllTeams();
@@ -61,6 +63,7 @@ public class TeamService {
         existingPreference.updateTastePreferences(updateRequestDTO);
 
         tastePreferenceRepository.save(existingPreference);
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference);
     }
 
 
