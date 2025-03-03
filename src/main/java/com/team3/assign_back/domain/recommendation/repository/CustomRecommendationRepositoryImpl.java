@@ -10,6 +10,8 @@ import com.team3.assign_back.domain.recommendation.entity.QRecommendation;
 import com.team3.assign_back.domain.recommendation.entity.QUsersRecommendation;
 import com.team3.assign_back.domain.review.entity.QRecommendationReview;
 import com.team3.assign_back.domain.review.entity.QReview;
+import com.team3.assign_back.domain.team.entity.QTeam;
+import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
 import com.team3.assign_back.domain.users.entity.QUsers;
 import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
@@ -50,6 +52,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
     private final JPAQueryFactory query;
     private static final QUsers users = QUsers.users;
+    private static final QTeam team = QTeam.team;
     private static final QRecommendation recommendation = QRecommendation.recommendation;
     private static final QUsersRecommendation usersRecommendation = QUsersRecommendation.usersRecommendation;
     private static final QRecommendationReview recommendationReview = QRecommendationReview.recommendationReview;
@@ -233,6 +236,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .on(usersRecommendation.recommendation.eq(recommendation))
                 .join(users)
                 .on(usersRecommendation.user.eq(users))
+                .join(users.team, team)
                 .leftJoin(recommendationReview)
                 .on(recommendationReview.recommendation.eq(recommendation))
                 .join(review)
@@ -248,13 +252,18 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                         recommendation.accuracy,
                         food.imgUrl,
                         recommendationReview.id.isNotNull(),
-                        list(users.id)
+                        list(constructor(UserSearchResponseDto.class,
+                                users.id,
+                                users.name,
+                                team.name,
+                                users.profileImgUrl
+                        ))
                 )));
 
 
         //이 과정 꼭 넣어야 할지 고민됨.
         for(RecommendationHistoryResponseDto dto : results){
-            dto.getParticipantIds().remove(userId);
+            dto.getParticipants().removeIf(userSearchResponseDto -> userSearchResponseDto.getId().equals(userId));
         }
 
 
