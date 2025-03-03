@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Builder
 public record ApiResponseDto<T> (String message, T data, LocalDateTime timestamp){
 
