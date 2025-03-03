@@ -102,6 +102,12 @@ public class RecommendationService {
             throw e;
         }
 
+        if(recommendationCandidates.isEmpty()){
+
+            deleteRejectedFood(userId, type, participantIds);
+
+            throw new CustomException(RECOMMENDATION_EXHAUSTED);
+        }
 
         RecommendationResponseDto recommendationResponseDto = recommendationCandidates.get(new Random().nextInt(recommendationCandidates.size()));
 
@@ -145,47 +151,8 @@ public class RecommendationService {
                 "users:" + participantIds.stream().sorted().map(String::valueOf).collect(Collectors.joining(","));
     }
 
-
-    private void updateDislike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
-
-        if(type == COMPANYDINNER){
-            Long teamId = userRepository.findTeamIdByUsersId(userId);
-            tastePreferenceEmbeddingService.updateDislikeEmbedding(teamId, null, foodId);
-        } else{
-            if (!participants.contains(userId)) {
-                participants.add(userId);
-            }
-            tastePreferenceEmbeddingService.updateDislikeEmbedding(null, participants, foodId);
-
-        }
-
-    }
-
-    private void updateLike(Long userId, FoodEnum.FoodType type, List<Long> participants, Long foodId){
-
-        if(type == COMPANYDINNER){
-            Long teamId = userRepository.findTeamIdByUsersId(userId);
-            tastePreferenceEmbeddingService.updateLikeEmbedding(teamId, null, foodId);
-        } else{
-
-            if (participants == null) {
-                participants = new ArrayList<>();
-            }
-            if (!participants.contains(userId)) {
-                participants.add(userId);
-            }
-            tastePreferenceEmbeddingService.updateLikeEmbedding(null, participants, foodId);
-
-        }
-
-    }
-
-
     public void rejectRecommendation(Long userId, FoodEnum.FoodType type, List<Long> rejectedFoodIds, List<Long> participantIds) {
 
-        String key = (type == COMPANYDINNER) ?
-                "team:" + userRepository.findTeamIdByUsersId(userId) + ":accuracies":
-                "users:" + participantIds.stream().sorted().map(String::valueOf).collect(Collectors.joining(",")) + ":accuracies";
 
         int index = rejectedFoodIds.size() - 1;
 
