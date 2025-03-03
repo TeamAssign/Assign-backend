@@ -66,42 +66,58 @@ public class TeamController {
     )
     @Parameter(name = "teamId", description = "조회할 팀 ID", required = true, example = "1")
     @GetMapping("/{teamId}/profile")
-    public ResponseEntity<TeamProfileDTO> getTeamTastePreference(
-            @PathVariable Long teamId){
+    public ResponseEntity<ApiResponseDto<TeamProfileDTO>> getTeamTastePreference(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("teamId") Long teamId
+           ){
+
+        String vendorId = jwt.getSubject();
+        Long userId = userService.getUserIdByVendorId(vendorId);
+
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long userTeamId = user.getTeam().getId();
+
+        if(teamId != null && !teamId.equals(userTeamId)){
+            throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
+        }
+
         TeamProfileDTO teamProfileDTO = teamService.getTeamTastePreference(teamId);
-        return ResponseEntity.ok(teamProfileDTO);
+        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", teamProfileDTO);
+
     }
 
-//    @Operation(
-//            summary = "팀 맛 선호도 업데이트",
-//            description = "특정 팀의 맛 선호도를 수정합니다."
-//    )
-//    @ApiResponse(
-//            responseCode = "200",
-//            description = "팀 맛 선호도 업데이트 성공",
-//            content = @Content(mediaType = "text/plain")
-//    )
-//    @Parameter(name = "teamId", description = "업데이트할 팀 ID", required = true, example = "1")
-//    @PutMapping("/{teamId}/profile")
-//    public ResponseEntity<String> updateTeamTastePreference(
-//            @AuthenticationPrincipal Jwt jwt,
-//            @PathVariable Long teamId,
-//            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
-//
-//        String vendorId = jwt.getSubject();
-//        Long userId = userService.getUserIdByVendorId(vendorId);
-//
-//        Users user = userRepository.findById(userId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-//
-//        Long userTeamId = user.getTeam().getId();
-//        if(teamId != null && !teamId.equals(userTeamId)){
-//            throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
-//        }
-//
-//        teamService.updateTeamTastePreference(userId, teamId, updatedPreference);
-//        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
-//    }
+    @Operation(
+            summary = "팀 맛 선호도 업데이트",
+            description = "특정 팀의 맛 선호도를 수정합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "팀 맛 선호도 업데이트 성공",
+            content = @Content(mediaType = "text/plain")
+    )
+    @Parameter(name = "teamId", description = "업데이트할 팀 ID", required = true, example = "1")
+    @PutMapping("/{teamId}/profile")
+    public ResponseEntity<ApiResponseDto<String>> updateTeamTastePreference(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("teamId") Long teamId,
+            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
+
+        String vendorId = jwt.getSubject();
+        Long userId = userService.getUserIdByVendorId(vendorId);
+
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long userTeamId = user.getTeam().getId();
+        if(teamId != null && !teamId.equals(userTeamId)){
+            throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
+        }
+
+        teamService.updateTeamTastePreference(userId, updatedPreference);
+        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
+    }
 
     @Operation(
             summary = "팀 리뷰 조회",
@@ -112,13 +128,11 @@ public class TeamController {
             description = "팀 리뷰 조회 성공",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewResponseDto.class))
     )
-    @Parameter(name = "teamId", description = "조회할 팀 ID", required = false, example = "1")
     @Parameter(name = "page", description = "페이지 번호", example = "0")
     @Parameter(name = "size", description = "페이지 크기", example = "10")
     @GetMapping("/reviews")
     public ResponseEntity<ApiResponseDto<PageResponseDto<ReviewResponseDto>>> getReviewByTeam(
            @AuthenticationPrincipal Jwt jwt,
-           @RequestParam(value = "teamId", required = false) Long teamId,
            @RequestParam(name = "page", defaultValue = "0") int page,
            @RequestParam(name = "size", defaultValue = "10") int size) {
 
@@ -129,9 +143,6 @@ public class TeamController {
                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
        Long userTeamId = user.getTeam().getId();
-       if(teamId != null && !teamId.equals(userTeamId)){
-           throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
-       }
 
        Pageable pageable = PageRequest.of(page, size);
 

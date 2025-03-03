@@ -2,6 +2,9 @@ package com.team3.assign_back.domain.users.controller;
 
 import com.team3.assign_back.domain.review.dto.ReviewResponseDto;
 import com.team3.assign_back.domain.review.service.ReviewService;
+import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
+import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
+import com.team3.assign_back.domain.users.dto.UserProfileDto;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
 import com.team3.assign_back.domain.users.dto.UserResponseDto;
 import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
@@ -120,4 +123,51 @@ public class UserController {
 
         return ApiResponseDto.from(HttpStatus.OK, "사용자 검색 결과입니다.", response);
     }
+
+    @Operation(
+            summary = "사용자 프로필 조회",
+            description = "특정 사용자의 맛 선호도를 포함한 프로필 정보를 조회합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "사용자 프로필 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeamProfileDTO.class))
+    )
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponseDto<UserProfileDto>> getTeamTastePreference(
+            @AuthenticationPrincipal Jwt jwt
+    ){
+
+        String vendorId = jwt.getSubject();
+        Long userId = userService.getUserIdByVendorId(vendorId);
+
+
+        UserProfileDto userProfile = userService.getUserProfile(userId);
+
+        return ApiResponseDto.from(HttpStatus.OK,"사용자 프로필이 성공적으로 조회 되었습니다.", userProfile);
+
+    }
+
+    @Operation(
+            summary = "사용자 맛 선호도 업데이트",
+            description = "사용자의 맛 선호도를 수정합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "사용자 맛 선호도 업데이트 성공",
+            content = @Content(mediaType = "text/plain")
+    )
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponseDto<String>> updateTeamTastePreference(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
+
+        String vendorId = jwt.getSubject();
+        Long userId = userService.getUserIdByVendorId(vendorId);
+
+        userService.updateUserTastePreference(userId, updatedPreference);
+        return ApiResponseDto.from(HttpStatus.OK,"사용자 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
+    }
+
+
 }

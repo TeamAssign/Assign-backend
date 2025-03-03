@@ -9,7 +9,6 @@ import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
 import com.team3.assign_back.domain.team.dto.TeamResponseDto;
 import com.team3.assign_back.domain.team.entity.Team;
 import com.team3.assign_back.domain.team.repository.TeamRepository;
-import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TeamService {
-    private final UserRepository userRepository;
     private final TastePreferenceRepository tastePreferenceRepository;
     private final TeamTastePreferenceRepository teamTastePreferenceRepository;
     private final TeamRepository teamRepository;
@@ -52,7 +50,7 @@ public class TeamService {
     }
 
     @Transactional
-    public void updateTeamTastePreference(Long teamId, TastePreferenceUpdateRequestDTO updatedPreference){
+    public void updateTeamTastePreference(Long teamId, TastePreferenceUpdateRequestDTO updateRequestDTO){
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
@@ -60,7 +58,7 @@ public class TeamService {
                 .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
 
         TastePreference existingPreference = teamTastePreference.getTastePreference();
-        existingPreference.updateTastePreferences(updatedPreference);
+        existingPreference.updateTastePreferences(updateRequestDTO);
 
         tastePreferenceRepository.save(existingPreference);
     }

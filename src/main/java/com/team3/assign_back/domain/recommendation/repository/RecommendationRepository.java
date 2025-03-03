@@ -1,11 +1,10 @@
 package com.team3.assign_back.domain.recommendation.repository;
 
-import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
 import com.team3.assign_back.domain.recommendation.entity.Recommendation;
-import com.team3.assign_back.global.enums.FoodEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
 
+@Repository
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 }
