@@ -1,8 +1,9 @@
- spring:
+spring:
   application:
     name: assign-back
   config:
-#    import: classpath:/.env[.properties]”
+
+    #    import: classpath:/.env[.properties]”
     import: optional:classpath:.env[.properties]
   batch:
     job:

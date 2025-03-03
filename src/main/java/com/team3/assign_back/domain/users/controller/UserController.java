@@ -134,7 +134,7 @@ public class UserController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeamProfileDTO.class))
     )
     @GetMapping("/profile")
-    public ResponseEntity<ApiResponseDto<UserProfileDto>> getTeamTastePreference(
+    public ResponseEntity<ApiResponseDto<UserProfileDto>> getUserTastePreference(
             @AuthenticationPrincipal Jwt jwt
     ){
 
@@ -158,7 +158,7 @@ public class UserController {
             content = @Content(mediaType = "text/plain")
     )
     @PutMapping("/profile")
-    public ResponseEntity<ApiResponseDto<String>> updateTeamTastePreference(
+    public ResponseEntity<ApiResponseDto<String>> updateUserTastePreference(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
 
