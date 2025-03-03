@@ -17,7 +17,7 @@ public class DummyController {
 
 
     //메인페이지 사내 일주일 식사 통계
-    @GetMapping("/stats")
+    @GetMapping("/summary/company")
     public ResponseEntity<ApiResponseDto<Map<String, Integer>>> stats(){
 
         Map<String, Integer> dataMap = new HashMap<>();
@@ -180,7 +180,7 @@ public class DummyController {
 
     }
 
-    @GetMapping("/users/stats")
+    @GetMapping("/summary/users")
     public ResponseEntity<ApiResponseDto<Map<String, Integer>>> usersStats(){
 
         Map<String, Integer> dataMap = new HashMap<>();
@@ -264,7 +264,7 @@ public class DummyController {
     }
 
 
-    @GetMapping("/teams/{teamId}/stats")
+    @GetMapping("/summary/teams/{teamId}")
     public ResponseEntity<ApiResponseDto<Map<String, Integer>>> teamStats(@PathVariable("teamId") Long teamId){
 
         Map<String, Integer> dataMap = new HashMap<>();
