@@ -1,6 +1,7 @@
 package com.team3.assign_back.domain.users.service;
 
 import com.team3.assign_back.domain.intermediate.entity.UserTastePreference;
+import com.team3.assign_back.domain.intermediate.service.TagService;
 import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceRepository;
@@ -38,6 +39,7 @@ public class UserService {
     private final UserTastePreferenceRepository userTastePreferenceRepository;
 
     private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
+    private final TagService tagService;
 
     @Transactional
     public void registerUser(String vendorId, UserRegisterRequestDto requestDto) {
@@ -48,6 +50,7 @@ public class UserService {
         Users users = createUser(vendorId, requestDto, team);
         createUserTastePreference(users, tastePreference);
         tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
+        tagService.saveUserTag(users);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }

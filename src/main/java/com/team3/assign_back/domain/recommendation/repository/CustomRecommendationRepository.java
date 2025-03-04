@@ -18,4 +18,7 @@ public interface CustomRecommendationRepository {
     PageResponseDto<RecommendationHistoryResponseDto> getRecommendationHistories(Long userId, Pageable pageable);
 
     List<RecommendationResponseDto> getRecommendationToday(Long userId);
+
+    List<String> getRecommendationForTag(Long userId, int size);
+
 }
