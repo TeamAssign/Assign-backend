@@ -31,10 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -259,7 +256,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .on(recommendation.food.eq(food))
                 .where(recommendation.id.in(recommendationIds)).fetch();
 
-        Map<Long, RecommendationHistoryResponseDto> recommendationHistoryResponseDtoMap = new HashMap<>();
+        TreeMap<Long, RecommendationHistoryResponseDto> recommendationHistoryResponseDtoMap = new TreeMap<>(Comparator.reverseOrder());
 
         for(Tuple tuple : tuples) {
             Long recommendationId = tuple.get(recommendation.id);
@@ -284,9 +281,12 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                     tuple.get(team.name),
                     tuple.get(users.profileImgUrl)
             );
+            if(userSearchResponseDto.getId().equals(userId)){
+                continue;
+            }
             boolean shouldBeSkipped = false;
             for(UserSearchResponseDto dto: recommendationHistoryResponseDto.getParticipants()){
-                if (userSearchResponseDto.getId().equals(dto.getId()) || userSearchResponseDto.getId().equals(userId)) {
+                if (userSearchResponseDto.getId().equals(dto.getId())) {
                     shouldBeSkipped = true;
                     break;
                 }
@@ -299,8 +299,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
         }
 
 
-
-            return new PageResponseDto<>(new PageImpl<>(new ArrayList<>(recommendationHistoryResponseDtoMap.values()), pageable, total.get()));
+        return new PageResponseDto<>(new PageImpl<>(new ArrayList<>(recommendationHistoryResponseDtoMap.values()), pageable, total.get()));
 
 
     }
