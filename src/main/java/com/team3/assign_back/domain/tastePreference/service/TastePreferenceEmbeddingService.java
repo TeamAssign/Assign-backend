@@ -22,7 +22,6 @@ import static com.team3.assign_back.global.constant.RecommendationConstant.*;
 @RequiredArgsConstructor
 public class TastePreferenceEmbeddingService {
 
-    private final TastePreferenceRepository tastePreferenceRepository;
     private final TastePreferenceEmbeddingRepository tastePreferenceEmbeddingRepository;
     private final CustomTasteMetricsEmbeddingRepository customTasteMetricsEmbeddingRepository;
 
@@ -43,6 +42,7 @@ public class TastePreferenceEmbeddingService {
                 tastePreference.getCons());
         float[] dislikeEmbedVector = embeddingModel.embed(dislikePrompt);
 
+        tastePreferenceEmbeddingRepository.deleteByTastePreference(tastePreference);
 
         TastePreferenceEmbedding tastePreferenceEmbedding = TastePreferenceEmbedding.builder()
                 .likeEmbedding(likeEmbedVector)
