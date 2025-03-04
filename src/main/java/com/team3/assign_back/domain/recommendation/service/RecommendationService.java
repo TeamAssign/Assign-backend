@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -242,7 +243,11 @@ public class RecommendationService {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        return customRecommendationRepository.getRecommendationHistories(userId, pageable);
+        try {
+            return customRecommendationRepository.getRecommendationHistories(userId, pageable);
+        } catch (ExecutionException | InterruptedException e) {
+            throw new CustomException(INTERNAL_SERVER_ERROR);
+        }
     }
 
     public RecommendationResponseDto getRecommendationToday(Long userId) {
