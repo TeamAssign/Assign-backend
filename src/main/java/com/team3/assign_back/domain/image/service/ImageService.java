@@ -32,20 +32,20 @@ public class ImageService {
     private String bucket;
 
     public ImageResponseDto generateUploadPreSignedUrl(ImageRequestDto imageRequestDto) {
-        if(IMAGE_MAXIMUM_LENGTH < imageRequestDto.getContentLength()){
+        if (IMAGE_MAXIMUM_LENGTH < imageRequestDto.getContentLength()) {
             throw new CustomException(ErrorCode.EXCEED_SIZE_LIMIT);
         }
 
-        if(!imageRequestDto.getContentType().startsWith("image")){
+        if (!imageRequestDto.getContentType().startsWith("image")) {
             throw new CustomException(ErrorCode.NOT_MATCHED_TYPE);
         }
 
         String key = "uploads/" + UUID.randomUUID() + "_" + imageRequestDto.getFilename();
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(key)
-                        .contentType(imageRequestDto.getContentType())
+                .bucket(bucket)
+                .key(key)
+                .contentType(imageRequestDto.getContentType())
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
@@ -73,7 +73,7 @@ public class ImageService {
             throw new CustomException(ErrorCode.INVALID_KEYWORD);
         }
     }
-
-
 }
+
+
 

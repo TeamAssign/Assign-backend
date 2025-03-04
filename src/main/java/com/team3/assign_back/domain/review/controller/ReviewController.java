@@ -51,21 +51,8 @@ public class ReviewController {
         Long userId = userService.getUserIdByVendorId(vendorId);
         log.info("Received userId: {}", userId);
 
-        String imgurl = reviewRequestDto.getImgurl();
-        String s3FilePath = extractS3Path(imgurl);
-        reviewRequestDto.setImgurl(s3FilePath);
 
         ReviewResponseDto reviewResponseDto = reviewService.createReview(userId, reviewRequestDto);
         return ApiResponseDto.from(HttpStatus.CREATED, "후기가 성공적으로 등록되었습니다.", reviewResponseDto);
-    }
-
-    private String extractS3Path(String preSignedUrl) {
-        try {
-            URI uri = new URI(preSignedUrl);
-            String path = uri.getPath(); // 예: "/uploads/abcd1234-test-image.png"
-            return path.startsWith("/") ? path.substring(1) : path; // 맨 앞 "/" 제거 후 반환
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("유효하지 않은 S3 Pre-signed URL입니다.", e);
-        }
     }
 }
