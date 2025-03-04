@@ -160,7 +160,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
                 JOIN users u ON u.id =?1
                 JOIN team t ON u.team_id = t.id
-                JOIN team_taste_preference ttp ON ttp.team_id = u.id
+                JOIN team_taste_preference ttp ON ttp.team_id = t.id
                 JOIN taste_preference tp ON ttp.taste_preference_id = tp.id
                 JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
                 WHERE f.category = ?2 AND f.id != ALL(?4)
