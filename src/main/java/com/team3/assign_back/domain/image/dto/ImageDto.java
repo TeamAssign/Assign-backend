@@ -1,4 +1,4 @@
-package com.team3.assign_back.domain.file.dto;
+package com.team3.assign_back.domain.image.dto;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDto {
+public class ImageDto {
     private String presignedUrl;
     private String key;
 }
