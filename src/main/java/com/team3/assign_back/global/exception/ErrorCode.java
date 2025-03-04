@@ -45,7 +45,7 @@ public enum ErrorCode {
     RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, "받은 추천이 존재하지 않습니다."),
 
     // 이미지 관련 에러
-    EXCEED_SIZE_LIMIT(HttpStatus.OK.PAYLOAD_TOO_LARGE, "이미지 파일의 크기가 10MB를 초과했습니다."),
+    EXCEED_SIZE_LIMIT(HttpStatus.PAYLOAD_TOO_LARGE, "이미지 파일의 크기가 10MB를 초과했습니다."),
     NOT_MATCHED_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "이미지 파일이 아닙니다.")
     ;
 
