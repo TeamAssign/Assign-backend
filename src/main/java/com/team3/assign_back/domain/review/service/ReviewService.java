@@ -50,7 +50,6 @@ public class ReviewService {
         Users users = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-
         Review review = reviewRepository.save(
                 Review.builder()
                         .users(users)
@@ -82,9 +81,7 @@ public class ReviewService {
                         .build()
         );
 
-
         saveParticipants(review, reviewRequestDto.getParticipants());
-
 
         return convertToDirectReviewDTO(directReview);
     }
