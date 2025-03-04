@@ -15,7 +15,7 @@ public class ReviewResponseDto {
     private Long reviewId;
     private String comment;
     private int star;
-    private String imgurl;
+    private String key;
     private List<ParticipantsDto> participants;
     private FoodEnum.FoodType type;
     private FoodEnum.FoodCategory category;
