@@ -310,6 +310,35 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .toList();
     }
 
+    @Override
+    public List<String> getRecommendationForTag(Long userId, int size) {
+        String nativeQuery = """
+            SELECT
+                f.name
+            FROM food f
+            JOIN taste_metrics tm ON tm.food_id = f.id
+            JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
+            JOIN users u ON u.id =?1
+            JOIN user_taste_preference utp ON utp.users_id = u.id
+            JOIN taste_preference tp ON utp.taste_preference_id = tp.id
+            JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
+            ORDER BY (2 -(tme.text_embedding <=> tpe.like_embedding) + (tme.text_embedding <=> tpe.dislike_embedding)) / 4 DESC
+            LIMIT ?2
+            """;
+
+        Query query = entityManager.createNativeQuery(nativeQuery);
+        query.setParameter(1, userId);
+        query.setParameter(2, size);
+
+        @SuppressWarnings("unchecked")
+        List<Object> results = (List<Object>) query.getResultList();
+
+        return results.stream()
+                .map(result ->
+                        (String) result)
+                .toList();
+    }
+
     private JPAQuery<?> getPaginationQuery(Long userId) {
         return query
                 .from(recommendation)
