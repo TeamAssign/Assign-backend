@@ -75,8 +75,6 @@ public class ReviewService {
                                 .build()
                 ));
 
-
-
         DirectReview directReview = directReviewRepository.save(
                 DirectReview.builder()
                         .review(review)
@@ -101,7 +99,6 @@ public class ReviewService {
         Recommendation recommendation = recommendationRepository.findById(reviewRequestDto.getRecommendationId())
                 .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_NOT_FOUND));
 
-
         RecommendationReview recommendationReview = recommendationReviewRepository.save(
                 RecommendationReview.builder()
                         .review(review)
@@ -120,7 +117,6 @@ public class ReviewService {
 
         return convertToRecommendationReviewDTO(recommendationReview, recommendation);
     }
-
 
     private void saveParticipants(Review review, List<Long> participantIds) {
         if (participantIds == null) {

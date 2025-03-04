@@ -37,13 +37,14 @@ public class TastePreference extends BaseEntity {
     @DecimalMin("1.00")
     @DecimalMax("5.00")
     @Digits(integer = 1, fraction = 2)
-    private BigDecimal salty;
+    private BigDecimal sweet;
 
     @Column(nullable = false)
     @DecimalMin("1.00")
     @DecimalMax("5.00")
     @Digits(integer = 1, fraction = 2)
-    private BigDecimal sweet;
+    private BigDecimal salty;
+
 
     @Column(nullable = true)
     private String pros; // 호 데이터
