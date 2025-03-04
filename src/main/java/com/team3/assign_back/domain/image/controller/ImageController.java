@@ -1,7 +1,8 @@
 package com.team3.assign_back.domain.image.controller;
 
-import com.team3.assign_back.domain.image.dto.ImageDto;
+import com.team3.assign_back.domain.image.dto.ImageResponseDto;
 import com.team3.assign_back.domain.image.dto.ImageRequestDto;
+import com.team3.assign_back.domain.image.dto.ImageUrlResponse;
 import com.team3.assign_back.domain.image.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,16 @@ public class ImageController {
     private final ImageService imageService;
 
     @PostMapping("/upload")
-    public ResponseEntity<ImageDto> getUploadPresignedUrl(@RequestBody ImageRequestDto fileRequest) {
+    public ResponseEntity<ImageResponseDto> getUploadPresignedUrl(@RequestBody ImageRequestDto fileRequest) {
 
 
-        ImageDto presignedUrl = imageService.generateUploadPreSignedUrl(fileRequest);
+        ImageResponseDto presignedUrl = imageService.generateUploadPreSignedUrl(fileRequest);
         return ResponseEntity.ok(presignedUrl);
+    }
+
+    @GetMapping()
+    public ResponseEntity<ImageUrlResponse> getImageUrl(@RequestParam(name = "key") String key){
+        ImageUrlResponse imageUrlResponse = imageService.getImageUrl(key);
+        return ResponseEntity.ok(imageUrlResponse);
     }
 }

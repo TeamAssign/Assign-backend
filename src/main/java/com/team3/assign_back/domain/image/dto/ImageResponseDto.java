@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImageDto {
+public class ImageResponseDto {
     private String presignedUrl;
     private String key;
 }
