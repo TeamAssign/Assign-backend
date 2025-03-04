@@ -137,7 +137,6 @@ public class UserController {
     public ResponseEntity<ApiResponseDto<UserProfileDto>> getUserTastePreference(
             @AuthenticationPrincipal Jwt jwt
     ){
-
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
 

@@ -67,21 +67,8 @@ public class TeamController {
     @Parameter(name = "teamId", description = "조회할 팀 ID", required = true, example = "1")
     @GetMapping("/{teamId}/profile")
     public ResponseEntity<ApiResponseDto<TeamProfileDTO>> getTeamTastePreference(
-            @AuthenticationPrincipal Jwt jwt,
             @PathVariable("teamId") Long teamId
            ){
-
-        String vendorId = jwt.getSubject();
-        Long userId = userService.getUserIdByVendorId(vendorId);
-
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        Long userTeamId = user.getTeam().getId();
-
-        if(teamId != null && !teamId.equals(userTeamId)){
-            throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
-        }
 
         TeamProfileDTO teamProfileDTO = teamService.getTeamTastePreference(teamId);
         return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", teamProfileDTO);
@@ -130,23 +117,17 @@ public class TeamController {
     )
     @Parameter(name = "page", description = "페이지 번호", example = "0")
     @Parameter(name = "size", description = "페이지 크기", example = "10")
-    @GetMapping("/reviews")
+    @Parameter(name = "teamId", description = "조회할 팀 Id", required = true, example = "1")
+    @GetMapping("/{teamId}/reviews")
     public ResponseEntity<ApiResponseDto<PageResponseDto<ReviewResponseDto>>> getReviewByTeam(
-           @AuthenticationPrincipal Jwt jwt,
+           @PathVariable("teamId") Long teamId,
            @RequestParam(name = "page", defaultValue = "0") int page,
            @RequestParam(name = "size", defaultValue = "10") int size) {
 
-       String vendorId = jwt.getSubject();
-       Long userId = userService.getUserIdByVendorId(vendorId);
-
-       Users user = userRepository.findById(userId)
-               .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-       Long userTeamId = user.getTeam().getId();
 
        Pageable pageable = PageRequest.of(page, size);
 
-       PageResponseDto<ReviewResponseDto> reviewResponses = reviewService.getReviewByTeam(userTeamId, pageable);
+       PageResponseDto<ReviewResponseDto> reviewResponses = reviewService.getReviewByTeam(teamId, pageable);
 
        return ApiResponseDto.from(HttpStatus.OK, "팀 후기 조회 결과입니다.", reviewResponses);
    }

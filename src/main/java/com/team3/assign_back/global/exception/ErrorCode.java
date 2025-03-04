@@ -32,17 +32,22 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "후기를 찾을 수 없습니다."),
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 후기를 작성하셨습니다."),
 
-    //추천 관련 에러
+    // 추천 관련 에러
     EMPTY_PARTICIPANTS(HttpStatus.BAD_REQUEST, "그룹인 경우 본인을 제외한 참가자를 반드시 추가해야 합니다."),
     RECOMMENDATION_EXHAUSTED(HttpStatus.TOO_MANY_REQUESTS, "더 이상 추천을 받을 수 없습니다."),
     KAKAO_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "메뉴에 대한 맛집 리스트를 찾을 수 없습니다."),
     KAKAO_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND,"음식점에 관한 이미지를 찾을 수 업습니다."),
     INVALID_KEYWORD(HttpStatus.BAD_REQUEST,"유효하지 않은 메뉴명입니다." ),
 
-    //음식 관련 에러
+    // 음식 관련 에러
     FOOD_NOT_FOUND(HttpStatus.NOT_FOUND, "음식 정보를 찾을 수 없습니다."),
     INVALID_FOOD_NAME(HttpStatus.BAD_REQUEST, "추천으로 받지 않은 메뉴명입니다."),
-    RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, "받은 추천이 존재하지 않습니다.");
+    RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, "받은 추천이 존재하지 않습니다."),
+
+    // 이미지 관련 에러
+    EXCEED_SIZE_LIMIT(HttpStatus.PAYLOAD_TOO_LARGE, "이미지 파일의 크기가 10MB를 초과했습니다."),
+    NOT_MATCHED_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "이미지 파일이 아닙니다.")
+    ;
 
 
     private final HttpStatus status;
