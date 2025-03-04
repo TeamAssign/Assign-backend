@@ -1,6 +1,7 @@
 package com.team3.assign_back.domain.recommendation.repository;
 
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team3.assign_back.domain.food.entity.QFood;
@@ -15,7 +16,6 @@ import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
 import com.team3.assign_back.domain.users.entity.QUsers;
 import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
-import com.team3.assign_back.global.exception.custom.CustomException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -31,16 +31,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
-import static com.querydsl.core.types.Projections.constructor;
 import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_QUERY_LIMIT_COUNT;
 import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_TODAY_QUERY_LIMIT_COUNT;
-import static com.team3.assign_back.global.exception.ErrorCode.INTERNAL_SERVER_ERROR;
 
 @Repository
 @RequiredArgsConstructor
@@ -164,7 +160,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 JOIN taste_metrics_embedding tme ON tme.taste_metrics_id = tm.food_id
                 JOIN users u ON u.id =?1
                 JOIN team t ON u.team_id = t.id
-                JOIN team_taste_preference ttp ON ttp.team_id = u.id
+                JOIN team_taste_preference ttp ON ttp.team_id = t.id
                 JOIN taste_preference tp ON ttp.taste_preference_id = tp.id
                 JOIN taste_preference_embedding tpe ON tpe.taste_preference_id = tp.id
                 WHERE f.category = ?2 AND f.id != ALL(?4)
@@ -213,7 +209,7 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
 
     @Override
-    public PageResponseDto<RecommendationHistoryResponseDto> getRecommendationHistories(Long userId, Pageable pageable) {
+    public PageResponseDto<RecommendationHistoryResponseDto> getRecommendationHistories(Long userId, Pageable pageable) throws ExecutionException, InterruptedException {
 
 
         CompletableFuture<Long> total = CompletableFuture.supplyAsync(()-> getPaginationQuery(userId)
@@ -231,7 +227,20 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
 
 
 
-        List<RecommendationHistoryResponseDto> results = query
+        List<Tuple> tuples = query
+                .select(
+                        recommendation.id,
+                        recommendation.type,
+                        food.category,
+                        food.name,
+                        recommendation.accuracy,
+                        food.imgUrl,
+                        recommendationReview.id,
+                        users.id,
+                        users.name,
+                        team.name,
+                        users.profileImgUrl
+                )
                 .from(recommendation)
                 .join(usersRecommendation)
                 .on(usersRecommendation.recommendation.eq(recommendation))
@@ -245,35 +254,53 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .on(recommendationReview.review.eq(review).and(review.users.id.eq(userId)))
                 .join(food)
                 .on(recommendation.food.eq(food))
-                .where(recommendation.id.in(recommendationIds))
-                .transform(groupBy(recommendation.id).list(constructor(RecommendationHistoryResponseDto.class,
-                        recommendation.id,
-                        recommendation.type,
-                        food.category,
-                        food.name,
-                        recommendation.accuracy,
-                        food.imgUrl,
-                        recommendationReview.id.isNotNull(),
-                        list(constructor(UserSearchResponseDto.class,
-                                users.id,
-                                users.name,
-                                team.name,
-                                users.profileImgUrl
-                        ))
-                )));
+                .where(recommendation.id.in(recommendationIds)).fetch();
+
+        TreeMap<Long, RecommendationHistoryResponseDto> recommendationHistoryResponseDtoMap = new TreeMap<>(Comparator.reverseOrder());
+
+        for(Tuple tuple : tuples) {
+            Long recommendationId = tuple.get(recommendation.id);
+
+            RecommendationHistoryResponseDto recommendationHistoryResponseDto = recommendationHistoryResponseDtoMap.get(recommendationId);
+            if(recommendationHistoryResponseDto == null) {
+                recommendationHistoryResponseDto = RecommendationHistoryResponseDto.builder()
+                        .recommendationId(recommendationId)
+                        .type(tuple.get(recommendation.type))
+                        .category(tuple.get(food.category))
+                        .name(tuple.get(food.name))
+                        .accuracy(tuple.get(recommendation.accuracy))
+                        .imageUrl(tuple.get(food.imgUrl))
+                        .isReviewed(tuple.get(recommendationReview.id) != null)
+                        .participants(new ArrayList<>())
+                        .build();
+                recommendationHistoryResponseDtoMap.put(recommendationId, recommendationHistoryResponseDto);
+            }
+            UserSearchResponseDto userSearchResponseDto = new UserSearchResponseDto(
+                    tuple.get(users.id),
+                    tuple.get(users.name),
+                    tuple.get(team.name),
+                    tuple.get(users.profileImgUrl)
+            );
+            if(userSearchResponseDto.getId().equals(userId)){
+                continue;
+            }
+            boolean shouldBeSkipped = false;
+            for(UserSearchResponseDto dto: recommendationHistoryResponseDto.getParticipants()){
+                if (userSearchResponseDto.getId().equals(dto.getId())) {
+                    shouldBeSkipped = true;
+                    break;
+                }
+            }
+            if(!shouldBeSkipped){
+                recommendationHistoryResponseDto.getParticipants().add(userSearchResponseDto);
+            }
 
 
-        //이 과정 꼭 넣어야 할지 고민됨.
-        for(RecommendationHistoryResponseDto dto : results){
-            dto.getParticipants().removeIf(userSearchResponseDto -> userSearchResponseDto.getId().equals(userId));
         }
 
 
-        try {
-            return new PageResponseDto<>(new PageImpl<>(results, pageable, total.get()));
-        } catch (InterruptedException | ExecutionException e) {
-            throw new CustomException(INTERNAL_SERVER_ERROR);
-        }
+        return new PageResponseDto<>(new PageImpl<>(new ArrayList<>(recommendationHistoryResponseDtoMap.values()), pageable, total.get()));
+
 
     }
 
