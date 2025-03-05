@@ -135,7 +135,7 @@ public class UserService {
         Users users = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        UserTastePreference userTastePreference = userTastePreferenceRepository.findById(userId)
+        UserTastePreference userTastePreference = userTastePreferenceRepository.findByUsers_Id(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
 
         TastePreference getPreference = userTastePreference.getTastePreference();
