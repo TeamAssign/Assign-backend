@@ -53,7 +53,7 @@ public class UserService {
         Users users = createUser(vendorId, requestDto, team);
         createUserTastePreference(users, tastePreference);
         tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
-        tagService.saveUserTag(users);
+//        tagService.saveUserTag(users);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
@@ -176,5 +176,6 @@ public class UserService {
         );
 
         tastePreference.updateTastePreferences(tastePreferenceUpdateRequestDTO);
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
     }
 }
