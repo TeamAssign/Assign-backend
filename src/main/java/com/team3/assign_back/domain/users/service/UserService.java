@@ -163,7 +163,7 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
         TastePreference tastePreference = userTastePreference.getTastePreference();
 
-        String imageUrl = imageService.getImageUrl(requestDTO.getProfileImageUrl()).imageUrl();
+        String imageUrl = requestDTO.getProfileImageUrl();
 
         users.updateUserProfile(imageUrl);
 
