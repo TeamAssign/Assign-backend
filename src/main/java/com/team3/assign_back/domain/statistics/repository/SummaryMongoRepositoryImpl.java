@@ -2,6 +2,7 @@ package com.team3.assign_back.domain.statistics.repository;
 
 import com.team3.assign_back.domain.statistics.entity.CompanySummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.TeamSummaryMonthly;
+import com.team3.assign_back.domain.statistics.entity.UserRecommendationStats;
 import com.team3.assign_back.domain.statistics.entity.UserSummaryMonthly;
 import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
@@ -69,4 +70,5 @@ public class SummaryMongoRepositoryImpl implements SummaryMongoRepository {
 
         return mongoTemplate.find(query, UserSummaryMonthly.class);
     }
+
 }
