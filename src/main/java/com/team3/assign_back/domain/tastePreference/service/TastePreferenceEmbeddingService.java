@@ -23,13 +23,15 @@ import static com.team3.assign_back.global.constant.RecommendationConstant.*;
 public class TastePreferenceEmbeddingService {
 
     private final TastePreferenceEmbeddingRepository tastePreferenceEmbeddingRepository;
+    private final TastePreferenceRepository tastePreferenceRepository;
     private final CustomTasteMetricsEmbeddingRepository customTasteMetricsEmbeddingRepository;
 
     private final OpenAiEmbeddingModel embeddingModel;
 
     @Transactional
-    public void saveOrUpdateEmbedding(TastePreference tastePreference){
+    public void saveOrUpdateEmbedding(Long tastePreferenceId){
 
+        TastePreference tastePreference = tastePreferenceRepository.getReferenceById(tastePreferenceId);
 
         String likePrompt = String.format(USER_PROMPT_LIKES,
                 tastePreference.getPros(),
