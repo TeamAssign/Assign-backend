@@ -4,7 +4,7 @@ import com.team3.assign_back.domain.review.dto.ReviewResponseDto;
 import com.team3.assign_back.domain.review.service.ReviewService;
 import com.team3.assign_back.domain.statistics.dto.UserRecommendationStatsDto;
 import com.team3.assign_back.domain.statistics.service.SummaryService;
-import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
+import com.team3.assign_back.domain.tastePreference.dto.UserProfileUpdateRequestDTO;
 import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
 import com.team3.assign_back.domain.users.dto.UserProfileDto;
 import com.team3.assign_back.domain.users.dto.UserRegisterRequestDto;
@@ -140,7 +140,6 @@ public class UserController {
     public ResponseEntity<ApiResponseDto<UserProfileDto>> getUserTastePreference(
             @AuthenticationPrincipal Jwt jwt
     ){
-
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
 
@@ -163,13 +162,15 @@ public class UserController {
     @PutMapping("/profile")
     public ResponseEntity<ApiResponseDto<String>> updateUserTastePreference(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody TastePreferenceUpdateRequestDTO updatedPreference) {
+            @RequestBody UserProfileUpdateRequestDTO updatedPreference
+            ) {
 
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
 
-        userService.updateUserTastePreference(userId, updatedPreference);
-        return ApiResponseDto.from(HttpStatus.OK,"사용자 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
+        userService.updateUserProfile(userId, updatedPreference);
+
+        return ApiResponseDto.from(HttpStatus.OK,"사용자 프로필이 성공적으로 업데이트 되었습니다.", "업데이트 완료");
     }
 
     @GetMapping
@@ -178,6 +179,7 @@ public class UserController {
         UserRecommendationStatsDto result = summaryService.getLatesUserPreferenceSummary(userId);
         return ApiResponseDto.from(HttpStatus.OK,"사용자 선호 성향 분석 데이터 조회 성공.", result);
     }
+
 
 
 }

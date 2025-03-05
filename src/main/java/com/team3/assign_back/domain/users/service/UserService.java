@@ -1,8 +1,10 @@
 package com.team3.assign_back.domain.users.service;
 
+import com.team3.assign_back.domain.image.service.ImageService;
 import com.team3.assign_back.domain.intermediate.entity.UserTastePreference;
 import com.team3.assign_back.domain.intermediate.service.TagService;
 import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateRequestDTO;
+import com.team3.assign_back.domain.tastePreference.dto.UserProfileUpdateRequestDTO;
 import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.tastePreference.repository.TastePreferenceRepository;
 import com.team3.assign_back.domain.tastePreference.repository.UserTastePreferenceRepository;
@@ -40,6 +42,7 @@ public class UserService {
 
     private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
     private final TagService tagService;
+    private final ImageService imageService;
 
     @Transactional
     public void registerUser(String vendorId, UserRegisterRequestDto requestDto) {
@@ -50,7 +53,7 @@ public class UserService {
         Users users = createUser(vendorId, requestDto, team);
         createUserTastePreference(users, tastePreference);
         tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
-        tagService.saveUserTag(users);
+//        tagService.saveUserTag(users);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
     }
@@ -152,16 +155,27 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserTastePreference(Long userId, TastePreferenceUpdateRequestDTO updateRequestDTO){
+    public void updateUserProfile(Long userId, UserProfileUpdateRequestDTO requestDTO) {
+        Users users = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         UserTastePreference userTastePreference = userTastePreferenceRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
+        TastePreference tastePreference = userTastePreference.getTastePreference();
 
-        TastePreference existingPreference = userTastePreference.getTastePreference();
-        existingPreference.updateTastePreferences(updateRequestDTO);
+        String imageUrl = imageService.getImageUrl(requestDTO.getProfileImageUrl()).imageUrl();
 
-        tastePreferenceRepository.save(existingPreference);
-        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference);
+        users.updateUserProfile(imageUrl);
 
+        TastePreferenceUpdateRequestDTO tastePreferenceUpdateRequestDTO = new TastePreferenceUpdateRequestDTO(
+                requestDTO.getSpicy(),
+                requestDTO.getSalty(),
+                requestDTO.getSweet(),
+                requestDTO.getPros(),
+                requestDTO.getCons()
+        );
+
+        tastePreference.updateTastePreferences(tastePreferenceUpdateRequestDTO);
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
     }
-
 }

@@ -71,4 +71,15 @@ public class SummaryMongoRepositoryImpl implements SummaryMongoRepository {
         return mongoTemplate.find(query, UserSummaryMonthly.class);
     }
 
+    @Override
+    public UserRecommendationStats findLatestUserPreferenceSummary(long userId) {
+        Query query = new Query(Criteria.where("userId").is(userId))
+                .with(Sort.by(Sort.Direction.DESC, "year", "month"))
+                .limit(1);
+
+        UserRecommendationStats result = mongoTemplate.findOne(query, UserRecommendationStats.class);
+        if (result == null) throw new CustomException(ErrorCode.USER_SUMMARY_NOT_FOUND);
+        return result;
+    }
+
 }

@@ -6,10 +6,7 @@ import com.team3.assign_back.domain.tastePreference.dto.TastePreferenceUpdateReq
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -37,13 +34,14 @@ public class TastePreference extends BaseEntity {
     @DecimalMin("1.00")
     @DecimalMax("5.00")
     @Digits(integer = 1, fraction = 2)
-    private BigDecimal salty;
+    private BigDecimal sweet;
 
     @Column(nullable = false)
     @DecimalMin("1.00")
     @DecimalMax("5.00")
     @Digits(integer = 1, fraction = 2)
-    private BigDecimal sweet;
+    private BigDecimal salty;
+
 
     @Column(nullable = true)
     private String pros; // 호 데이터
