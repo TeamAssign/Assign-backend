@@ -20,8 +20,8 @@ public class ImageController {
     public ResponseEntity<ImageResponseDto> getUploadPresignedUrl(@RequestBody ImageRequestDto fileRequest) {
 
 
-        ImageResponseDto presignedUrl = imageService.generateUploadPreSignedUrl(fileRequest);
-        return ResponseEntity.ok(presignedUrl);
+        ImageResponseDto imageResponseDto = imageService.generateUploadPreSignedUrl(fileRequest);
+        return ResponseEntity.ok(imageResponseDto);
     }
 
     @GetMapping("/url")
