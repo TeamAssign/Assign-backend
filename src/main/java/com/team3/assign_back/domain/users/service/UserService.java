@@ -47,8 +47,6 @@ public class UserService {
     private final TagService tagService;
     private final ImageService imageService;
 
-    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
     @Transactional
     public void registerUser(String vendorId, UserRegisterRequestDto requestDto) {
         validateUserNotExist(vendorId);
@@ -186,8 +184,7 @@ public class UserService {
             tastePreferenceRepository.flush();
 
             CompletableFuture.runAsync(()->
-                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId())
-                            , threadPoolTaskExecutor)
+                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId()))
                     .exceptionally(e -> {
                         log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
                         return null;
