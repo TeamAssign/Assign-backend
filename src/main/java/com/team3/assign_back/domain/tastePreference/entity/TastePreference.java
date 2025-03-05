@@ -59,8 +59,8 @@ public class TastePreference extends BaseEntity {
 
     public void updateTastePreferences(TastePreferenceUpdateRequestDTO tastePreferenceUpdateRequestDTO){
         this.spicy = tastePreferenceUpdateRequestDTO.getSpicy();
-        this.salty = tastePreferenceUpdateRequestDTO.getSalty();
         this.sweet = tastePreferenceUpdateRequestDTO.getSweet();
+        this.salty = tastePreferenceUpdateRequestDTO.getSalty();
         this.pros = tastePreferenceUpdateRequestDTO.getPros();
         this.cons = tastePreferenceUpdateRequestDTO.getCons();
     }
