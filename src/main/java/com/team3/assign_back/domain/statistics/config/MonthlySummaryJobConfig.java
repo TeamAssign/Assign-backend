@@ -23,7 +23,8 @@ public class MonthlySummaryJobConfig {
     @Bean(name = "monthlySummaryJob")
     public Job monthlySummaryJob() {
         return new JobBuilder("monthlySummaryJob", jobRepository)
-                .start(userRecommendationStatsStep())
+                .start(saveUserTagsStep())
+                .next(userRecommendationStatsStep())
                 .incrementer(new RunIdIncrementer())
                 .build();
     }
@@ -33,4 +34,10 @@ public class MonthlySummaryJobConfig {
                 .tasklet(summaryStep.userRecommendationStatsTasklet(), transactionManager)
                 .build();
     }
+    public Step saveUserTagsStep() {
+        return new StepBuilder("saveUserTagsStep", jobRepository)
+                .tasklet(summaryStep.saveUserTagsTasklet(), transactionManager)
+                .build();
+    }
+
 }

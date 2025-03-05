@@ -35,7 +35,7 @@ public class SummaryService {
         LocalDate today = LocalDate.now();
         LocalDate MonthsAgo = today.minus(90, ChronoUnit.DAYS);
 
-
+        summaryMongoRepository.deleteExistingUserSummaries(today.getYear(), today.getMonthValue(),today.getDayOfMonth());
         List<UserReviewSummaryDto> directReviewResults = summaryQueryRepository.fetchDirectReviewForUser(MonthsAgo, today);
         List<UserReviewSummaryDto> recommendationReviewResults = summaryQueryRepository.fetchRecommendationReviewForUser(MonthsAgo, today);
 

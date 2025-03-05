@@ -27,7 +27,7 @@ public class SummaryController {
 
 
     // --- 통계 데이터 조회
-    /*@GetMapping("/users")
+    @GetMapping("/users")
     public ResponseEntity<ApiResponseDto<UserSummaryMonthlyDto>> getUserSummary(@AuthenticationPrincipal Jwt jwt){
         Long userId = userService.getUserIdByVendorId(jwt.getSubject());
         UserSummaryMonthlyDto userSummaryMonthlyDto = summaryService.getLatestUserSummary(userId);
@@ -44,7 +44,7 @@ public class SummaryController {
     public ResponseEntity<ApiResponseDto<CompanySummaryMonthlyDto>> getCompanySummary(){
         CompanySummaryMonthlyDto companySummaryMonthlyDto = summaryService.getLatestCompanySummary();
         return ApiResponseDto.from(HttpStatus.OK,"전사 통계 조회 성공",companySummaryMonthlyDto);
-    }*/
+    }
 
 
 

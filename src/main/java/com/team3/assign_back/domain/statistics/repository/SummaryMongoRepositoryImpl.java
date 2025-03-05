@@ -82,4 +82,14 @@ public class SummaryMongoRepositoryImpl implements SummaryMongoRepository {
         return result;
     }
 
+    @Override
+    public void deleteExistingUserSummaries(int year, int month, int day) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("year").is(year)
+                .and("month").is(month)
+                .and("day").is(day));
+
+        mongoTemplate.remove(query, UserSummaryMonthly.class);
+    }
+
 }

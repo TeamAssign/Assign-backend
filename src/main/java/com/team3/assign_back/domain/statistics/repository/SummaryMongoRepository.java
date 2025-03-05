@@ -15,4 +15,6 @@ public interface SummaryMongoRepository {
     CompanySummaryMonthly findLatestCompanySummary();
     List<UserSummaryMonthly> findUserSummariesForCompany(LocalDate today);
     UserRecommendationStats findLatestUserPreferenceSummary(long userId);
+
+    void deleteExistingUserSummaries(int year, int month, int day);
 }
