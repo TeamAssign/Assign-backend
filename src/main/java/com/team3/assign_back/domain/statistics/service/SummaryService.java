@@ -1,21 +1,16 @@
 package com.team3.assign_back.domain.statistics.service;
+import com.team3.assign_back.domain.statistics.entity.UserRecommendationStats;
+import com.team3.assign_back.domain.recommendation.repository.CustomRecommendationRepository;
 import com.team3.assign_back.domain.statistics.repository.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.domain.Sort;
 import com.team3.assign_back.domain.statistics.dto.*;
 import com.team3.assign_back.domain.statistics.entity.CompanySummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.TeamSummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.UserSummaryMonthly;
 
-import com.team3.assign_back.global.exception.custom.CustomException;
-import com.team3.assign_back.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -33,6 +28,7 @@ public class SummaryService {
     private final CustomSummaryQueryRepository summaryQueryRepository;
     private final SummaryMongoRepository summaryMongoRepository;
     private final MongoTemplate mongoTemplate;
+    private final CustomRecommendationRepository customRecommendationRepository;
 
     // 유저별 최근 3달 통계(기준 당일) 생성
     public List<UserSummaryMonthly> saveAllUserSummaries() {
@@ -124,6 +120,25 @@ public class SummaryService {
         return companySummaryRepository.save(summary);
     }
 
+    // 유저별 선호도 분석 데이터
+    public List<UserRecommendationStats> saveBatchUserPreferenceStats(){
+        List<UserRecommendationStats> userRecommendationStats = customRecommendationRepository.getUserRecommendationStats();
+        int currentYear = LocalDate.now().getYear();
+        int currentMonth = LocalDate.now().getMonthValue();
+
+        List<UserRecommendationStats> updatedStatsList = userRecommendationStats.stream()
+                .map(stats -> {
+                    stats.setYear(currentYear);
+                    stats.setMonth(currentMonth);
+                    return stats;
+                })
+                .collect(Collectors.toList());
+
+        // MongoDB에 저장
+        mongoTemplate.insertAll(updatedStatsList);
+        return updatedStatsList;
+    }
+
     public UserSummaryMonthlyDto getLatestUserSummary(long userId) {
         return UserSummaryMonthlyDto.fromEntity(summaryMongoRepository.findLatestUserSummary(userId));
     }
@@ -134,6 +149,10 @@ public class SummaryService {
 
     public CompanySummaryMonthlyDto getLatestCompanySummary() {
         return CompanySummaryMonthlyDto.fromEntity(summaryMongoRepository.findLatestCompanySummary());
+    }
+
+    public UserRecommendationStatsDto getLatesUserPreferenceSummary(long userId){
+        return UserRecommendationStatsDto.fromEntity(summaryMongoRepository.findLatestUserPreferenceSummary(userId));
     }
 
     private UserSummaryMonthly.Statistics aggregateUserStatistics(List<UserReviewSummaryDto> dtos) {
@@ -164,4 +183,5 @@ public class SummaryService {
 
         return new TeamSummaryMonthly.Statistics(totalCount, categoryCounts, menuCounts);
     }
+
 }

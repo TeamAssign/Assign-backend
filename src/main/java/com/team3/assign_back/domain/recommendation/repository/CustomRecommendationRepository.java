@@ -2,6 +2,7 @@ package com.team3.assign_back.domain.recommendation.repository;
 
 import com.team3.assign_back.domain.recommendation.dto.RecommendationHistoryResponseDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
+import com.team3.assign_back.domain.statistics.entity.UserRecommendationStats;
 import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
 import org.springframework.data.domain.Pageable;
@@ -21,5 +22,7 @@ public interface CustomRecommendationRepository {
     List<RecommendationResponseDto> getRecommendationToday(Long userId);
 
     List<String> getRecommendationForTag(Long userId, int size);
+
+    List<UserRecommendationStats> getUserRecommendationStats();
 
 }

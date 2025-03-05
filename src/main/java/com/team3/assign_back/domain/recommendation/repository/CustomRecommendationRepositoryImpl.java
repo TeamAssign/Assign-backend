@@ -2,13 +2,17 @@ package com.team3.assign_back.domain.recommendation.repository;
 
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team3.assign_back.domain.food.entity.QFood;
+import com.team3.assign_back.domain.intermediate.entity.QTag;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationHistoryResponseDto;
 import com.team3.assign_back.domain.recommendation.dto.RecommendationResponseDto;
 import com.team3.assign_back.domain.recommendation.entity.QRecommendation;
 import com.team3.assign_back.domain.recommendation.entity.QUsersRecommendation;
+import com.team3.assign_back.domain.statistics.entity.UserRecommendationStats;
 import com.team3.assign_back.domain.review.entity.QRecommendationReview;
 import com.team3.assign_back.domain.review.entity.QReview;
 import com.team3.assign_back.domain.team.entity.QTeam;
@@ -16,6 +20,7 @@ import com.team3.assign_back.domain.users.dto.UserSearchResponseDto;
 import com.team3.assign_back.domain.users.entity.QUsers;
 import com.team3.assign_back.global.common.PageResponseDto;
 import com.team3.assign_back.global.enums.FoodEnum;
+import com.team3.assign_back.global.enums.TagEnum;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -30,10 +35,13 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_QUERY_LIMIT_COUNT;
 import static com.team3.assign_back.global.constant.RecommendationConstant.RECOMMENDATION_TODAY_QUERY_LIMIT_COUNT;
@@ -55,6 +63,8 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
     private static final QRecommendationReview recommendationReview = QRecommendationReview.recommendationReview;
     private static final QReview review = QReview.review;
     private static final QFood food = QFood.food;
+    private static final QTag tag = QTag.tag;
+
 
 
 
@@ -374,6 +384,53 @@ public class CustomRecommendationRepositoryImpl implements CustomRecommendationR
                 .join(users)
                 .on(usersRecommendation.user.eq(users))
                 .where(users.id.eq(userId));
+    }
+
+    @Override
+    public List<UserRecommendationStats> getUserRecommendationStats() {
+
+        String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+
+        List<Tuple> results = query
+                .select(
+                        users.id,
+                        Expressions.numberTemplate(Double.class,
+                                "COALESCE(AVG(CASE WHEN {0} = true THEN {1} ELSE NULL END), 0.0)",
+                                recommendation.isAgree, food.price
+                        ),
+                        Expressions.numberTemplate(Double.class,
+                                "COALESCE((SUM(CASE WHEN {0} = true THEN 1 ELSE 0 END) * 100.0) / NULLIF(COUNT(*), 0), 0)",
+                                recommendation.isAgree
+                        ),
+                        tag.mealTag
+                )
+                .from(users)
+                .leftJoin(usersRecommendation).on(users.id.eq(usersRecommendation.user.id))
+                .leftJoin(recommendation).on(usersRecommendation.recommendation.id.eq(recommendation.id))
+                .leftJoin(food).on(recommendation.food.id.eq(food.id))
+                .leftJoin(tag).on(users.id.eq(tag.users.id))
+                .where(Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM')", recommendation.createdAt).eq(currentMonth))
+                .groupBy(users.id, tag.mealTag)
+                .orderBy(recommendation.countDistinct().desc())
+                .fetch();
+
+        return results.stream()
+                .collect(Collectors.groupingBy(
+                        row -> row.get(users.id), // userId 기준 그룹화
+                        Collectors.collectingAndThen(Collectors.toList(), userRows -> {
+                            Double avgFoodPrice = userRows.get(0).get(1, Double.class);
+                            Double agreePercentage = userRows.get(0).get(2, Double.class);
+
+                            List<TagEnum.MealTag> mealTags = userRows.stream()
+                                    .map(row -> row.get(3, TagEnum.MealTag.class))
+                                    .filter(Objects::nonNull)
+                                    .distinct()
+                                    .collect(Collectors.toList());
+
+                            return new UserRecommendationStats(userRows.get(0).get(users.id), avgFoodPrice, agreePercentage, mealTags);
+                        })
+                ))
+                .values().stream().toList();
     }
 
 }
