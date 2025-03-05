@@ -18,7 +18,6 @@ public enum ErrorCode {
 
     // 팀 관련 에러
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
-    TASTE_PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND, "팀의 맛 선호도를 찾을 수 없습니다."),
     TEAM_REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "팀 리뷰를 찾을 수 없습니다."),
     INVALID_TEAM_SELECTION(HttpStatus.BAD_REQUEST, "본인이 속한 팀만 선택할 수 있습니다."),
 
@@ -46,7 +45,10 @@ public enum ErrorCode {
 
     // 이미지 관련 에러
     EXCEED_SIZE_LIMIT(HttpStatus.PAYLOAD_TOO_LARGE, "이미지 파일의 크기가 10MB를 초과했습니다."),
-    NOT_MATCHED_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "이미지 파일이 아닙니다.")
+    NOT_MATCHED_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "이미지 파일이 아닙니다."),
+
+    // 맛 선호도
+    TASTE_PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND, "맛 선호도를 찾을 수 없습니다.")
     ;
 
 
