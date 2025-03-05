@@ -20,6 +20,7 @@ import com.team3.assign_back.domain.team.repository.TeamRepository;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.domain.users.repository.UserRepository;
 import com.team3.assign_back.global.common.PageResponseDto;
+import com.team3.assign_back.global.enums.FoodEnum;
 import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -74,8 +75,6 @@ public class ReviewService {
                                 .build()
                 ));
 
-
-
         DirectReview directReview = directReviewRepository.save(
                 DirectReview.builder()
                         .review(review)
@@ -87,7 +86,11 @@ public class ReviewService {
                         .build()
         );
 
-        saveParticipants(review, reviewRequestDto.getParticipants());
+        List<Long> participants = (reviewRequestDto.getType() == FoodEnum.FoodType.COMPANYDINNER || reviewRequestDto.getType() == FoodEnum.FoodType.SOLO)
+                ? new ArrayList<>()
+                : (reviewRequestDto.getParticipants() != null ? reviewRequestDto.getParticipants() : new ArrayList<>());
+
+        saveParticipants(review, participants);
 
         return convertToDirectReviewDTO(directReview);
     }
@@ -95,9 +98,6 @@ public class ReviewService {
     private ReviewResponseDto createRecommendationReview(ReviewRequestDto reviewRequestDto, Review review, String imageUrl) {
         Recommendation recommendation = recommendationRepository.findById(reviewRequestDto.getRecommendationId())
                 .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_NOT_FOUND));
-
-        Food food = recommendation.getFood();
-        String foodName = food.getName();
 
         RecommendationReview recommendationReview = recommendationReviewRepository.save(
                 RecommendationReview.builder()
@@ -109,11 +109,14 @@ public class ReviewService {
                         .build()
         );
 
-        saveParticipants(review, reviewRequestDto.getParticipants());
+        List<Long> participants = (recommendation.getType() == FoodEnum.FoodType.COMPANYDINNER || recommendation.getType() == FoodEnum.FoodType.SOLO)
+                ? new ArrayList<>()
+                : (reviewRequestDto.getParticipants() != null ? reviewRequestDto.getParticipants() : new ArrayList<>());
 
-        return convertToRecommendationReviewDTO(recommendationReview, foodName, recommendation);
+        saveParticipants(review, participants);
+
+        return convertToRecommendationReviewDTO(recommendationReview, recommendation);
     }
-
 
     private void saveParticipants(Review review, List<Long> participantIds) {
         if (participantIds == null) {
@@ -172,8 +175,6 @@ public class ReviewService {
                 .map(participant -> ParticipantsDto.from(participant.getUsers()))
                 .collect(Collectors.toList());
 
-
-
         return ReviewResponseDto.builder()
                 .reviewId(review.getId())
                 .comment(directReview.getComment())
@@ -186,7 +187,7 @@ public class ReviewService {
                 .build();
     }
 
-    private ReviewResponseDto convertToRecommendationReviewDTO(RecommendationReview recommendationReview, String foodName, Recommendation recommendation) {
+    private ReviewResponseDto convertToRecommendationReviewDTO(RecommendationReview recommendationReview, Recommendation recommendation) {
         Review review = reviewRepository.findReviewWithParticipants(recommendationReview.getReview().getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
@@ -201,7 +202,7 @@ public class ReviewService {
                 .star(recommendationReview.getStar())
                 .key(recommendationReview.getImgUrl())
                 .type(recommendation.getType())
-                .food(foodName)
+                .food(recommendation.getFood().getName())
                 .category(recommendation.getFood().getCategory())
                 .participants(participantsDtoList)
                 .build();
@@ -230,10 +231,7 @@ public class ReviewService {
                 throw new CustomException(ErrorCode.FOOD_NOT_FOUND);
             }
 
-            Food food = recommendation.getFood();
-            String foodName = food.getName();
-
-            return convertToRecommendationReviewDTO(recommendationReview, foodName, recommendation);
+            return convertToRecommendationReviewDTO(recommendationReview, recommendation);
         }
 
         throw new CustomException(ErrorCode.REVIEW_NOT_FOUND);
