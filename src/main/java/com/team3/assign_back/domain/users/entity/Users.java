@@ -49,4 +49,9 @@ public class Users extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "users")
     private List<Participant> participants = new ArrayList<>();
+
+    public void updateUserProfile(String profileImgUrl){
+        this.profileImgUrl = profileImgUrl;
+    }
+
 }
