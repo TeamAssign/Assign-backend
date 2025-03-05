@@ -146,6 +146,10 @@ public class ReviewService {
 
         Page<Review> reviews = reviewRepository.findByUsersReview(userId, pageable);
 
+        if (reviews.isEmpty()) {
+            return PageResponseDto.empty();
+        }
+
         return new PageResponseDto<>(reviews.map(this::convertToReviewResponse));
     }
 
@@ -156,16 +160,16 @@ public class ReviewService {
 
         Page<Review> teamReviews = reviewRepository.findReviewsByTeamId(teamId, pageable);
 
+        if (teamReviews.isEmpty()) {
+            return PageResponseDto.empty();
+        }
+
         return new PageResponseDto<>(teamReviews.map(this::convertToReviewResponse));
     }
 
     private ReviewResponseDto convertToDirectReviewDTO(DirectReview directReview) {
         Review review = reviewRepository.findReviewWithParticipants(directReview.getReview().getId())
-                .orElse(null);
-
-        if(review == null){
-            return ReviewResponseDto.builder().build();
-        }
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
         List<ParticipantsDto> participantsDtoList = review.getParticipants().stream()
                 .map(participant -> ParticipantsDto.from(participant.getUsers()))
@@ -185,11 +189,7 @@ public class ReviewService {
 
     private ReviewResponseDto convertToRecommendationReviewDTO(RecommendationReview recommendationReview, Recommendation recommendation) {
         Review review = reviewRepository.findReviewWithParticipants(recommendationReview.getReview().getId())
-                .orElse(null);
-
-        if(review == null){
-            return ReviewResponseDto.builder().build();
-        }
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
         List<ParticipantsDto> participantsDtoList = review.getParticipants().stream()
                 .map(participant -> ParticipantsDto.from(participant.getUsers()))
