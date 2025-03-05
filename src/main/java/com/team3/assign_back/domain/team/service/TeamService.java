@@ -30,8 +30,6 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
 
-    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
     public List<TeamResponseDto> getAllTeams() {
         return teamRepository.findAllTeams();
     }
@@ -72,8 +70,7 @@ public class TeamService {
             tastePreferenceRepository.flush();
 
             CompletableFuture.runAsync(()->
-                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference.getId())
-                            , threadPoolTaskExecutor)
+                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference.getId()))
                     .exceptionally(e -> {
                         log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
                         return null;
