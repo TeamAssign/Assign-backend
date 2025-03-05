@@ -180,16 +180,19 @@ public class UserService {
                 requestDTO.getCons()
         );
 
-        tastePreference.updateTastePreferences(tastePreferenceUpdateRequestDTO);
+        boolean changed = tastePreference.updateTastePreferences(tastePreferenceUpdateRequestDTO);
 
-        tastePreferenceRepository.flush();
+        if(changed){
+            tastePreferenceRepository.flush();
 
-        CompletableFuture.runAsync(()->
-                                tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId())
-                        , threadPoolTaskExecutor)
-                .exceptionally(e -> {
-                    log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
-                    return null;
-                });
+            CompletableFuture.runAsync(()->
+                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId())
+                            , threadPoolTaskExecutor)
+                    .exceptionally(e -> {
+                        log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
+                        return null;
+                    });
+
+        }
     }
 }

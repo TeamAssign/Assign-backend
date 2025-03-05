@@ -64,19 +64,22 @@ public class TeamService {
                 .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
 
         TastePreference existingPreference = teamTastePreference.getTastePreference();
-        existingPreference.updateTastePreferences(updateRequestDTO);
+        boolean changed = existingPreference.updateTastePreferences(updateRequestDTO);
 
-        tastePreferenceRepository.save(existingPreference);
+        if(changed){
+            tastePreferenceRepository.save(existingPreference);
 
-        tastePreferenceRepository.flush();
+            tastePreferenceRepository.flush();
 
-        CompletableFuture.runAsync(()->
-                                tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference.getId())
-                        , threadPoolTaskExecutor)
-                .exceptionally(e -> {
-                    log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
-                    return null;
-                });
+            CompletableFuture.runAsync(()->
+                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference.getId())
+                            , threadPoolTaskExecutor)
+                    .exceptionally(e -> {
+                        log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
+                        return null;
+                    });
+
+        }
     }
 
 
