@@ -11,6 +11,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Entity
@@ -57,11 +58,34 @@ public class TastePreference extends BaseEntity {
     @OneToMany(mappedBy = "tastePreference")
     private List<TeamTastePreference> TeamTastePreferences = new ArrayList<>();
 
-    public void updateTastePreferences(TastePreferenceUpdateRequestDTO tastePreferenceUpdateRequestDTO){
-        this.spicy = tastePreferenceUpdateRequestDTO.getSpicy();
-        this.sweet = tastePreferenceUpdateRequestDTO.getSweet();
-        this.salty = tastePreferenceUpdateRequestDTO.getSalty();
-        this.pros = tastePreferenceUpdateRequestDTO.getPros();
-        this.cons = tastePreferenceUpdateRequestDTO.getCons();
+    public boolean updateTastePreferences(TastePreferenceUpdateRequestDTO tastePreferenceUpdateRequestDTO){
+        boolean changed = false;
+
+        if (!Objects.equals(this.spicy, tastePreferenceUpdateRequestDTO.getSpicy())) {
+            this.spicy = tastePreferenceUpdateRequestDTO.getSpicy();
+            changed = true;
+        }
+
+        if (!Objects.equals(this.sweet, tastePreferenceUpdateRequestDTO.getSweet())) {
+            this.sweet = tastePreferenceUpdateRequestDTO.getSweet();
+            changed = true;
+        }
+
+        if (!Objects.equals(this.salty, tastePreferenceUpdateRequestDTO.getSalty())) {
+            this.salty = tastePreferenceUpdateRequestDTO.getSalty();
+            changed = true;
+        }
+
+        if (!Objects.equals(this.pros, tastePreferenceUpdateRequestDTO.getPros())) {
+            this.pros = tastePreferenceUpdateRequestDTO.getPros();
+            changed = true;
+        }
+
+        if (!Objects.equals(this.cons, tastePreferenceUpdateRequestDTO.getCons())) {
+            this.cons = tastePreferenceUpdateRequestDTO.getCons();
+            changed = true;
+        }
+
+        return changed;
     }
 }
