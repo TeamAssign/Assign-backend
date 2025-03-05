@@ -24,7 +24,7 @@ public class ImageController {
         return ResponseEntity.ok(imageResponseDto);
     }
 
-    @GetMapping("/url/{key}")
+    @GetMapping("/url")
     public ResponseEntity<ImageUrlResponse> getImageUrl(@RequestParam(name = "key") String key){
         ImageUrlResponse imageUrlResponse = imageService.getImageUrl(key);
         return ResponseEntity.ok(imageUrlResponse);
