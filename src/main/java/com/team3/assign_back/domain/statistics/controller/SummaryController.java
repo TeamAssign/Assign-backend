@@ -1,5 +1,6 @@
 package com.team3.assign_back.domain.statistics.controller;
 
+import com.team3.assign_back.domain.statistics.batch.MonthlyBatchScheduler;
 import com.team3.assign_back.domain.statistics.dto.CompanySummaryMonthlyDto;
 import com.team3.assign_back.domain.statistics.dto.TeamSummaryMonthlyDto;
 import com.team3.assign_back.domain.statistics.dto.UserSummaryMonthlyDto;
@@ -24,6 +25,7 @@ public class SummaryController {
     private final SummaryService summaryService;
     private final BatchScheduler batchScheduler;
     private final UserService userService;
+    private final MonthlyBatchScheduler monthlyBatchScheduler;
 
 
     // --- 통계 데이터 조회
@@ -57,7 +59,7 @@ public class SummaryController {
 
     @PostMapping("/preference/batch")
     public ResponseEntity<ApiResponseDto<String>> runBatchUserPreference(){
-        summaryService.saveBatchUserPreferenceStats();
+        monthlyBatchScheduler.executeBatch();
         return ApiResponseDto.from(HttpStatus.OK,"사용자별 선호 분석 배치 작업 완료.", null);
     }
 
