@@ -48,8 +48,6 @@ public class KakaoApiService {
                 .queryParam("size", 15);
 
         String url = builder.build().toUriString();
-        log.info("URL :{}", url);
-        log.info("헤더 확인: {}", headers);
 
         ResponseEntity<KakaoPlaceResponse> response = restTemplate.exchange(
                 url, HttpMethod.GET, entity, KakaoPlaceResponse.class);
