@@ -2,6 +2,7 @@ package com.team3.assign_back.domain.statistics.batch;
 
 import com.team3.assign_back.domain.statistics.entity.CompanySummaryMonthly;
 import com.team3.assign_back.domain.statistics.entity.TeamSummaryMonthly;
+import com.team3.assign_back.domain.statistics.entity.UserRecommendationStats;
 import com.team3.assign_back.domain.statistics.entity.UserSummaryMonthly;
 import com.team3.assign_back.domain.statistics.service.SummaryService;
 import lombok.RequiredArgsConstructor;
@@ -21,27 +22,32 @@ public class SummaryStep {
 
     public Tasklet userSummaryTasklet() {
         return (contribution, chunkContext) -> {
-            log.info("User Summary Batch 실행 중...");
             List<UserSummaryMonthly> results = summaryService.saveAllUserSummaries();
-            log.info("저장된 유저 통계 개수: {}", results.size());
+            log.info("User summary records saved: {}", results.size());
             return RepeatStatus.FINISHED;
         };
     }
 
     public Tasklet teamSummaryTasklet() {
         return (contribution, chunkContext) -> {
-            log.info("Team Summary Batch 실행 중...");
             List<TeamSummaryMonthly> results = summaryService.saveAllTeamSummaries();
-            log.info("저장된 팀 통계 개수: {}", results.size());
+            log.info("Team summary records saved: {}", results.size());
             return RepeatStatus.FINISHED;
         };
     }
 
     public Tasklet companySummaryTasklet() {
         return (contribution, chunkContext) -> {
-            log.info("Company Summary Batch 실행 중...");
             CompanySummaryMonthly results = summaryService.saveCompanySummary();
-            log.info("저장된 회사 통계 데이터 {}", results);
+            log.info("Company summary data saved: {}", results);
+            return RepeatStatus.FINISHED;
+        };
+    }
+
+    public Tasklet userRecommendationStatsTasklet() {
+        return (contribution, chunkContext) -> {
+            List<UserRecommendationStats> results = summaryService.saveBatchUserPreferenceStats();
+            log.info("User preference summary records saved: {}", results.size());
             return RepeatStatus.FINISHED;
         };
     }

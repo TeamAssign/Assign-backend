@@ -10,43 +10,27 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class SummaryJobConfig {
+public class MonthlySummaryJobConfig {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final SummaryStep summaryStep;
 
-    @Bean(name = "summaryJob")
-    @Primary
-    public Job summaryJob() {
-        return new JobBuilder("summaryJob", jobRepository)
-                .start(userSummaryStep())
-                .next(teamSummaryStep())
-                .next(companySummaryStep())
+    @Bean(name = "monthlySummaryJob")
+    public Job monthlySummaryJob() {
+        return new JobBuilder("monthlySummaryJob", jobRepository)
+                .start(userRecommendationStatsStep())
                 .incrementer(new RunIdIncrementer())
                 .build();
     }
 
-    public Step userSummaryStep() {
-        return new StepBuilder("userSummaryStep", jobRepository)
-                .tasklet(summaryStep.userSummaryTasklet(), transactionManager)
-                .build();
-    }
-
-    public Step teamSummaryStep() {
-        return new StepBuilder("teamSummaryStep", jobRepository)
-                .tasklet(summaryStep.teamSummaryTasklet(), transactionManager)
-                .build();
-    }
-
-    public Step companySummaryStep() {
-        return new StepBuilder("companySummaryStep", jobRepository)
-                .tasklet(summaryStep.companySummaryTasklet(), transactionManager)
+    public Step userRecommendationStatsStep() {
+        return new StepBuilder("userRecommendationStatsStep", jobRepository)
+                .tasklet(summaryStep.userRecommendationStatsTasklet(), transactionManager)
                 .build();
     }
 }

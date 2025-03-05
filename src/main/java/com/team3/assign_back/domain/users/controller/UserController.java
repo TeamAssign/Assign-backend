@@ -2,6 +2,8 @@ package com.team3.assign_back.domain.users.controller;
 
 import com.team3.assign_back.domain.review.dto.ReviewResponseDto;
 import com.team3.assign_back.domain.review.service.ReviewService;
+import com.team3.assign_back.domain.statistics.dto.UserRecommendationStatsDto;
+import com.team3.assign_back.domain.statistics.service.SummaryService;
 import com.team3.assign_back.domain.tastePreference.dto.UserProfileUpdateRequestDTO;
 import com.team3.assign_back.domain.team.dto.TeamProfileDTO;
 import com.team3.assign_back.domain.users.dto.UserProfileDto;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final ReviewService reviewService;
+    private final SummaryService summaryService;
 
     @Operation(
             summary = "유저 등록",
@@ -168,6 +171,13 @@ public class UserController {
         userService.updateUserProfile(userId, updatedPreference);
 
         return ApiResponseDto.from(HttpStatus.OK,"사용자 프로필이 성공적으로 업데이트 되었습니다.", "업데이트 완료");
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponseDto<UserRecommendationStatsDto>> getUserPreference(@AuthenticationPrincipal Jwt jwt){
+        Long userId = userService.getUserIdByVendorId(jwt.getSubject());
+        UserRecommendationStatsDto result = summaryService.getLatestUserPreferenceSummary(userId);
+        return ApiResponseDto.from(HttpStatus.OK,"사용자 선호 성향 분석 데이터 조회 성공.", result);
     }
 
 
