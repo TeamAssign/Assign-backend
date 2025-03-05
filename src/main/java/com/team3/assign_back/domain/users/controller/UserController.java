@@ -176,7 +176,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ApiResponseDto<UserRecommendationStatsDto>> getUserPreference(@AuthenticationPrincipal Jwt jwt){
         Long userId = userService.getUserIdByVendorId(jwt.getSubject());
-        UserRecommendationStatsDto result = summaryService.getLatesUserPreferenceSummary(userId);
+        UserRecommendationStatsDto result = summaryService.getLatestUserPreferenceSummary(userId);
         return ApiResponseDto.from(HttpStatus.OK,"사용자 선호 성향 분석 데이터 조회 성공.", result);
     }
 

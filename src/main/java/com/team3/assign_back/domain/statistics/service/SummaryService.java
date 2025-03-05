@@ -151,7 +151,7 @@ public class SummaryService {
         return CompanySummaryMonthlyDto.fromEntity(summaryMongoRepository.findLatestCompanySummary());
     }
 
-    public UserRecommendationStatsDto getLatesUserPreferenceSummary(long userId){
+    public UserRecommendationStatsDto getLatestUserPreferenceSummary(long userId){
         return UserRecommendationStatsDto.fromEntity(summaryMongoRepository.findLatestUserPreferenceSummary(userId));
     }
 
