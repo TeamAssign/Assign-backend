@@ -27,6 +27,7 @@ public class SummaryStep {
     private final SummaryService summaryService;
     private final UserRepository usersRepository;
     private final TagService tagService;
+    private final ExecutorService executorService;
 
     public Tasklet userSummaryTasklet() {
         return (contribution, chunkContext) -> {
@@ -64,13 +65,17 @@ public class SummaryStep {
         return (contribution, chunkContext) -> {
             List<Users> users = usersRepository.findAll();
 
-            users.forEach(user -> {
-                try {
-                    tagService.saveUserTag(user);
-                } catch (Exception e) {
-                    log.error("Error occurred while saving user tags - User ID: {}, Error: {}", user.getId(), e.getMessage());
-                }
-            });
+            List<CompletableFuture<Void>> futures = users.stream()
+                    .map(user -> CompletableFuture.runAsync(() -> {
+                        try {
+                            tagService.saveUserTag(user);
+                        } catch (Exception e) {
+                            log.error("Error occurred while saving user tags - User ID: {}, Error: {}", user.getId(), e.getMessage());
+                        }
+                    }, executorService))
+                    .toList();
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
             log.info("All user tags saved asynchronously: {}명", users.size());
             return RepeatStatus.FINISHED;
