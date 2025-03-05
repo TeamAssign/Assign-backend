@@ -33,4 +33,8 @@ public class PageResponseDto<T> {
         this.content = page.getContent();
         this.pageInfo = new PageInfo(page);
     }
+
+    public static <T> PageResponseDto<T> empty(){
+        return new PageResponseDto<>(Page.empty());
+    }
 }

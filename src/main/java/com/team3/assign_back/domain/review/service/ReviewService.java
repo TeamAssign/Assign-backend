@@ -147,7 +147,7 @@ public class ReviewService {
         Page<Review> reviews = reviewRepository.findByUsersReview(userId, pageable);
 
         if (reviews.isEmpty()) {
-            throw new CustomException(ErrorCode.REVIEW_NOT_FOUND);
+            return PageResponseDto.empty();
         }
 
         return new PageResponseDto<>(reviews.map(this::convertToReviewResponse));
@@ -161,7 +161,7 @@ public class ReviewService {
         Page<Review> teamReviews = reviewRepository.findReviewsByTeamId(teamId, pageable);
 
         if (teamReviews.isEmpty()) {
-            throw new CustomException(ErrorCode.TEAM_REVIEW_NOT_FOUND);
+            return PageResponseDto.empty();
         }
 
         return new PageResponseDto<>(teamReviews.map(this::convertToReviewResponse));

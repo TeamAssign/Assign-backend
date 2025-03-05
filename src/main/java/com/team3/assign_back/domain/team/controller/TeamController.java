@@ -103,7 +103,7 @@ public class TeamController {
         }
 
         teamService.updateTeamTastePreference(userId, updatedPreference);
-        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", "업데이트 완료");
+        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 조회 되었습니다.", "업데이트 완료");
     }
 
     @Operation(
