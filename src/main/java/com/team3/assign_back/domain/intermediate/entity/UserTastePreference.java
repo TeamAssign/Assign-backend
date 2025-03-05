@@ -4,10 +4,7 @@ import com.team3.assign_back.domain.tastePreference.entity.TastePreference;
 import com.team3.assign_back.domain.users.entity.Users;
 import com.team3.assign_back.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
