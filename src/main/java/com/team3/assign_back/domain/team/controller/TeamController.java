@@ -71,7 +71,7 @@ public class TeamController {
            ){
 
         TeamProfileDTO teamProfileDTO = teamService.getTeamTastePreference(teamId);
-        return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 업데이트 되었습니다.", teamProfileDTO);
+        return ApiResponseDto.from(HttpStatus.OK,"팀 프로필이 조회 되었습니다.", teamProfileDTO);
 
     }
 

@@ -59,7 +59,7 @@ public class ReviewService {
                         .build()
         );
 
-        String imageUrl = imageService.getImageUrl(reviewRequestDto.getImgurl()).imageUrl();
+        String imageUrl = imageService.getImageUrl(reviewRequestDto.getImgUrl()).imageUrl();
 
         return (reviewRequestDto.getRecommendationId() != null) ?
                 createRecommendationReview(reviewRequestDto, review,imageUrl) :

@@ -40,7 +40,7 @@ public class ImageService {
             throw new CustomException(ErrorCode.NOT_MATCHED_TYPE);
         }
 
-        String key = "uploads/" + UUID.randomUUID() + "_" + imageRequestDto.getFilename();
+        String key = "uploads/" + UUID.randomUUID() + "_" + imageRequestDto.getFileName();
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)

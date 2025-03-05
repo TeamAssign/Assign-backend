@@ -17,5 +17,5 @@ public class UserProfileDto {
     private BigDecimal sweet;
     private String pros;
     private String cons;
-    private String imgurl;
+    private String profileImageUrl;
 }
