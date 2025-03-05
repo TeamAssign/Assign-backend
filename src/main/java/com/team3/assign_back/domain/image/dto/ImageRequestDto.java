@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageRequestDto {
-    private String filename;
+    private String fileName;
     private String contentType;
     private Long contentLength;
 }
