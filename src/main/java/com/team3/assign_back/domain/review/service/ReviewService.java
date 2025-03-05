@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
-    private final ImageService imageService;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
@@ -59,10 +58,10 @@ public class ReviewService {
                         .build()
         );
 
-        String imageUrl = imageService.getImageUrl(reviewRequestDto.getImgUrl()).imageUrl();
+        String imageUrl = reviewRequestDto.getImgUrl();
 
         return (reviewRequestDto.getRecommendationId() != null) ?
-                createRecommendationReview(reviewRequestDto, review,imageUrl) :
+                createRecommendationReview(reviewRequestDto, review, imageUrl) :
                 createDirectReview(reviewRequestDto, review, imageUrl);
     }
 
