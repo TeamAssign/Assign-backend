@@ -1,12 +1,15 @@
 package com.team3.assign_back.domain.statistics.entity;
 
 import com.team3.assign_back.global.enums.TagEnum;
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +38,10 @@ public class UserRecommendationStats {
     private Double agreePercentage;
 
     private List<TagEnum.MealTag> mealTags;
+
+    @Column(updatable = false)
+    @CreatedDate
+    protected LocalDateTime createdAt;
 
     public UserRecommendationStats(Long userId, Double avgFoodPrice, Double agreePercentage,  List<TagEnum.MealTag> mealTags) {
         this.userId = userId;
