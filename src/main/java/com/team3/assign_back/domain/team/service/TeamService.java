@@ -14,10 +14,12 @@ import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -27,6 +29,8 @@ public class TeamService {
     private final TeamTastePreferenceRepository teamTastePreferenceRepository;
     private final TeamRepository teamRepository;
     private final TastePreferenceEmbeddingService tastePreferenceEmbeddingService;
+
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     public List<TeamResponseDto> getAllTeams() {
         return teamRepository.findAllTeams();
@@ -63,7 +67,16 @@ public class TeamService {
         existingPreference.updateTastePreferences(updateRequestDTO);
 
         tastePreferenceRepository.save(existingPreference);
-        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference);
+
+        tastePreferenceRepository.flush();
+
+        CompletableFuture.runAsync(()->
+                                tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference.getId())
+                        , threadPoolTaskExecutor)
+                .exceptionally(e -> {
+                    log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
+                    return null;
+                });
     }
 
 

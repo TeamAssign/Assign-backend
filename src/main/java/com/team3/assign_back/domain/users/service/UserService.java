@@ -25,8 +25,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -44,6 +47,8 @@ public class UserService {
     private final TagService tagService;
     private final ImageService imageService;
 
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
     @Transactional
     public void registerUser(String vendorId, UserRegisterRequestDto requestDto) {
         validateUserNotExist(vendorId);
@@ -52,7 +57,7 @@ public class UserService {
         TastePreference tastePreference = createTastePreference(requestDto);
         Users users = createUser(vendorId, requestDto, team);
         createUserTastePreference(users, tastePreference);
-        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId());
 //        tagService.saveUserTag(users);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
@@ -176,6 +181,15 @@ public class UserService {
         );
 
         tastePreference.updateTastePreferences(tastePreferenceUpdateRequestDTO);
-        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
+
+        tastePreferenceRepository.flush();
+
+        CompletableFuture.runAsync(()->
+                                tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId())
+                        , threadPoolTaskExecutor)
+                .exceptionally(e -> {
+                    log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
+                    return null;
+                });
     }
 }
