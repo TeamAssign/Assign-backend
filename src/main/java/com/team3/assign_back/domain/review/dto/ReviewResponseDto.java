@@ -15,10 +15,10 @@ public class ReviewResponseDto {
     private Long reviewId;
     private String comment;
     private int star;
-    private String key;
+    private String imgUrl;
     private List<ParticipantsDto> participants;
     private FoodEnum.FoodType type;
     private FoodEnum.FoodCategory category;
-    private String food;
+    private String menu;
     private Long recommendationId;
 }
