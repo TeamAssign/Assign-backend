@@ -98,11 +98,11 @@ public class TeamController {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Long userTeamId = user.getTeam().getId();
-        if(teamId != null && !teamId.equals(userTeamId)){
+        if(!teamId.equals(userTeamId)){
             throw new CustomException(ErrorCode.INVALID_TEAM_SELECTION);
         }
 
-        teamService.updateTeamTastePreference(userId, updatedPreference);
+        teamService.updateTeamTastePreference(teamId, updatedPreference);
         return ApiResponseDto.from(HttpStatus.OK,"팀 맛 선호도가 성공적으로 조회 되었습니다.", "업데이트 완료");
     }
 
