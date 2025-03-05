@@ -156,7 +156,7 @@ public class ReviewService {
             throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
         }
 
-        Page<Review> teamReviews = reviewRepository.findByTeams_IdOrTypeIsCompanyDinner(teamId, pageable);
+        Page<Review> teamReviews = reviewRepository.findByTeamId(teamId, pageable);
 
         if (teamReviews.isEmpty()) {
             return PageResponseDto.empty();
