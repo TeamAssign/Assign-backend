@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface UserTastePreferenceRepository extends JpaRepository<UserTastePreference, Long> {
     Optional<UserTastePreference> findByUsers_Id(Long userId);
 
-    Optional<UserTastePreference> findByUser(Users users);
+    Optional<UserTastePreference> findByUsers(Users users);
 }
