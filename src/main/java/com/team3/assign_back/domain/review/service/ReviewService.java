@@ -58,14 +58,13 @@ public class ReviewService {
                         .build()
         );
 
-        String imageUrl = reviewRequestDto.getImgUrl();
 
         return (reviewRequestDto.getRecommendationId() != null) ?
-                createRecommendationReview(reviewRequestDto, review, imageUrl) :
-                createDirectReview(reviewRequestDto, review, imageUrl);
+                createRecommendationReview(reviewRequestDto, review) :
+                createDirectReview(reviewRequestDto, review);
     }
 
-    private ReviewResponseDto createDirectReview(ReviewRequestDto reviewRequestDto, Review review, String imageUrl) {
+    private ReviewResponseDto createDirectReview(ReviewRequestDto reviewRequestDto, Review review) {
         Food food = foodRepository.findByName(reviewRequestDto.getMenu())
                 .orElseGet(() -> foodRepository.save(
                         Food.builder()
@@ -81,7 +80,7 @@ public class ReviewService {
                         .food(food)
                         .comment(reviewRequestDto.getComment())
                         .star(reviewRequestDto.getStar())
-                        .imgUrl(imageUrl)
+                        .imgUrl(reviewRequestDto.getImgUrl())
                         .build()
         );
 
@@ -94,7 +93,7 @@ public class ReviewService {
         return convertToDirectReviewDTO(directReview);
     }
 
-    private ReviewResponseDto createRecommendationReview(ReviewRequestDto reviewRequestDto, Review review, String imageUrl) {
+    private ReviewResponseDto createRecommendationReview(ReviewRequestDto reviewRequestDto, Review review) {
         Recommendation recommendation = recommendationRepository.findById(reviewRequestDto.getRecommendationId())
                 .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_NOT_FOUND));
 
@@ -104,7 +103,7 @@ public class ReviewService {
                         .recommendation(recommendation)
                         .comment(reviewRequestDto.getComment())
                         .star(reviewRequestDto.getStar())
-                        .imgUrl(imageUrl)
+                        .imgUrl(reviewRequestDto.getImgUrl())
                         .build()
         );
 
@@ -157,7 +156,7 @@ public class ReviewService {
             throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
         }
 
-        Page<Review> teamReviews = reviewRepository.findByTeams_Id(teamId, pageable);
+        Page<Review> teamReviews = reviewRepository.findByTeams_IdOrTypeIsCompanyDinner(teamId, pageable);
 
         if (teamReviews.isEmpty()) {
             return PageResponseDto.empty();
