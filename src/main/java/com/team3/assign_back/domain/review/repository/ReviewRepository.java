@@ -21,14 +21,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT DISTINCT r FROM Review r " +
             "JOIN r.participants p " +
             "JOIN p.users u " +
+            "LEFT JOIN RecommendationReview recRev ON recRev.review.id = r.id " +
+            "LEFT JOIN recRev.recommendation rec " +
+            "LEFT JOIN DirectReview recDirect ON recDirect.review.id = r.id " +
             "WHERE u.team.id = :teamId " +
-            "AND r.id NOT IN (" +
+            "AND (r.id NOT IN (" +
             "   SELECT p1.review.id FROM Participant p1 " +
             "   JOIN p1.users u1 " +
             "   GROUP BY p1.review.id " +
             "   HAVING COUNT(DISTINCT u1.team.id) > 1" +
-            ")")
-    Page<Review> findByTeams_Id(@Param("teamId") Long teamId, Pageable pageable);
+            ") OR rec.type = 'COMPANYDINNER' OR recDirect.type = 'COMPANYDINNER')")
+    Page<Review> findByTeamId(@Param("teamId") Long teamId, Pageable pageable);
 
 
     @EntityGraph(attributePaths = {"participants.users"})

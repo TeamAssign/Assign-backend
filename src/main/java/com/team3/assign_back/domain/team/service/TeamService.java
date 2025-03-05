@@ -14,10 +14,12 @@ import com.team3.assign_back.global.exception.ErrorCode;
 import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -60,10 +62,21 @@ public class TeamService {
                 .orElseThrow(() -> new CustomException(ErrorCode.TASTE_PREFERENCE_NOT_FOUND));
 
         TastePreference existingPreference = teamTastePreference.getTastePreference();
-        existingPreference.updateTastePreferences(updateRequestDTO);
+        boolean changed = existingPreference.updateTastePreferences(updateRequestDTO);
 
-        tastePreferenceRepository.save(existingPreference);
-        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference);
+        if(changed){
+            tastePreferenceRepository.save(existingPreference);
+
+            tastePreferenceRepository.flush();
+
+            CompletableFuture.runAsync(()->
+                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(existingPreference.getId()))
+                    .exceptionally(e -> {
+                        log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
+                        return null;
+                    });
+
+        }
     }
 
 

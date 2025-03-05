@@ -25,8 +25,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -52,7 +55,7 @@ public class UserService {
         TastePreference tastePreference = createTastePreference(requestDto);
         Users users = createUser(vendorId, requestDto, team);
         createUserTastePreference(users, tastePreference);
-        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
+        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId());
 //        tagService.saveUserTag(users);
 
         log.info("신규 사용자 등록 완료: vendorId={}", vendorId);
@@ -175,7 +178,18 @@ public class UserService {
                 requestDTO.getCons()
         );
 
-        tastePreference.updateTastePreferences(tastePreferenceUpdateRequestDTO);
-        tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference);
+        boolean changed = tastePreference.updateTastePreferences(tastePreferenceUpdateRequestDTO);
+
+        if(changed){
+            tastePreferenceRepository.flush();
+
+            CompletableFuture.runAsync(()->
+                                    tastePreferenceEmbeddingService.saveOrUpdateEmbedding(tastePreference.getId()))
+                    .exceptionally(e -> {
+                        log.warn("saveOrUpdateEmbedding,{}", e.getMessage(), e);
+                        return null;
+                    });
+
+        }
     }
 }
