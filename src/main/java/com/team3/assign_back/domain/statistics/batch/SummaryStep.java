@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -25,6 +27,7 @@ public class SummaryStep {
     private final SummaryService summaryService;
     private final UserRepository usersRepository;
     private final TagService tagService;
+    private final ExecutorService executorService;
 
     public Tasklet userSummaryTasklet() {
         return (contribution, chunkContext) -> {
@@ -69,13 +72,12 @@ public class SummaryStep {
                         } catch (Exception e) {
                             log.error("Error occurred while saving user tags - User ID: {}, Error: {}", user.getId(), e.getMessage());
                         }
-                    }))
+                    }, executorService))
                     .toList();
 
-            // 모든 비동기 작업이 완료될 때까지 대기
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
-            log.info("all of users tag saved asynchronously: {}명", users.size());
+            log.info("All user tags saved asynchronously: {}명", users.size());
             return RepeatStatus.FINISHED;
         };
     }
