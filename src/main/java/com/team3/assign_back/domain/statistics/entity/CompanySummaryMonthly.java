@@ -1,11 +1,14 @@
 package com.team3.assign_back.domain.statistics.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Document(collection = "company_summary_monthly")
@@ -22,6 +25,10 @@ public class CompanySummaryMonthly {
     private int day;
 
     private Statistics statistics;
+
+    @Column(updatable = false)
+    @CreatedDate
+    protected LocalDateTime createdAt;
 
     @Data
     @NoArgsConstructor

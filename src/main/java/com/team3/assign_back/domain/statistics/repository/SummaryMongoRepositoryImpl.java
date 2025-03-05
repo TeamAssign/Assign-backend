@@ -26,7 +26,7 @@ public class SummaryMongoRepositoryImpl implements SummaryMongoRepository {
     @Override
     public UserSummaryMonthly findLatestUserSummary(long userId) {
         Query query = new Query(Criteria.where("userId").is(userId))
-                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day"))
+                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day", "createdAt"))
                 .limit(1);
 
         UserSummaryMonthly result = mongoTemplate.findOne(query, UserSummaryMonthly.class);
@@ -38,7 +38,7 @@ public class SummaryMongoRepositoryImpl implements SummaryMongoRepository {
     @Override
     public TeamSummaryMonthly findLatestTeamSummary(long teamId) {
         Query query = new Query(Criteria.where("teamId").is(teamId))
-                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day"))
+                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day", "createdAt"))
                 .limit(1);
 
         TeamSummaryMonthly result = mongoTemplate.findOne(query, TeamSummaryMonthly.class);
@@ -50,7 +50,7 @@ public class SummaryMongoRepositoryImpl implements SummaryMongoRepository {
     @Override
     public CompanySummaryMonthly findLatestCompanySummary() {
         Query query = new Query()
-                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day"))
+                .with(Sort.by(Sort.Direction.DESC, "year", "month", "day", "createdAt"))
                 .limit(1);
 
         CompanySummaryMonthly result = mongoTemplate.findOne(query, CompanySummaryMonthly.class);
