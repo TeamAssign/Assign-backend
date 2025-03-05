@@ -144,7 +144,7 @@ public class ReviewService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Page<Review> reviews = reviewRepository.findByUsersReview(userId, pageable);
+        Page<Review> reviews = reviewRepository.findByUsers_Id(userId, pageable);
 
         if (reviews.isEmpty()) {
             return PageResponseDto.empty();
@@ -158,7 +158,7 @@ public class ReviewService {
             throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
         }
 
-        Page<Review> teamReviews = reviewRepository.findReviewsByTeamId(teamId, pageable);
+        Page<Review> teamReviews = reviewRepository.findByTeams_Id(teamId, pageable);
 
         if (teamReviews.isEmpty()) {
             return PageResponseDto.empty();
@@ -179,10 +179,10 @@ public class ReviewService {
                 .reviewId(review.getId())
                 .comment(directReview.getComment())
                 .star(directReview.getStar())
-                .food(directReview.getFood().getName())
+                .menu(directReview.getFood().getName())
                 .type(directReview.getType())
                 .category(directReview.getFood().getCategory())
-                .key(directReview.getImgUrl())
+                .imgUrl(directReview.getImgUrl())
                 .participants(participantsDtoList)
                 .build();
     }
@@ -200,9 +200,9 @@ public class ReviewService {
                 .recommendationId(recommendationReview.getRecommendation().getId())
                 .comment(recommendationReview.getComment())
                 .star(recommendationReview.getStar())
-                .key(recommendationReview.getImgUrl())
+                .imgUrl(recommendationReview.getImgUrl())
                 .type(recommendation.getType())
-                .food(recommendation.getFood().getName())
+                .menu(recommendation.getFood().getName())
                 .category(recommendation.getFood().getCategory())
                 .participants(participantsDtoList)
                 .build();
@@ -212,7 +212,6 @@ public class ReviewService {
         if (review.getUsers() == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-
 
         if (review.getDirectReview() != null) {
             return convertToDirectReviewDTO(review.getDirectReview());

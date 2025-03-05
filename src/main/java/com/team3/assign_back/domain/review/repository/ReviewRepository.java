@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r WHERE r.users.id = :userId")
-    Page<Review> findByUsersReview(@Param("userId") Long userId, Pageable pageable);
+    Page<Review> findByUsers_Id(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT DISTINCT r FROM Review r " +
             "JOIN r.participants p " +
@@ -28,7 +28,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "   GROUP BY p1.review.id " +
             "   HAVING COUNT(DISTINCT u1.team.id) > 1" +
             ")")
-    Page<Review> findReviewsByTeamId(@Param("teamId") Long teamId, Pageable pageable);
+    Page<Review> findByTeams_Id(@Param("teamId") Long teamId, Pageable pageable);
 
 
     @EntityGraph(attributePaths = {"participants.users"})
