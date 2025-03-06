@@ -357,7 +357,7 @@ public class FoodService {
                 throw new RuntimeException(fileInfoDto.getFileName());
             }
 
-            String normalizedFoodName = Normalizer.normalize(food.getName(), Normalizer.Form.NFC);;
+            String normalizedFoodName = Normalizer.normalize(food.getName(), Normalizer.Form.NFD);
 
             Food newFood = Food.builder()
                     .id(food.getId())
