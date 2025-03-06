@@ -2,10 +2,7 @@ package com.team3.assign_back.domain.statistics.repository;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.DateTimePath;
-import com.querydsl.core.types.dsl.EnumPath;
-import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team3.assign_back.domain.food.entity.QFood;
 import com.team3.assign_back.domain.intermediate.entity.QParticipant;
@@ -82,14 +79,15 @@ public class CustomSummaryQueryRepositoryImpl implements CustomSummaryQueryRepos
                 .join(users).on(review.users.id.eq(users.id))
                 .join(team).on(users.team.id.eq(team.id))
                 .join(food).on(directReview.food.id.eq(food.id))
-                .join(participant).on(participant.review.id.eq(review.id))
+                .leftJoin(participant).on(participant.review.id.eq(review.id))
                 .where(
                         dateBetween(directReview.createdAt, start, end),
-                        isGroupOrCompanyDinner(directReview.type)
+                        isGroupOrCompanyDinner(directReview.type),
+                        isValidTeamReview(review.id, directReview.type, team.id)
+
                 )
                 .groupBy(team.id, directReview.createdAt,
-                        food.category, food.name, review.id)
-                .having(teamCountEqualsOne(review.id))
+                        food.category, food.name)
                 .fetch();
     }
 
@@ -106,14 +104,14 @@ public class CustomSummaryQueryRepositoryImpl implements CustomSummaryQueryRepos
                 .join(team).on(users.team.id.eq(team.id))
                 .join(recommendation).on(recommendationReview.recommendation.id.eq(recommendation.id))
                 .join(food).on(recommendation.food.id.eq(food.id))
-                .join(participant).on(participant.review.id.eq(review.id))
+                .leftJoin(participant).on(participant.review.id.eq(review.id))
                 .where(
                         dateBetween(recommendationReview.createdAt, start, end),
-                        isGroupOrCompanyDinner(recommendationReview.recommendation.type)
+                        isGroupOrCompanyDinner(recommendationReview.recommendation.type),
+                        isValidTeamReview(review.id, recommendationReview.recommendation.type, team.id)
                 )
                 .groupBy(team.id, recommendationReview.createdAt,
-                        food.category, food.name, review.id)
-                .having(teamCountEqualsOne(review.id))
+                        food.category, food.name)
                 .fetch();
     }
 
@@ -126,10 +124,26 @@ public class CustomSummaryQueryRepositoryImpl implements CustomSummaryQueryRepos
         return type.in(FoodEnum.FoodType.GROUP, FoodEnum.FoodType.COMPANYDINNER);
     }
 
-    private BooleanExpression teamCountEqualsOne(NumberPath<Long> reviewId) {
-        return queryFactory.select(participant.users.team.id.countDistinct())
-                .from(participant)
-                .where(participant.review.id.eq(reviewId))
-                .eq(1L);
+    private BooleanExpression isValidTeamReview(NumberPath<Long> reviewId, EnumPath<FoodEnum.FoodType> type, NumberPath<Long> teamId) {
+        BooleanExpression isGroupReview = type.eq(FoodEnum.FoodType.GROUP)
+                .and(queryFactory.select(participant.id.count()).from(participant)
+                        .where(participant.review.id.eq(reviewId))
+                        .gt(0L))
+                .and(queryFactory.select(participant.users.team.id.countDistinct()).from(participant)
+                        .where(participant.review.id.eq(reviewId))
+                        .eq(1L))
+                .and(queryFactory.select(participant.users.team.id.max()).from(participant)
+                        .where(participant.review.id.eq(reviewId))
+                        .eq(queryFactory.select(users.team.id).from(users).where(users.id.eq(review.users.id))));
+
+        BooleanExpression isCompanyDinnerReview = type.eq(FoodEnum.FoodType.COMPANYDINNER)
+                .and(queryFactory.select(participant.id.count()).from(participant)
+                        .where(participant.review.id.eq(reviewId))
+                        .eq(0L))
+                .and(queryFactory.select(users.team.id).from(users)
+                        .where(users.id.eq(review.users.id))
+                        .eq(teamId));
+
+        return isGroupReview.or(isCompanyDinnerReview);
     }
 }
