@@ -296,6 +296,7 @@ public class FoodService {
         }
     }
 
+    //매일 새벽 세시
     @Scheduled(cron = "0 0 3 * * ?", zone = "Asia/Seoul") //
     public void batchSaveFoodImageUrl(){
 
