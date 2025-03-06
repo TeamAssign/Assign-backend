@@ -115,17 +115,17 @@ public class TeamController {
             description = "팀 리뷰 조회 성공",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewResponseDto.class))
     )
-    @Parameter(name = "page", description = "페이지 번호", example = "0")
+    @Parameter(name = "page", description = "페이지 번호", example = "1")
     @Parameter(name = "size", description = "페이지 크기", example = "10")
     @Parameter(name = "teamId", description = "조회할 팀 Id", required = true, example = "1")
     @GetMapping("/{teamId}/reviews")
     public ResponseEntity<ApiResponseDto<PageResponseDto<ReviewResponseDto>>> getReviewByTeam(
            @PathVariable("teamId") Long teamId,
-           @RequestParam(name = "page", defaultValue = "0") int page,
+           @RequestParam(name = "page", defaultValue = "1") int page,
            @RequestParam(name = "size", defaultValue = "10") int size) {
 
 
-       Pageable pageable = PageRequest.of(page, size);
+       Pageable pageable = PageRequest.of(page-1, size);
 
        PageResponseDto<ReviewResponseDto> reviewResponses = reviewService.getReviewByTeam(teamId, pageable);
 
