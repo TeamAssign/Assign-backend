@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -166,6 +166,7 @@ public class ReviewService {
         List<Review> mergedReviews = Stream.concat(groupReviews.getContent().stream(),
                         teamReviews.getContent().stream())
                 .distinct()
+                .sorted(Comparator.comparing(Review::getCreatedAt).reversed())
                 .toList();
 
         Page<Review> mergedPage = new PageImpl<>(mergedReviews, pageable, mergedReviews.size());
