@@ -2,7 +2,6 @@ package com.team3.assign_back.domain.review.service;
 
 import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.domain.food.repository.FoodRepository;
-import com.team3.assign_back.domain.image.service.ImageService;
 import com.team3.assign_back.domain.intermediate.entity.Participant;
 import com.team3.assign_back.domain.intermediate.repository.ParticipantRepository;
 import com.team3.assign_back.domain.recommendation.entity.Recommendation;
@@ -26,13 +25,16 @@ import com.team3.assign_back.global.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -156,13 +158,24 @@ public class ReviewService {
             throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
         }
 
-        Page<Review> teamReviews = reviewRepository.findByTeamId(teamId, pageable);
 
-        if (teamReviews.isEmpty()) {
+
+        Page<Review> teamReviews = reviewRepository.findByTeams(teamId, pageable);
+        Page<Review> groupReviews = reviewRepository.findGroupReviews(teamId, pageable);
+        log.info("Team Reviews Found: {}", teamReviews.getTotalElements());
+        List<Review> mergedReviews = Stream.concat(groupReviews.getContent().stream(),
+                        teamReviews.getContent().stream())
+                .distinct()
+                .toList();
+
+        Page<Review> mergedPage = new PageImpl<>(mergedReviews, pageable, mergedReviews.size());
+
+
+        if (mergedPage.isEmpty()) {
             return PageResponseDto.empty();
         }
 
-        return new PageResponseDto<>(teamReviews.map(this::convertToReviewResponse));
+        return new PageResponseDto<>(mergedPage.map(this::convertToReviewResponse));
     }
 
     private ReviewResponseDto convertToDirectReviewDTO(DirectReview directReview) {
