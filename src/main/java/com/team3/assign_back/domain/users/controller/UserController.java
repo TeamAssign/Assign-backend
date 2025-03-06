@@ -84,17 +84,17 @@ public class UserController {
             description = "사용자 리뷰 조회 성공",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewResponseDto.class))
     )
-    @Parameter(name = "page", description = "페이지 번호", example = "0")
+    @Parameter(name = "page", description = "페이지 번호", example = "1")
     @Parameter(name = "size", description = "페이지 크기", example = "10")
     @GetMapping("/reviews")
     public ResponseEntity<ApiResponseDto<PageResponseDto<ReviewResponseDto>>> getReviewByUser(@AuthenticationPrincipal Jwt jwt,
-                                                                                              @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                                              @RequestParam(name = "page", defaultValue = "1") int page,
                                                                                               @RequestParam(name = "size", defaultValue = "10") int size){
 
         String vendorId = jwt.getSubject();
         Long userId = userService.getUserIdByVendorId(vendorId);
 
-        Pageable pageable = PageRequest.of(page,size);
+        Pageable pageable = PageRequest.of(page-1,size);
         PageResponseDto<ReviewResponseDto> reviewResponses = reviewService.getReviewByUser(userId, pageable);
         return ApiResponseDto.from(HttpStatus.OK,"사용자 후기 조회 결과입니다.", reviewResponses);
     }
