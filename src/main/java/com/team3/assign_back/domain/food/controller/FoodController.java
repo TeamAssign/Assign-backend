@@ -24,8 +24,8 @@ public class FoodController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<Void> test(List<FileInfoDto> fileInfoDtos){
+    @PostMapping("/test")
+    public ResponseEntity<Void> test(@RequestBody List<FileInfoDto> fileInfoDtos){
         foodService.test(fileInfoDtos);
         return new ResponseEntity<>(HttpStatus.OK);
     }
