@@ -3,10 +3,7 @@ package com.team3.assign_back.domain.food.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team3.assign_back.domain.food.dto.FoodNotHavingImageRequestDto;
-import com.team3.assign_back.domain.food.dto.FoodAnalysisDto;
-import com.team3.assign_back.domain.food.dto.FoodAnalysisRequestDto;
-import com.team3.assign_back.domain.food.dto.FoodNotHavingImageResponseDto;
+import com.team3.assign_back.domain.food.dto.*;
 import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.domain.food.entity.TasteMetrics;
 import com.team3.assign_back.domain.food.repository.FoodRepository;
@@ -350,17 +347,17 @@ public class FoodService {
 
 
     @Transactional
-    public void test() {
+    public void test(List<FileInfoDto> fileInfoDtos) {
 
-        List<Food> foods = foodRepository.findAll();
+        for(FileInfoDto fileInfoDto: fileInfoDtos){
+            Food food = foodRepository.findByName(fileInfoDto.getFileName()).orElseThrow();
 
-        for(Food food: foods){
             Food newFood = Food.builder()
                     .id(food.getId())
                     .category(food.getCategory())
                     .name(food.getName())
                     .price(food.getPrice())
-                    .imgUrl("https://elice-assign-bucket.s3.ap-northeast-2.amazonaws.com/uploads/" + URLEncoder.encode(food.getName(), StandardCharsets.UTF_8))
+                    .imgUrl("https://elice-assign-bucket.s3.ap-northeast-2.amazonaws.com/uploads/" + URLEncoder.encode(food.getName(), StandardCharsets.UTF_8) + "." + fileInfoDto.getExtension())
                     .build();
             foodRepository.save(newFood);
         }
