@@ -139,6 +139,7 @@ public class ReviewService {
         participantRepository.saveAll(participantList);
     }
 
+    @Transactional(readOnly = true)
     public PageResponseDto<ReviewResponseDto> getReviewByUser(Long userId , Pageable pageable) {
         if (!userRepository.existsById(userId)) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -153,12 +154,11 @@ public class ReviewService {
         return new PageResponseDto<>(reviews.map(this::convertToReviewResponse));
     }
 
+    @Transactional(readOnly = true)
     public PageResponseDto<ReviewResponseDto> getReviewByTeam(Long teamId, Pageable pageable) {
         if(!teamRepository.existsById(teamId)){
             throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
         }
-
-
 
         Page<Review> teamReviews = reviewRepository.findByTeams(teamId, pageable);
         Page<Review> groupReviews = reviewRepository.findGroupReviews(teamId, pageable);
