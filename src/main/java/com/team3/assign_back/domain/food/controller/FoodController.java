@@ -21,6 +21,13 @@ public class FoodController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<Void> test(){
+        foodService.test();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 //    @PostMapping
 //    public ResponseEntity<Void> createFoods(@RequestBody FoodAnalysisRequestDto foodAnalysisRequestDto){
 //        foodService.createFoods(foodAnalysisRequestDto);
