@@ -1,7 +1,6 @@
 package com.team3.assign_back.domain.review.repository;
 
 import com.team3.assign_back.domain.review.entity.Review;
-import com.team3.assign_back.global.enums.FoodEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -10,14 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    @Query("SELECT r FROM Review r WHERE r.users.id = :userId")
+    @Query("SELECT r FROM Review r WHERE r.users.id = :userId ORDER BY r.createdAt DESC" )
     Page<Review> findByUsers_Id(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT DISTINCT r FROM Review r " +
@@ -34,7 +32,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "GROUP BY r, u.team.id " +
             "HAVING COUNT(DISTINCT p.users.team.id) = 1 " +
             "   AND MAX(p.users.team.id) = :teamId " +
-            "   AND MAX(u.team.id) = :teamId")
+            "   AND MAX(u.team.id) = :teamId " +
+            "ORDER BY r.createdAt DESC ")
     Page<Review> findGroupReviews(
             @Param("teamId") Long teamId,
             Pageable pageable);
@@ -49,7 +48,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "   (dr.id IS NOT NULL AND dr.type = 'COMPANYDINNER') " +
             "   OR (rr.id IS NOT NULL AND rec.type = 'COMPANYDINNER') " +
             ") " +
-            "AND u.team.id = :teamId ")
+            "AND u.team.id = :teamId " +
+            "ORDER BY r.createdAt DESC")
     Page<Review> findByTeams(
             @Param("teamId") Long teamId,
             Pageable pageable);
