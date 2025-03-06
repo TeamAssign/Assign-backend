@@ -1,11 +1,14 @@
 package com.team3.assign_back.domain.food.controller;
 
 
+import com.team3.assign_back.domain.food.dto.FileInfoDto;
 import com.team3.assign_back.domain.food.service.FoodService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -22,8 +25,8 @@ public class FoodController {
     }
 
     @GetMapping("/test")
-    public ResponseEntity<Void> test(){
-        foodService.test();
+    public ResponseEntity<Void> test(List<FileInfoDto> fileInfoDtos){
+        foodService.test(fileInfoDtos);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
