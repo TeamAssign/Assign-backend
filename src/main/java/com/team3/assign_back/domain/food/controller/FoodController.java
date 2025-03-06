@@ -1,12 +1,12 @@
 package com.team3.assign_back.domain.food.controller;
 
 
-import com.team3.assign_back.domain.food.dto.FoodAnalysisRequestDto;
 import com.team3.assign_back.domain.food.service.FoodService;
-import com.team3.assign_back.domain.tastePreference.service.TastePreferenceEmbeddingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/food")
@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.*;
 public class FoodController {
 
     private final FoodService foodService;
+
+    @GetMapping("/image")
+    public ResponseEntity<Void> getFoodImages(){
+        foodService.batchSaveFoodImageUrl();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 //    @PostMapping
 //    public ResponseEntity<Void> createFoods(@RequestBody FoodAnalysisRequestDto foodAnalysisRequestDto){
