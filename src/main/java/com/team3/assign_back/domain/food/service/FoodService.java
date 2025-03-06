@@ -18,6 +18,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -33,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -56,8 +58,6 @@ public class FoodService {
     private final ObjectMapper objectMapper;
 
     private final JdbcTemplate jdbcTemplate;
-    private final RestTemplate restTemplate;
-
     private final PlatformTransactionManager transactionManager;
 
     @Value("${PYTHON_URL}")
@@ -297,7 +297,8 @@ public class FoodService {
     }
 
     //매일 새벽 세시
-    @Scheduled(cron = "0 0 3 * * ?", zone = "Asia/Seoul") //
+    @Scheduled(cron = "0 0 3 * * ?", zone = "Asia/Seoul")
+    @Async
     public void batchSaveFoodImageUrl(){
 
         List<FoodNotHavingImageRequestDto> foodNotHavingImageRequestDtos = foodRepository.customFindFoodsWithoutImage();
@@ -327,6 +328,11 @@ public class FoodService {
 
     private List<FoodNotHavingImageResponseDto> getFoodNotHavingImageResponseDtos(List<FoodNotHavingImageRequestDto> foodNotHavingImageRequestDtos) {
         List<FoodNotHavingImageResponseDto> foodNotHavingImageResponseDtos = null;
+
+        RestTemplate restTemplate = new RestTemplateBuilder()
+                .connectTimeout(Duration.ofMinutes(5L))
+                .readTimeout(Duration.ofHours(5L))
+                .build();
         try {
             foodNotHavingImageResponseDtos = restTemplate.exchange(
                             url,
