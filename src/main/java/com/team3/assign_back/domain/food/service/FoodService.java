@@ -60,6 +60,8 @@ public class FoodService {
     private final JdbcTemplate jdbcTemplate;
     private final PlatformTransactionManager transactionManager;
 
+    private final RestTemplate restTemplate;
+
     @Value("${PYTHON_URL}")
     private String url;
 
@@ -329,10 +331,6 @@ public class FoodService {
     private List<FoodNotHavingImageResponseDto> getFoodNotHavingImageResponseDtos(List<FoodNotHavingImageRequestDto> foodNotHavingImageRequestDtos) {
         List<FoodNotHavingImageResponseDto> foodNotHavingImageResponseDtos = null;
 
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .connectTimeout(Duration.ofMinutes(5L))
-                .readTimeout(Duration.ofHours(5L))
-                .build();
         try {
             foodNotHavingImageResponseDtos = restTemplate.exchange(
                             url,
