@@ -3,8 +3,10 @@ package com.team3.assign_back.domain.food.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team3.assign_back.domain.food.dto.FoodNotHavingImageRequestDto;
 import com.team3.assign_back.domain.food.dto.FoodAnalysisDto;
 import com.team3.assign_back.domain.food.dto.FoodAnalysisRequestDto;
+import com.team3.assign_back.domain.food.dto.FoodNotHavingImageResponseDto;
 import com.team3.assign_back.domain.food.entity.Food;
 import com.team3.assign_back.domain.food.entity.TasteMetrics;
 import com.team3.assign_back.domain.food.repository.FoodRepository;
@@ -15,10 +17,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -31,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.team3.assign_back.domain.food.prompt.FoodPrompt.FOOD_ANALYSIS;
 import static com.team3.assign_back.global.constant.FoodConstant.FOOD_LIST_BATCH_SIZE;
+import static com.team3.assign_back.global.constant.FoodConstant.PYTHON_SERVER_URL;
 
 @Service
 @Slf4j
@@ -46,6 +56,10 @@ public class FoodService {
     private final ObjectMapper objectMapper;
 
     private final JdbcTemplate jdbcTemplate;
+    private final RestTemplate restTemplate;
+
+    private final PlatformTransactionManager transactionManager;
+
 
 
     public void createFoods(FoodAnalysisRequestDto foodAnalysisRequestDto){
@@ -68,7 +82,7 @@ public class FoodService {
 
     @Async
     @Transactional
-    private void batchCreateFoods(String category, List<String> batch) {
+    protected void batchCreateFoods(String category, List<String> batch) {
 
         String sql = "INSERT INTO food (category, name, created_at, updated_at) VALUES (?, ?, ?, ?)";
 
@@ -131,7 +145,7 @@ public class FoodService {
 
     @Async
     @Transactional
-    private void batchCreateTasteMetrics(List<FoodAnalysisDto> batch, List<Food> batchFoods) {
+    protected void batchCreateTasteMetrics(List<FoodAnalysisDto> batch, List<Food> batchFoods) {
 
         String sql = "INSERT INTO taste_metrics (food_id, description, description_for_company_dinner, spicy, salty, sweet, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -159,7 +173,7 @@ public class FoodService {
 
     @Async
     @Transactional
-    private void batchUpdateFoods(List<FoodAnalysisDto> batch, List<Food> batchFoods) {
+    protected void batchUpdateFoods(List<FoodAnalysisDto> batch, List<Food> batchFoods) {
         String sql = "UPDATE food SET price = ?, updated_at = ? WHERE id = ?";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
@@ -224,7 +238,7 @@ public class FoodService {
 
     @Async
     @Transactional
-    private void batchCreateTasteMetricsEmbedding(List<String> embeddingVectorToStringList, List<String> embeddingVectorToStringListForCompanyDinner, List<TasteMetrics> tasteMetricsWithoutEmbedding) {
+    protected void batchCreateTasteMetricsEmbedding(List<String> embeddingVectorToStringList, List<String> embeddingVectorToStringListForCompanyDinner, List<TasteMetrics> tasteMetricsWithoutEmbedding) {
 
         String sql = "INSERT INTO taste_metrics_embedding (taste_metrics_id, text_embedding, text_for_company_dinner_embedding, created_at, updated_at) VALUES (?, ?::vector, ?::vector, ?, ?)";
 
@@ -278,6 +292,50 @@ public class FoodService {
         }
     }
 
+    @Scheduled(cron = "0 0 3 * * ?", zone = "Asia/Seoul") //
+    public void batchSaveFoodImageUrl(){
+
+        List<FoodNotHavingImageRequestDto> foodNotHavingImageRequestDtos = foodRepository.customFindFoodsWithoutImage();
+
+        if (foodNotHavingImageRequestDtos.isEmpty()) {
+            return;
+        }
+        List<FoodNotHavingImageResponseDto> foodNotHavingImageResponseDtos = getFoodNotHavingImageResponseDtos(foodNotHavingImageRequestDtos);
+
+        if (foodNotHavingImageResponseDtos == null || foodNotHavingImageResponseDtos.isEmpty()) {
+            log.warn("이미지받기실패");
+            return;
+        }
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.execute(status -> {
+            try {
+                foodRepository.customSaveFoodImages(foodNotHavingImageResponseDtos);
+                return true;
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw e;
+            }
+        });
+
+    }
+
+    private List<FoodNotHavingImageResponseDto> getFoodNotHavingImageResponseDtos(List<FoodNotHavingImageRequestDto> foodNotHavingImageRequestDtos) {
+        List<FoodNotHavingImageResponseDto> foodNotHavingImageResponseDtos = null;
+        try {
+            foodNotHavingImageResponseDtos = restTemplate.exchange(
+                            PYTHON_SERVER_URL,
+                            HttpMethod.POST,
+                            new HttpEntity<>(foodNotHavingImageRequestDtos),
+                            new ParameterizedTypeReference<List<FoodNotHavingImageResponseDto>>() {
+                            }
+                    )
+                    .getBody();
+        }catch (Exception e){
+            log.warn("이미지받기실패,{}", e.getMessage(), e);
+        }
+        return foodNotHavingImageResponseDtos;
+    }
 
 
 }
