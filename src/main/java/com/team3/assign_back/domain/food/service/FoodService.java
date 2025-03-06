@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -356,12 +357,14 @@ public class FoodService {
                 throw new RuntimeException(fileInfoDto.getFileName());
             }
 
+            String normalizedFoodName = Normalizer.normalize(food.getName(), Normalizer.Form.NFC);;
+
             Food newFood = Food.builder()
                     .id(food.getId())
                     .category(food.getCategory())
                     .name(food.getName())
                     .price(food.getPrice())
-                    .imgUrl("https://elice-assign-bucket.s3.ap-northeast-2.amazonaws.com/uploads/" + URLEncoder.encode(food.getName(), StandardCharsets.UTF_8) + "." + fileInfoDto.getExtension())
+                    .imgUrl("https://elice-assign-bucket.s3.ap-northeast-2.amazonaws.com/uploads/" + URLEncoder.encode(normalizedFoodName, StandardCharsets.UTF_8) + "." + fileInfoDto.getExtension())
                     .build();
             foodRepository.save(newFood);
         }
