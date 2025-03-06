@@ -350,7 +350,11 @@ public class FoodService {
     public void test(List<FileInfoDto> fileInfoDtos) {
 
         for(FileInfoDto fileInfoDto: fileInfoDtos){
-            Food food = foodRepository.findByName(fileInfoDto.getFileName()).orElseThrow();
+            Food food = foodRepository.findByName(fileInfoDto.getFileName()).orElse(null);
+            if(food == null){
+                log.warn(fileInfoDto.getFileName());
+                throw new RuntimeException(fileInfoDto.getFileName());
+            }
 
             Food newFood = Food.builder()
                     .id(food.getId())
