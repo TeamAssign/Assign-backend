@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -40,7 +41,6 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.team3.assign_back.domain.food.prompt.FoodPrompt.FOOD_ANALYSIS;
 import static com.team3.assign_back.global.constant.FoodConstant.FOOD_LIST_BATCH_SIZE;
-import static com.team3.assign_back.global.constant.FoodConstant.PYTHON_SERVER_URL;
 
 @Service
 @Slf4j
@@ -59,6 +59,10 @@ public class FoodService {
     private final RestTemplate restTemplate;
 
     private final PlatformTransactionManager transactionManager;
+
+    @Value("${PYTHON_URL}")
+    private String url;
+
 
 
 
@@ -324,7 +328,7 @@ public class FoodService {
         List<FoodNotHavingImageResponseDto> foodNotHavingImageResponseDtos = null;
         try {
             foodNotHavingImageResponseDtos = restTemplate.exchange(
-                            PYTHON_SERVER_URL,
+                            url,
                             HttpMethod.POST,
                             new HttpEntity<>(foodNotHavingImageRequestDtos),
                             new ParameterizedTypeReference<List<FoodNotHavingImageResponseDto>>() {
