@@ -34,6 +34,7 @@ public class CustomFoodRepositoryImpl implements CustomFoodRepository{
                         food.name,
                         food.category)
                 .where(food.imgUrl.isNull())
+                .limit(5)
                 .fetch();
 
         return tuples.stream()
