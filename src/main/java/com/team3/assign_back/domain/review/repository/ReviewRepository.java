@@ -32,8 +32,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "GROUP BY r, u.team.id " +
             "HAVING COUNT(DISTINCT p.users.team.id) = 1 " +
             "   AND MAX(p.users.team.id) = :teamId " +
-            "   AND MAX(u.team.id) = :teamId " +
-            "ORDER BY r.createdAt DESC ")
+            "   AND MAX(u.team.id) = :teamId ")
     Page<Review> findGroupReviews(
             @Param("teamId") Long teamId,
             Pageable pageable);
@@ -48,8 +47,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "   (dr.id IS NOT NULL AND dr.type = 'COMPANYDINNER') " +
             "   OR (rr.id IS NOT NULL AND rec.type = 'COMPANYDINNER') " +
             ") " +
-            "AND u.team.id = :teamId " +
-            "ORDER BY r.createdAt DESC")
+            "AND u.team.id = :teamId " )
     Page<Review> findByTeams(
             @Param("teamId") Long teamId,
             Pageable pageable);
