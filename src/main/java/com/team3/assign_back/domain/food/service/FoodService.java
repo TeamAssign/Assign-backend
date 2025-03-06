@@ -31,6 +31,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -347,4 +349,22 @@ public class FoodService {
     }
 
 
+    @Transactional
+    public void test() {
+
+        List<Food> foods = foodRepository.findAll();
+
+        for(Food food: foods){
+            Food newFood = Food.builder()
+                    .id(food.getId())
+                    .category(food.getCategory())
+                    .name(food.getName())
+                    .price(food.getPrice())
+                    .imgUrl("https://elice-assign-bucket.s3.ap-northeast-2.amazonaws.com/uploads/" + URLEncoder.encode(food.getName(), StandardCharsets.UTF_8))
+                    .build();
+            foodRepository.save(newFood);
+        }
+
+
+    }
 }
