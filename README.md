@@ -32,11 +32,17 @@ Assign은 열정 넘치는 6명의 개발자가 모여 시작한 프로젝트입
 
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
 ![Spring Securiey](https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![Spring Batch](https://img.shields.io/badge/STOMP-000000?style=for-the-badge&logo=null&logoColor=white)
 ![JPA](https://img.shields.io/badge/jpa-6DB33F?style=for-the-badge&logo=jpa&logoColor=white)
 ![QUERYDSL](https://img.shields.io/badge/queryDSL-6DB33F?style=for-the-badge&logo=queryDSL&logoColor=white)
 ![AMAZONS3](https://img.shields.io/badge/amazons3-569A31?style=for-the-badge&logo=amazons3&logoColor=white)
 ![JWT](https://img.shields.io/badge/jsonwebtokens-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
-![STOMP](https://img.shields.io/badge/STOMP-000000?style=for-the-badge&logo=null&logoColor=white)
+<img src="https://img.shields.io/badge/Auth0-000000?style=for-the-badge&logo=Auth0&logoColor=white">
+![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
+![KakaoTalk](https://img.shields.io/badge/kakaotalk-ffcd00.svg?style=for-the-badge&logo=kakaotalk&logoColor=000000)
+
+
+
 
 
 </div>
@@ -47,17 +53,18 @@ Assign은 열정 넘치는 6명의 개발자가 모여 시작한 프로젝트입
 
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![GitLab](https://img.shields.io/badge/GitLab-330F63?style=for-the-badge&logo=gitlab&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-![OAuth](https://img.shields.io/badge/OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 ![SWAGGER](https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white)
-
+![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
 
 </div>
 
 ## 🗂 ERD
-![devinit (3)](https://github.com/user-attachments/assets/2d584c32-f1f2-4971-a2d0-09585cec062c)
+![devinit (3)](https://github.com/user-attachments/assets/dfc9fefa-1ac2-41f0-b1f0-18748ec1c78d)
 
 ## 🎨 WIRE FRAME
 
