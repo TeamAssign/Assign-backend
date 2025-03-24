@@ -11,15 +11,15 @@ Assign은 열정 넘치는 6명의 개발자가 모여 시작한 프로젝트입
 
 |Frontend|Frontend|Backend|Backend|Backend|Backend|
 |:------:|:------:|:------:|:------:|:------:|:------:|
-|[<img src="https://avatars.githubusercontent.com/u/78842816?v=4" width="100px">](https://github.com/min-s9709)|[<img src="https://avatars.githubusercontent.com/u/74394824?v=4" width="100px">](https://github.com/seung365)|[<img src="https://avatars.githubusercontent.com/u/49359846?v=4" width="100px">](https://github.com/jiwon2030)|[<img src="https://avatars.githubusercontent.com/u/77718648?v=4" width="100px">](https://github.com/moonsunmean)|[<img src="https://avatars.githubusercontent.com/u/77718648?v=4" width="100px">](https://github.com/BugeonJo)|[<img src="https://avatars.githubusercontent.com/u/77718648?v=4" width="100px">](https://github.com/asdg2795)|
+|[<img src="https://avatars.githubusercontent.com/u/78842816?v=4" width="100px">](https://github.com/min-s9709)|[<img src="https://avatars.githubusercontent.com/u/74394824?v=4" width="100px">](https://github.com/seung365)|[<img src="https://avatars.githubusercontent.com/u/49359846?v=4" width="100px">](https://github.com/jiwon2030)|[<img src="https://avatars.githubusercontent.com/u/77718648?v=4" width="100px">](https://github.com/moonsunmean)|[<img src="https://avatars.githubusercontent.com/u/156037515?v=4" width="100px">](https://github.com/BugeonJo)|[<img src="https://avatars.githubusercontent.com/u/102370423?v=4" width="100px">](https://github.com/asdg2795)|
 |[김민성](https://github.com/min-s9709)|[백승범](https://github.com/seung365)|[민지원](https://github.com/jiwon2030)|[문선민](https://github.com/moonsunmean)|[조부건](https://github.com/BugeonJo)|[김준수](https://github.com/asdg2795)|
 
 ## 📌 프로젝트 소개
 
-**Assign**은 개발자들의 새로운 시작을 응원합니다!
+**Assign**은 모든 직장인의 점심시간을 지켜드립니다!
 
-개발자 커리어를 시작하는 순간부터 함께하는 커뮤니티를 지향합니다. <br>
-DevInit이란 이름에는 개발자(Developer)의 시작(Init)이라는 의미를 담았습니다.
+1분 1초가 소중한 당신의 점심시간! 점심 메뉴 선택까지 업무가 될 수는 없다! <br>
+ 당신의 팀은 오늘도 식사 메뉴 선택으로 고민하고 있나요? 오늘 뭐 먹지는 AI가 당신과 팀원들의 취향을 분석해 최적의 식사 메뉴와 회식 장소를 추천해주는 서비스입니다.
 
 ## 🎥 시연 영상
 [오늘뭐먹지 소개영상 보러가기](https://www.youtube.com/watch?v=o9vIi2q4dpY)
