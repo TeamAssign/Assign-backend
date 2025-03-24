@@ -68,7 +68,7 @@ Assign은 열정 넘치는 6명의 개발자가 모여 시작한 프로젝트입
 
 ## 🎨 WIRE FRAME
 
-👉 https://www.figma.com/design/Rd6KQMMBOgj4wo1GZG1sKh/DevInit?node-id=0-1&p=f&t=vLnJyybdHWRWDzEo-0
+👉 https://www.figma.com/design/sPtrzjFh5C9YfvzDKlXIjj/Team3_Assign?node-id=0-1&p=f&t=RUpxiAbWcZOCfYNm-0
   
 
 ---
